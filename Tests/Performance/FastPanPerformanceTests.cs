@@ -58,6 +58,18 @@ namespace Mapbox.PerformanceTests
 
         /// <summary>Degrees of longitude per second. At zoom 16 this crosses a tile roughly 3x a second.</summary>
         private const double DegreesPerSecond = 0.05;
+
+        /// <summary>
+        /// Zoom bounds for the sweep. Crossing a zoom level replaces the whole tile cover at once,
+        /// where a pan only replaces the edge column - so this is where a queued task is most likely
+        /// to become irrelevant before it dispatches.
+        /// </summary>
+        private const float MinZoom = 14f;
+        private const float MaxZoom = 17f;
+
+        /// <summary>Zoom levels per second. Three levels each way inside the sweep duration.</summary>
+        private const float ZoomLevelsPerSecond = 2f;
+
         private const int SampleCount = 3;
 
         private static MapboxContext _mapboxContext;
@@ -109,7 +121,36 @@ namespace Mapbox.PerformanceTests
             }
         }
 
+        /// <summary>
+        /// The counterpart to <see cref="FastPan"/>, and the more sensitive of the two: a pan carries
+        /// most of its cover forward from one frame to the next, so few queued tasks ever stop being
+        /// wanted. Crossing a zoom level discards every tile on screen at once.
+        /// </summary>
+        [UnityTest, Performance]
+        public IEnumerator FastZoom()
+        {
+            Runnable.EnableRunnableInEditor();
+
+            yield return DriveOnce(true, null, null, null, null);
+
+            var started = new SampleGroup("FastZoom.TasksStarted", SampleUnit.Undefined);
+            var cancelled = new SampleGroup("FastZoom.CancelledBeforeRunning", SampleUnit.Undefined);
+            var duration = new SampleGroup("FastZoom.DurationMs", SampleUnit.Millisecond);
+            var frames = new SampleGroup("FastZoom.Frames", SampleUnit.Undefined);
+
+            for (var i = 0; i < SampleCount; i++)
+            {
+                yield return DriveOnce(true, started, cancelled, duration, frames);
+            }
+        }
+
         private IEnumerator PanOnce(SampleGroup startedGroup, SampleGroup cancelledGroup,
+            SampleGroup durationGroup, SampleGroup framesGroup = null)
+        {
+            return DriveOnce(false, startedGroup, cancelledGroup, durationGroup, framesGroup);
+        }
+
+        private IEnumerator DriveOnce(bool zoom, SampleGroup startedGroup, SampleGroup cancelledGroup,
             SampleGroup durationGroup, SampleGroup framesGroup = null)
         {
             var mapInfo = new MapInformation(StartLatLng);
@@ -148,7 +189,7 @@ namespace Mapbox.PerformanceTests
 
             var loaded = false;
             Runnable.Instance.StartCoroutine(map.LoadMapViewCoroutine(() => loaded = true));
-            yield return TestWait.Until(() => loaded, "FastPan: the initial view to load", 120f);
+            yield return TestWait.Until(() => loaded, $"{(zoom ? "FastZoom" : "FastPan")}: the initial view to load", 120f);
 
             // Counters are attached only for the pan itself, so the initial load above does not
             // contribute - it has nothing to cancel, which is the whole point of measuring separately.
@@ -166,7 +207,21 @@ namespace Mapbox.PerformanceTests
             var frames = 0;
             while ((elapsed = UnityEngine.Time.realtimeSinceStartup - panStart) < PanSeconds)
             {
-                map.ChangeView(new LatitudeLongitude(origin.Latitude, origin.Longitude + DegreesPerSecond * elapsed));
+                if (zoom)
+                {
+                    // Triangle wave between the bounds, so the sweep crosses each zoom level in both
+                    // directions rather than only on the way out.
+                    var span = MaxZoom - MinZoom;
+                    var phase = (elapsed * ZoomLevelsPerSecond) % (2 * span);
+                    var level = MinZoom + (phase <= span ? phase : 2 * span - phase);
+                    map.ChangeView(null, level);
+                }
+                else
+                {
+                    map.ChangeView(new LatitudeLongitude(origin.Latitude,
+                        origin.Longitude + DegreesPerSecond * elapsed));
+                }
+
                 frames++;
                 yield return null;
             }
