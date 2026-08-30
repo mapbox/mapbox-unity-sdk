@@ -11,6 +11,7 @@ using Mapbox.UnityMapService.DataSources;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -80,7 +81,7 @@ namespace Mapbox.BaseModuleTests
                 isDone = true;
                 resultData = data;
             }));
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "SaveBlobTest: !isDone");
             
             Assert.NotNull(resultData);
             Assert.AreEqual(_testTileId, resultData.TileId);
@@ -97,7 +98,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileNoTagNoExpiration: isWorking");
 
             //update all tiles to no etag and expiration so web request response will be 200 due to no etag
             var allTiles = _sqliteCache.GetAllTiles();
@@ -137,7 +138,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileNoTagNoExpiration: isWorking");
             
             while (!eventFired && t < timeout)
             {
@@ -168,7 +169,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileWithTagNoExpiration: isWorking");
 
             //update all tiles to no exp. we keep etags so web request response will be 304
             var allTiles = _sqliteCache.GetAllTiles();
@@ -208,7 +209,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileWithTagNoExpiration: isWorking");
             
             while (!eventFired && t < timeout)
             {

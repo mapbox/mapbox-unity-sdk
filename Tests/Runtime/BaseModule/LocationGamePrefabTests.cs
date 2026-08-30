@@ -5,6 +5,7 @@ using Mapbox.Example.Scripts.Map;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.PlayModeTests
 {
@@ -66,7 +67,7 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
 
             yield return _mapCore.Initialize();
         
-            while(_mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates) yield return null;
+            yield return TestWait.While(() => _mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates, "FindAndRegisterToMapInitialize: _mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates");
         
             Assert.IsNotNull(_map);
             Assert.IsTrue(_map.Status > InitializationStatus.Initialized);

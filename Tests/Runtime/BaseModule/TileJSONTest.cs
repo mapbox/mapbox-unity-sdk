@@ -4,6 +4,7 @@ using Mapbox.BaseModule.Data.Platform.TileJSON;
 using Mapbox.BaseModule.Map;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -32,10 +33,7 @@ namespace Mapbox.BaseModuleTests
                 response = jsonResponse;
             });
 
-            while (!request.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !request.IsCompleted, "MapboxStreets: !request.IsCompleted");
 
             testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom);
             testsForVectorTilesets(response);
@@ -54,10 +52,7 @@ namespace Mapbox.BaseModuleTests
                 response = jsonResponse;
             });
 
-            while (!request.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !request.IsCompleted, "ConcatenatedVectorTilesets: !request.IsCompleted");
 
             testsCommonToVectorAndRasterTilesets(
                 response
@@ -83,10 +78,7 @@ namespace Mapbox.BaseModuleTests
                 response = jsonResponse;
             });
 
-            while (!request.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !request.IsCompleted, "MapboxSatellite: !request.IsCompleted");
 
             testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom, boundsSouth: -85, boundsNorth: 85);
         }

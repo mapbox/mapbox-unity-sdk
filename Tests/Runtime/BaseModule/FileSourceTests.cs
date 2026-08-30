@@ -4,6 +4,7 @@ using Mapbox.BaseModule.Data.Platform.Cache;
 using Mapbox.BaseModule.Map;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.DataTests
 {
@@ -28,10 +29,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 resultData = response;
             });
 
-            while (!request.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !request.IsCompleted, "Request: !request.IsCompleted");
         
             Assert.IsNotNull(resultData.Data, "No data received from the servers.");
         }
@@ -45,10 +43,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 resultData = response;
             });
         
-            while (!request.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !request.IsCompleted, "RequestDnsError: !request.IsCompleted");
             Assert.IsTrue(resultData.HasError);
         }
     }

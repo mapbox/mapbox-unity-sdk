@@ -16,6 +16,7 @@ using NUnit.Framework;
 using Unity.PerformanceTesting;
 using UnityEditor;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.VectorModuleTests
 {
@@ -42,10 +43,7 @@ namespace Mapbox.VectorModuleTests
             {
                 response = r;
             });
-            while (!req.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !req.IsCompleted, "SetUp: !req.IsCompleted");
             
             buffer = response.Data;
             Assert.NotZero(buffer.Length);

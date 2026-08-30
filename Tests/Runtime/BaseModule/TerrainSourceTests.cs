@@ -12,6 +12,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using TerrainData = Mapbox.BaseModule.Data.DataFetchers.TerrainData;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -84,7 +85,7 @@ namespace Mapbox.BaseModuleTests
                 resultData = data;
                 isDone = true;
             }));
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "LoadTileCoroutineTest: !isDone");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);

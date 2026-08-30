@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Platform.Cache;
+using Mapbox.BaseModule.Data.Tasks;
 using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Unity;
 using Mapbox.BaseModule.Utilities;
@@ -10,6 +11,7 @@ using Mapbox.MapDebug.Scripts.Logging;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -85,7 +87,7 @@ namespace Mapbox.BaseModuleTests
                     isDone = true;
                     resultData = data;
                 });
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "SaveImageTest: !isDone");
             Assert.AreEqual(_testTexture.GetPixels32(), resultData.Texture.GetPixels32());
         }
         
@@ -106,7 +108,7 @@ namespace Mapbox.BaseModuleTests
                     isDone = true;
                     resultData = data;
                 }));
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "SaveImageCoroutineTest: !isDone");
             Assert.AreEqual(_testTexture.GetPixels32(), resultData.Texture.GetPixels32());
         }
         
@@ -153,7 +155,7 @@ namespace Mapbox.BaseModuleTests
                 resultData = data;
                 isDone = true;
             });
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "GetImageTest: !isDone");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);
@@ -172,7 +174,7 @@ namespace Mapbox.BaseModuleTests
                 resultData = data;
                 isDone = true;
             }));
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "GetImageCoroutineTest: !isDone");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);
@@ -183,18 +185,16 @@ namespace Mapbox.BaseModuleTests
         public IEnumerator GetTileInfoTest()
         {
             yield return SaveBlobTest();
-            VectorData resultData = null;
-            bool isDone = false;
+
+            // GetTileInfoTask submits the task itself and hands back the wrapper, so the result is
+            // not there yet on the line after the call - this used to read DataResult immediately
+            // and assert against the null it got.
             var wrapper = _cacheManager.GetTileInfoTask<VectorData>(_testTileId, _testTilesetName);
-            resultData = wrapper.DataResult;
-            // wrapper.DataCompleted += (task, data) =>
-            // {
-            //     resultData = data;
-            //     isDone = true;
-            // };
-            // _cacheManager.AddTask(wrapper);
-            // while (!isDone) yield return null;
-            
+            yield return TestWait.Until(() => wrapper.IsCompleted, "GetTileInfoTest: the tile-info read to complete");
+            var resultData = wrapper.DataResult;
+
+            Assert.AreEqual(DataTaskOutcome.Completed, wrapper.Outcome);
+            Assert.NotNull(resultData, "Cache returned nothing for a tile SaveBlobTest just wrote.");
             Assert.AreEqual(_testVectorData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testVectorData.TileId, resultData.TileId);
             Assert.AreEqual(_testVectorData.Data, resultData.Data);
@@ -212,16 +212,15 @@ namespace Mapbox.BaseModuleTests
                 resultData = data;
                 isDone = true;
             });
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "ReadEtagTest: !isDone");
 
             Assert.IsNull(resultData.ETag);
             Assert.IsNull(resultData.ExpirationDate);
-            isDone = false;
+            // The task fills the instance passed to it, so resultData gains its ETag and expiry once
+            // it completes. Without the wait, the two assertions below contradicted the two above.
             var wrapper = _cacheManager.GetTileInfoTask(resultData.TileId, resultData.TilesetId, 1, resultData);
-            // wrapper.DataCompleted += (task, data) => isDone = true;
-            // _cacheManager.AddTask(wrapper);
-            // while (!isDone) yield return null;
-            
+            yield return TestWait.Until(() => wrapper.IsCompleted, "ReadEtagTest: the tile-info read to complete");
+
             Assert.AreEqual(_testRasterData.ETag, resultData.ETag);
             Assert.Less(_testRasterData.ExpirationDate.Value.Subtract(resultData.ExpirationDate.Value).TotalMinutes, 5);
         }
@@ -231,34 +230,19 @@ namespace Mapbox.BaseModuleTests
         {
             yield return SaveImageTest();
             
-            RasterData resultData = null;
-            bool isDone = false;
             var wrapper = _cacheManager.GetTileInfoTask<RasterData>(_testTileId, _testTilesetName, 1);
-            resultData = wrapper.DataResult;
-            // wrapper.DataCompleted += (task, data) =>
-            // {
-            //     isDone = true;
-            //     resultData = data;
-            // };
-            // _cacheManager.AddTask(wrapper);
-            // while(!isDone) yield return null;
-            
+            yield return TestWait.Until(() => wrapper.IsCompleted, "UpdateExpirationTest: the first tile-info read to complete");
+            var resultData = wrapper.DataResult;
+
             Assert.NotNull(resultData);
             Assert.Less(_testRasterData.ExpirationDate.Value.Subtract(resultData.ExpirationDate.Value).TotalMinutes, 5);
             
             _cacheManager.UpdateExpiration(_testTileId, _testTilesetName, _testExpirationDate);
             
-            isDone = false;
             var wrapper2 = _cacheManager.GetTileInfoTask<RasterData>(_testTileId, _testTilesetName, 1);
+            yield return TestWait.Until(() => wrapper2.IsCompleted, "UpdateExpirationTest: the re-read after UpdateExpiration to complete");
             resultData = wrapper2.DataResult;
-            // wrapper2.DataCompleted += (task, data) =>
-            // {
-            //     isDone = true;
-            //     resultData = data;
-            // };
-            // _cacheManager.AddTask(wrapper2);
-            // while(!isDone) yield return null;
-            
+
             Assert.NotNull(resultData);
             Assert.Less(_testExpirationDate.Subtract(resultData.ExpirationDate.Value).TotalMinutes, 5);
         }

@@ -4,6 +4,7 @@ using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -37,7 +38,7 @@ namespace Mapbox.BaseModuleTests
                 }
             );
 
-            while (null == token) { yield return null; }
+            yield return TestWait.While(() => null == token, "TokenTest: null == token");
             Assert.IsNull(token.ErrorMessage);
             Assert.IsFalse(token.HasError);
             Assert.AreEqual(MapboxTokenStatus.TokenValid, token.Status, "Config token is not valid");
@@ -56,7 +57,7 @@ namespace Mapbox.BaseModuleTests
                 }
             );
 
-            while (null == token) { yield return null; }
+            yield return TestWait.While(() => null == token, "TokenTest: null == token");
             Assert.IsNull(token.ErrorMessage);
             Assert.IsFalse(token.HasError);
             Assert.AreEqual(MapboxTokenStatus.TokenMalformed, token.Status, "token is malformed");
@@ -75,7 +76,7 @@ namespace Mapbox.BaseModuleTests
                 }
             );
 
-            while (null == token) { yield return null; }
+            yield return TestWait.While(() => null == token, "TokenTest: null == token");
             Assert.IsNull(token.ErrorMessage);
             Assert.IsFalse(token.HasError);
             Assert.AreEqual(MapboxTokenStatus.TokenInvalid, token.Status, "token is invalid");

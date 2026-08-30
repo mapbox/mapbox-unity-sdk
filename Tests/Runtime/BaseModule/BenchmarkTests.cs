@@ -8,6 +8,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Tests.Runtime.BaseModule
 {
@@ -344,8 +345,7 @@ namespace Tests.Runtime.BaseModule
                 System.Action handler = () => legDone = true;
                 preCacher.PreCacheCompleted += handler;
                 yield return preCacher.PreCacheAllTiles(_mapBehaviour.MapboxMap);
-                while (!legDone)
-                    yield return null;
+                yield return TestWait.While(() => !legDone, "AllocationBaseline: !legDone");
                 preCacher.PreCacheCompleted -= handler;
             }
 

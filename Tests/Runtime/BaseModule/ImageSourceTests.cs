@@ -14,6 +14,7 @@ using Mapbox.UnityMapService.DataSources;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -92,7 +93,7 @@ namespace Mapbox.BaseModuleTests
                     isDone = true;
                     resultData = data;
                 });
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "SaveImageTest: !isDone");
             Assert.AreEqual(_testTexture.GetPixels32(), resultData.Texture.GetPixels32());
         }
         
@@ -108,7 +109,7 @@ namespace Mapbox.BaseModuleTests
                 resultData = data;
                 isDone = true;
             });
-            while (!isDone) yield return null;
+            yield return TestWait.While(() => !isDone, "GetImageCallback: !isDone");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);
@@ -130,7 +131,7 @@ namespace Mapbox.BaseModuleTests
                     isWorking = false;
                     resultData = data;
                 }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "GetImageCoroutineTest: isWorking");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);
@@ -148,7 +149,7 @@ namespace Mapbox.BaseModuleTests
                 isWorking = false;
                 resultData = data;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "LoadTileCoroutineTestNoPreSaveShouldWeb: isWorking");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);
@@ -170,7 +171,7 @@ namespace Mapbox.BaseModuleTests
                 isWorking = false;
                 resultData = data;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "LoadTileCoroutineTestShouldFileCache: isWorking");
             
             Assert.AreEqual(_testRasterData.TilesetId, resultData.TilesetId);
             Assert.AreEqual(_testRasterData.TileId, resultData.TileId);
@@ -187,7 +188,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileNoTagNoExpiration: isWorking");
 
             //update all tiles to no etag and expiration so web request response will be 200 due to no etag
                         var allTiles = _sqliteCache.GetAllTiles();
@@ -215,7 +216,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileNoTagNoExpiration: isWorking");
             
             //waiting for tile update finish
                         var eventFired = false;
@@ -256,7 +257,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileWithTagNoExpiration: isWorking");
 
             //update all tiles to no exp. we keep etags so web request response will be 304
                         var allTiles = _sqliteCache.GetAllTiles();
@@ -282,7 +283,7 @@ namespace Mapbox.BaseModuleTests
             {
                 isWorking = false;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "UpdateTileWithTagNoExpiration: isWorking");
             
             //waiting for tile update finish
                         var eventFired = false;

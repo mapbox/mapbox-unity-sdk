@@ -19,6 +19,7 @@ using Mapbox.VectorModule;
 using Mapbox.VectorModule.MeshGeneration;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.DataTests
 {
@@ -121,7 +122,7 @@ namespace Mapbox.BaseModuleTests.DataTests
             {
                 mapLoaded = true;
             }));
-            while(mapLoaded == false) yield return null;
+            yield return TestWait.While(() => mapLoaded == false, "LoadMapView: mapLoaded == false");
 
             var tiles = _map.TileCover.Tiles.Select(x => x.Canonical);
 

@@ -11,7 +11,8 @@
         "Unity.Recorder",
         "Unity.Recorder.Editor",
         "MapboxImageryModule",
-        "MapboxVectorModule"
+        "MapboxVectorModule",
+        "MapboxTestUtils"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -6,6 +6,7 @@ using Mapbox.BaseModule.Utilities;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -52,10 +53,7 @@ namespace Mapbox.BaseModuleTests
                 buffer[30] = 0;
                 Assert.AreEqual(buffer, Compression.Decompress(buffer));
             });
-            while (!response.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !response.IsCompleted, "Corrupt: !response.IsCompleted");
         }
     
         [UnityTest]
@@ -90,10 +88,7 @@ namespace Mapbox.BaseModuleTests
                 Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);
 #endif
             });
-            while (!response.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !response.IsCompleted, "Decompress: !response.IsCompleted");
         }
 
     }
