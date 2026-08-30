@@ -9,6 +9,7 @@
         "UnityMapModule",
         "MapboxImageryModule",
         "MapboxVectorModule",
+        "MapboxComponentSystem",
         "MapboxDebug",
         "MapboxTestUtils"
     ],
