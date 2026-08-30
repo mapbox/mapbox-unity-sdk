@@ -181,15 +181,22 @@ namespace Mapbox.UnityMapService.DataSources
         {
             // Tracked like the etag read above, so CancelFetching can reach it. This is the path that
             // reads the actual tile bytes and it was the one path whose tasks nothing could cancel.
-            TaskWrapper tracked = null;
+            //
+            // Untracking is keyed on the task completing, not on this coroutine completing, and that
+            // distinction matters: IsActiveRequest is _activeTasks.ContainsKey, which PbfSource and
+            // ImageSource use as their "already in flight" guard. An entry left behind by a coroutine
+            // that was abandoned - the map destroyed mid-read, the owner stopped - would make that
+            // tile look permanently in flight and it would never be requested again. DataCompleted
+            // fires on cancellation as well as on success, so the entry always comes back out.
             yield return _cacheManager.GetBlobCoroutine<T1>(tileId, tilesetid, priority, data, callback,
                 task =>
                 {
-                    tracked = task;
                     TrackTask(task);
+                    if (task is DataTaskWrapper<T1> typed)
+                    {
+                        typed.DataCompleted += (resultTask, result) => CompleteTask(task);
+                    }
                 });
-
-            if (tracked != null) CompleteTask(tracked);
         }
         
         public void UpdateExpiration(CanonicalTileId tileId, string tilesetId, DateTime date)
