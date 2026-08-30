@@ -20,7 +20,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 
         IEnumerator GetImageCoroutine<T>(CanonicalTileId tileId, string tilesetId, bool isTextureNonreadable, Action<T> callback) where T : RasterData, new();
         DataTaskWrapper<T> GetTileInfoTask<T>(CanonicalTileId tileId, string tilesetid, int priority = 1, T data = null) where T : MapboxTileData, new();
-        IEnumerator GetBlobCoroutine<T>(CanonicalTileId tileId, string tilesetid, int priority = 1, T data = null, Action<T> callback = null) where T : MapboxTileData, new();
+        IEnumerator GetBlobCoroutine<T>(CanonicalTileId tileId, string tilesetid, int priority = 1, T data = null, Action<T> callback = null, Action<TaskWrapper> onTaskCreated = null) where T : MapboxTileData, new();
         
         void UpdateExpiration(CanonicalTileId tileId, string tilesetId, DateTime date);
     }
@@ -176,7 +176,14 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
             }
         }
 
-        public virtual IEnumerator GetBlobCoroutine<T>(CanonicalTileId tileId, string tilesetid, int priority = 1, T data = null, Action<T> callback = null) where T : MapboxTileData, new()
+        /// <summary>
+        /// <paramref name="onTaskCreated"/> hands the caller the wrapper so it can be tracked and
+        /// cancelled. Without it the task was created, queued and dropped on the floor here: nothing
+        /// upstream held a reference, so a tile leaving the cover could not cancel its own read, and
+        /// the dispatch delay those reads waited through protected a cancellation that could never
+        /// arrive.
+        /// </summary>
+        public virtual IEnumerator GetBlobCoroutine<T>(CanonicalTileId tileId, string tilesetid, int priority = 1, T data = null, Action<T> callback = null, Action<TaskWrapper> onTaskCreated = null) where T : MapboxTileData, new()
         {
             if (_sqLiteCache == null) yield break;
             
@@ -185,6 +192,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
                 TileId = tileId,
                 DataAction = () => _sqLiteCache.Get<T>(tilesetid, tileId, data)
             };
+            onTaskCreated?.Invoke(task);
             _taskManager.AddTask(task, priority);
             while(task.IsCompleted == false) yield return null;
             

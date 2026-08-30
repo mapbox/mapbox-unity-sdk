@@ -179,7 +179,17 @@ namespace Mapbox.UnityMapService.DataSources
         
         public IEnumerator GetTileData<T1>(CanonicalTileId tileId, string tilesetid, T1 data = null, int priority = 1, Action<T1> callback = null) where T1 : MapboxTileData, new()
         {
-            yield return _cacheManager.GetBlobCoroutine<T1>(tileId, tilesetid, priority, data, callback);
+            // Tracked like the etag read above, so CancelFetching can reach it. This is the path that
+            // reads the actual tile bytes and it was the one path whose tasks nothing could cancel.
+            TaskWrapper tracked = null;
+            yield return _cacheManager.GetBlobCoroutine<T1>(tileId, tilesetid, priority, data, callback,
+                task =>
+                {
+                    tracked = task;
+                    TrackTask(task);
+                });
+
+            if (tracked != null) CompleteTask(tracked);
         }
         
         public void UpdateExpiration(CanonicalTileId tileId, string tilesetId, DateTime date)

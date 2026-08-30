@@ -156,6 +156,10 @@ namespace Mapbox.BaseModule.Map
         /// <param name="bearing">Bearing value of the camera</param>
         public void ChangeView(LatitudeLongitude? latlng = null, float? zoom = null, float? pitch = null, float? bearing = null, float? scale = null)
         {
+            // Lets the task queue tell a moving map from a settled one, so it only pays the dispatch
+            // debounce - which exists so a tile leaving the cover can cancel its work - while there
+            // is movement that could actually cancel something.
+            UnityContext?.TaskManager?.NotifyViewChanged();
             MapInformation.SetInformation(latlng, zoom, pitch, bearing, scale);
             RedrawMap();
         }

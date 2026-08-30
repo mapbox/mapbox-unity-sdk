@@ -32,12 +32,27 @@ namespace Mapbox.BaseModule.Data.Tasks
 		public float StarvationThresholdSeconds = 2f;
 
 		/// <summary>
-		/// Per-priority dispatch delay. The debounce exists so a tile the camera has already left is
-		/// cancelled before its network request is spent on it. Queue 0 carries mesh generation,
-		/// which works on data already in hand, so making it wait only delays visuals.
+		/// How long after the last view change the map is still considered to be moving. While it is,
+		/// queued work waits <see cref="_requestDelay"/> before dispatch, which is the window in which
+		/// a tile leaving the cover can still cancel its tasks; once the view settles, work dispatches
+		/// immediately.
+		///
+		/// Measured rather than assumed: a static map load spent 200 ms of its ~206 ms waiting for a
+		/// debounce that had nothing to cancel, because no tile had left the cover yet. Applying the
+		/// delay unconditionally charges every load for a guarantee only movement needs.
 		/// </summary>
-		private static readonly float[] _queueDispatchDelay =
-			{ 0f, _requestDelay, _requestDelay, _requestDelay, _requestDelay };
+		public float ViewSettleSeconds = 0.25f;
+
+		private float _lastViewChangeTime = float.NegativeInfinity;
+
+		/// <summary>
+		/// Tell the queue the view moved. Called from <c>MapboxMap.ChangeView</c>; without it the
+		/// manager cannot tell a first load from a pan, and has to assume the expensive case always.
+		/// </summary>
+		public void NotifyViewChanged()
+		{
+			_lastViewChangeTime = Time.time;
+		}
 		
 		protected HashSet<TaskWrapper> _runningTasks;
 		protected List<Queue<TaskWrapper>> _taskQueue;
@@ -99,7 +114,7 @@ namespace Mapbox.BaseModule.Data.Tasks
 						break;
 					}
 
-					if (!HasMatured(head, i, now))
+					if (!HasMatured(head, now))
 						continue;
 
 					if (chosen < 0)
@@ -121,16 +136,17 @@ namespace Mapbox.BaseModule.Data.Tasks
 			return true;
 		}
 
-		private bool HasMatured(TaskWrapper task, int priorityLevel, float now)
+		private bool HasMatured(TaskWrapper task, float now)
 		{
 			if (!Application.isPlaying)
 				return true;
 
-			var delay = priorityLevel < _queueDispatchDelay.Length
-				? _queueDispatchDelay[priorityLevel]
-				: _requestDelay;
+			// A settled view has nothing in flight that could stop being wanted, so waiting only adds
+			// latency. While the view is moving the delay is the cancellation window and is kept.
+			if (now - _lastViewChangeTime > ViewSettleSeconds)
+				return true;
 
-			return now - task.EnqueueFrame >= delay;
+			return now - task.EnqueueFrame >= _requestDelay;
 		}
 
 		protected IEnumerator UpdateTaskManager()
