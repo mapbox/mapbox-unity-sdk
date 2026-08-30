@@ -242,6 +242,9 @@ namespace Mapbox.BaseModuleTests
                     Debug.LogError($"Mismatch at Z={tile.Z}, X={tile.X}, Y={tile.Y} → A={a}, B={b}");
                 }
             }
+
+            Assert.IsTrue(allMatch,
+                "CalculateTileEdgeSizeInMercator and TileEdgeSizeInMercator disagree; see the logged mismatches.");
         }
 
     }

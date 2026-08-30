@@ -192,6 +192,7 @@ namespace Mapbox.BaseModuleTests
 
             //update all tiles to no etag and expiration so web request response will be 200 due to no etag
                         var allTiles = _sqliteCache.GetAllTiles();
+                        Assert.IsNotEmpty(allTiles, "Cache held no tiles, so the per-tile assertions below would not run.");
                         foreach (var tile in allTiles)
                         {
                             tile.etag = "";
@@ -201,6 +202,7 @@ namespace Mapbox.BaseModuleTests
             
             //check if everything expired without etag
             allTiles = _sqliteCache.GetAllTiles();
+            Assert.IsNotEmpty(allTiles, "Cache held no tiles, so the per-tile assertions below would not run.");
             foreach (var tile in allTiles)
             {
                 Assert.IsEmpty(tile.etag);
@@ -241,6 +243,7 @@ namespace Mapbox.BaseModuleTests
             Assert.AreNotEqual(_fetchingManager.FileSource.ResponseCodeCounts[200], 0);
                         
             allTiles = _sqliteCache.GetAllTiles();
+            Assert.IsNotEmpty(allTiles, "Cache held no tiles, so the per-tile assertions below would not run.");
             foreach (var tile in allTiles)
             {
                 Assert.IsNotEmpty(tile.etag);
@@ -261,6 +264,7 @@ namespace Mapbox.BaseModuleTests
 
             //update all tiles to no exp. we keep etags so web request response will be 304
                         var allTiles = _sqliteCache.GetAllTiles();
+                        Assert.IsNotEmpty(allTiles, "Cache held no tiles, so the per-tile assertions below would not run.");
                         foreach (var tile in allTiles)
                         {
                             tile.expirationDate = 0;
@@ -269,6 +273,7 @@ namespace Mapbox.BaseModuleTests
             
             //check if everything expired without etag
             allTiles = _sqliteCache.GetAllTiles();
+            Assert.IsNotEmpty(allTiles, "Cache held no tiles, so the per-tile assertions below would not run.");
             foreach (var tile in allTiles)
             {
                 Assert.AreEqual(tile.expirationDate, 0);
@@ -308,6 +313,7 @@ namespace Mapbox.BaseModuleTests
             Assert.AreNotEqual(_fetchingManager.FileSource.ResponseCodeCounts[304], 0);
                         
             allTiles = _sqliteCache.GetAllTiles();
+            Assert.IsNotEmpty(allTiles, "Cache held no tiles, so the per-tile assertions below would not run.");
             foreach (var tile in allTiles)
             {
                 Assert.IsNotEmpty(tile.etag);

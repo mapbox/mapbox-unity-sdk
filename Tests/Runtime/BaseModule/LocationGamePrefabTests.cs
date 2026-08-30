@@ -26,7 +26,8 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
         [Test, Order(1)]
         public void CreateLocationMapPrefab()
         {
-            GameObject.Instantiate(_locationMap);
+            var instance = GameObject.Instantiate(_locationMap);
+            Assert.IsNotNull(instance, "Instantiating the location map prefab produced nothing.");
         }
     
         [UnityTest, Order(2)]
