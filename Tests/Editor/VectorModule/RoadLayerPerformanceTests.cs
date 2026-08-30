@@ -24,12 +24,27 @@ namespace Mapbox.VectorModuleTests
         private int SampleCount = 100;
         private ResilientWebRequestFileSource _fs;
         private byte[] buffer;
+
+        /// <summary>
+        /// The tile is fetched once per Editor session, not once per test. [UnitySetUp] runs before
+        /// every test, so this fixture used to spend a network round trip per test on bytes that
+        /// never change - and a run's numbers depended on all of them succeeding. Static, so it also
+        /// survives between runs in the same session, which keeps a before/after comparison on the
+        /// same input.
+        /// </summary>
+        private static byte[] _cachedTileBytes;
         private CanonicalTileId tileId = new CanonicalTileId(15, 18654, 9481);
         private string LatLng = "60.1664427,24.9318587";
         private string _roadVisualizerAssetPath = "Packages/com.mapbox.sdk/Tests/Editor/VectorModule/RoadSetup/TEST_BasicRoads.asset";
         [UnitySetUp]
         public IEnumerator SetUp()
         {
+            if (_cachedTileBytes != null)
+            {
+                buffer = _cachedTileBytes;
+                yield break;
+            }
+
             var mapboxContext = new MapboxContext();
             // Without this, Configuration is null and GetAccessToken() throws before the first
             // request is even built - every test in this fixture failed in setup.
@@ -48,6 +63,7 @@ namespace Mapbox.VectorModuleTests
             buffer = response.Data;
             Assert.IsNotNull(buffer, "Tile response carried no data.");
             Assert.NotZero(buffer.Length);
+            _cachedTileBytes = buffer;
         }
         
         private IMapInformation GetMapInformation()
