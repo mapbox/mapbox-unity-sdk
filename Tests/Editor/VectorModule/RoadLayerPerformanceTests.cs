@@ -31,6 +31,9 @@ namespace Mapbox.VectorModuleTests
         public IEnumerator SetUp()
         {
             var mapboxContext = new MapboxContext();
+            // Without this, Configuration is null and GetAccessToken() throws before the first
+            // request is even built - every test in this fixture failed in setup.
+            yield return mapboxContext.LoadConfigurationCoroutine(false);
             _fs = new ResilientWebRequestFileSource(mapboxContext.GetAccessToken(), mapboxContext.GetSkuToken);
             
             Response response = null;
@@ -40,7 +43,10 @@ namespace Mapbox.VectorModuleTests
             });
             yield return TestWait.While(() => !req.IsCompleted, "SetUp: !req.IsCompleted");
             
+            Assert.IsNotNull(response, "Tile request completed without delivering a response.");
+            Assert.IsFalse(response.HasError, $"Tile request failed ({response.StatusCode}): {response.ExceptionsAsString}");
             buffer = response.Data;
+            Assert.IsNotNull(buffer, "Tile response carried no data.");
             Assert.NotZero(buffer.Length);
         }
         

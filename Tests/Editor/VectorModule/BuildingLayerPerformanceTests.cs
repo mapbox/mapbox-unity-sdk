@@ -45,7 +45,10 @@ namespace Mapbox.VectorModuleTests
             });
             yield return TestWait.While(() => !req.IsCompleted, "SetUp: !req.IsCompleted");
             
+            Assert.IsNotNull(response, "Tile request completed without delivering a response.");
+            Assert.IsFalse(response.HasError, $"Tile request failed ({response.StatusCode}): {response.ExceptionsAsString}");
             buffer = response.Data;
+            Assert.IsNotNull(buffer, "Tile response carried no data.");
             Assert.NotZero(buffer.Length);
         }
 
@@ -127,7 +130,11 @@ namespace Mapbox.VectorModuleTests
             var settings = doChamfer
                 ? new BuildingComponentSettings() { RoundBuildingCorners = true }
                 : new BuildingComponentSettings() { RoundBuildingCorners = false };
-            var vizObj = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            // Instantiate a copy: AssetDatabase hands back the project asset itself, so assigning
+            // Settings on it edits the committed file and leaves whichever case ran last as its
+            // stored state - which also makes these two cases order-dependent.
+            var asset = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            var vizObj = UnityEngine.Object.Instantiate(asset);
             vizObj.Settings = settings;
             var viz = (BuildingComponentVisualizer) vizObj.ConstructLayerVisualizer(GetMapInformation(), null);
             yield return viz.Initialize();
@@ -146,7 +153,11 @@ namespace Mapbox.VectorModuleTests
             var settings = doChamfer
                 ? new BuildingComponentSettings() { RoundBuildingCorners = true }
                 : new BuildingComponentSettings() { RoundBuildingCorners = false };
-            var vizObj = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            // Instantiate a copy: AssetDatabase hands back the project asset itself, so assigning
+            // Settings on it edits the committed file and leaves whichever case ran last as its
+            // stored state - which also makes these two cases order-dependent.
+            var asset = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            var vizObj = UnityEngine.Object.Instantiate(asset);
             vizObj.Settings = settings;
             var viz = (BuildingComponentVisualizer) vizObj.ConstructLayerVisualizer(GetMapInformation(), null);
             yield return viz.Initialize();
