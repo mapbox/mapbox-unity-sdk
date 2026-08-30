@@ -1,8 +1,18 @@
 ## CHANGELOG
 
-### Unreleased
+### v3.2.0 (unreleased)
 
 Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, single values standing in for several different outcomes, and - in the removals below - public surfaces that advertised access to tile data they could never return.
+
+Adds the Landmarks Module: 3D landmark meshes fetched from the Mapbox 3D Buildings tileset, with overlap suppression against both the Vector and Components building pipelines. glTFast is consumed as a normal package dependency rather than bundled, and two new hard dependencies are declared: `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`.
+
+#### Why the dependency shape matters
+
+Landmark tiles are glTF binaries whose buffer views are compressed with `EXT_meshopt_compression`, and the extension is listed in the tiles' `extensionsRequired`. glTFast logs an error and aborts the load when a required extension has no decoder available, so `com.unity.meshopt.decompress` is a hard requirement, not an optional accelerator.
+
+Feature IDs (`_FEATURE_ID_RGBA4444`) arrive in their own dedicated meshopt buffer view — roughly 7 KB compressed per tile — and are needed after glTFast has released its load-time buffers. Rather than patching glTFast to extend that buffer lifetime, the module decompresses that single buffer view directly from the tile bytes it already holds, using the same public meshoptimizer API glTFast itself calls. This duplicates none of glTFast's geometry decoding and keeps glTFast an unmodified package dependency.
+
+The decompressed bytes are held for the duration of scene instantiation and unpacked to `Color` exactly once, straight into each mesh's final vertex buffer. On a representative z14 tile that is about 430 KB held plus a single 1.7 MB color write, rather than materializing a `Color` array per primitive and copying it again to group by mesh.
 
 #### Security
 
@@ -54,6 +64,12 @@ Correctness work across the tile pipeline, independent of any one feature module
 
 - The Components module's serialized settings never reached its Inspector. `MapboxComponentsModuleScriptEditor` drew the visualizer list and its two buttons and never called `DrawDefaultInspector`, so `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` were invisible - subclassing remained the only way to change the zoom range, which is precisely what promoting them to serialized fields was meant to remove. The editor now enumerates the serialized properties rather than naming them, so a field added to the script appears without anyone remembering the editor file.
 
+- Landmarks did not reliably hide the basic OSM buildings they overlap. `GltfVisualizer` published each landmark footprint as the footprint mesh's raw vertex array, which is in storage order rather than boundary order, while every consumer — `MapboxGeometryUtilities.PolygonsIntersect` via both `LandmarkToBuildingComponentConnector` and `LandmarkPolygonFilterObject` — requires consecutive vertices to be adjacent along the outline. A four-vertex quad footprint survived that by luck; a detailed one described a self-intersecting scribble, so overlap tests against it were unreliable and some overlapping buildings stayed visible. Reported at the Eiffel Tower, whose footprint is exactly the detailed case.
+
+  Footprints are now published as true outlines. `MapboxGeometryUtilities.ExtractBoundaryRings` welds coincident positions (exporters split vertices for differing normals and UVs, and without welding every edge looks like a boundary edge), keeps the directed triangle edges whose reverse is absent, and walks them into ordered rings. A closed mesh has no boundary edge at all, so it falls back to the convex hull of the X-Z projection rather than contributing nothing.
+
+  Two related defects in the same method are fixed alongside. Footprints are now collected in `AddPrimitive` rather than `EndScene`, which means a footprint node with more than one primitive contributes all of them instead of only primitive 0, and a footprint node nested below a root node is collected instead of being missed entirely. `EndScene` now walks the node hierarchy to deactivate nested footprint geometry, while still normalising only root-level transforms — rewriting a child's transform would detach it from its parent's placement.
+
 #### Changed
 
 - `ILayerModule.Initialize` now takes an `ITileLifecycleSource`, replacing the separate `ITileLifecycleObserver` hook. A module previously had no reference to whatever was driving it - neither the constructor nor `ConstructModule` supplies one - so an extra opt-in interface existed purely to hand the visualizer over. **Breaking** for anyone implementing `ILayerModule` directly or subclassing an SDK module and overriding `Initialize`. Nothing here is serialized, so no scene or prefab data is affected.
@@ -82,33 +98,12 @@ Correctness work across the tile pipeline, independent of any one feature module
 - `Mapbox.BaseModule.Utilities.MvtProperties.NormalizeIntegers`, public for anyone reading feature properties off their own decode path and hitting the same unsigned-int64 problem described above.
 
 - `UnitySource<T>.TilesetId`, so a caller can see which tileset - or which composed, comma-separated list of tilesets - a source it was handed actually fetches.
-### v3.2.0 (unreleased)
-
-Adds the Landmarks Module: 3D landmark meshes fetched from the Mapbox 3D Buildings tileset, with overlap suppression against both the Vector and Components building pipelines. glTFast is consumed as a normal package dependency rather than bundled, and two new hard dependencies are declared: `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`.
-
-#### Why the dependency shape matters
-
-Landmark tiles are glTF binaries whose buffer views are compressed with `EXT_meshopt_compression`, and the extension is listed in the tiles' `extensionsRequired`. glTFast logs an error and aborts the load when a required extension has no decoder available, so `com.unity.meshopt.decompress` is a hard requirement, not an optional accelerator.
-
-Feature IDs (`_FEATURE_ID_RGBA4444`) arrive in their own dedicated meshopt buffer view — roughly 7 KB compressed per tile — and are needed after glTFast has released its load-time buffers. Rather than patching glTFast to extend that buffer lifetime, the module decompresses that single buffer view directly from the tile bytes it already holds, using the same public meshoptimizer API glTFast itself calls. This duplicates none of glTFast's geometry decoding and keeps glTFast an unmodified package dependency.
-
-The decompressed bytes are held for the duration of scene instantiation and unpacked to `Color` exactly once, straight into each mesh's final vertex buffer. On a representative z14 tile that is about 430 KB held plus a single 1.7 MB color write, rather than materializing a `Color` array per primitive and copying it again to group by mesh.
-
-#### Added
 
 - `MapboxLandmarksModule` assembly: `LandmarksLayerModule` plus its `LandmarksLayerModuleScript` MonoBehaviour wrapper, driven by `Constants.Map.LandmarksTilesetId`.
 - Overlap suppression: `LandmarkToVectorConnector` + `LandmarkPolygonFilterObject` reject colliding footprints before mesh generation; `LandmarkToBuildingComponentConnector` zeroes colliding vertices after generation, since the Components module merges buildings into a single mesh.
 - Feature ID support, split across `FeatureIdSchema` (captures the custom vertex attribute via `JsonExtensionData`), `GlbBinaryChunk`, `MeshoptBufferViewDecoder`, `FeatureIdColorTable`, `FeatureIdDecoder`, and `FeatureIdMeshWriter` (adds Color as an extra vertex stream, because glTFast builds meshes through the low-level mesh API).
 - `LandmarkDemo` and `LandmarkDemoWithVector` samples.
 - Documentation: `LandmarksModule.md` and `LandmarksModuleInternals.md`.
-
-#### Fixed
-
-- Landmarks did not reliably hide the basic OSM buildings they overlap. `GltfVisualizer` published each landmark footprint as the footprint mesh's raw vertex array, which is in storage order rather than boundary order, while every consumer — `MapboxGeometryUtilities.PolygonsIntersect` via both `LandmarkToBuildingComponentConnector` and `LandmarkPolygonFilterObject` — requires consecutive vertices to be adjacent along the outline. A four-vertex quad footprint survived that by luck; a detailed one described a self-intersecting scribble, so overlap tests against it were unreliable and some overlapping buildings stayed visible. Reported at the Eiffel Tower, whose footprint is exactly the detailed case.
-
-  Footprints are now published as true outlines. `MapboxGeometryUtilities.ExtractBoundaryRings` welds coincident positions (exporters split vertices for differing normals and UVs, and without welding every edge looks like a boundary edge), keeps the directed triangle edges whose reverse is absent, and walks them into ordered rings. A closed mesh has no boundary edge at all, so it falls back to the convex hull of the X-Z projection rather than contributing nothing.
-
-  Two related defects in the same method are fixed alongside. Footprints are now collected in `AddPrimitive` rather than `EndScene`, which means a footprint node with more than one primitive contributes all of them instead of only primitive 0, and a footprint node nested below a root node is collected instead of being missed entirely. `EndScene` now walks the node hierarchy to deactivate nested footprint geometry, while still normalising only root-level transforms — rewriting a child's transform would detach it from its parent's placement.
 
 #### Dependencies
 
