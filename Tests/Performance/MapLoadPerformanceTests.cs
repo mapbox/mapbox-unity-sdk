@@ -72,7 +72,6 @@ namespace Mapbox.PerformanceTests
         private static TaskManager _taskManager;
         private static MockSqliteCache _sqliteCache;
         private static MockFileCache _fileCache;
-        private static DataFetchingManager _dataManager;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -92,8 +91,6 @@ namespace Mapbox.PerformanceTests
             _sqliteCache = new MockSqliteCache(_taskManager);
             _sqliteCache.ReadySqliteDatabase();
             _fileCache = new MockFileCache(_taskManager);
-
-            _dataManager = new DataFetchingManager(_mapboxContext.GetAccessToken(), _mapboxContext.GetSkuToken);
         }
 
         // ValueSource rather than TestCaseSource: a TestCaseSource feeding a [UnityTest] has to
@@ -127,9 +124,14 @@ namespace Mapbox.PerformanceTests
             mapInfo.Initialize();
 
             // Fresh memory cache, shared disk caches: the samples read tiles the warm-up fetched.
+            // The fetching manager is per sample too, because map.OnDestroy() below reaches through
+            // MapUnityService and nulls its file source - sharing one meant every sample after the
+            // first hit a null IFileSource inside TileJSON.Get. MapboxCacheManager.OnDestroy only
+            // drops the memory cache, so sqlite and file stay warm across samples as intended.
+            var dataManager = new DataFetchingManager(_mapboxContext.GetAccessToken(), _mapboxContext.GetSkuToken);
             var cacheManager = new MapboxCacheManager(_unityContext, new MemoryCache(), _fileCache, _sqliteCache);
             var mapService = new MapUnityService(
-                _unityContext, _mapboxContext, new UnityFixedAreaTileProvider(), cacheManager, _dataManager);
+                _unityContext, _mapboxContext, new UnityFixedAreaTileProvider(), cacheManager, dataManager);
 
             var map = new MapboxMap(mapInfo, _unityContext, mapService);
             var visualizer = new MapboxMapVisualizer(mapInfo, _unityContext, new TileCreator(_unityContext));
