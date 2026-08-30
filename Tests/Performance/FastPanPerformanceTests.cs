@@ -47,9 +47,17 @@ namespace Mapbox.PerformanceTests
     {
         private const string StartLatLng = "60.1664427,24.9318587";
 
-        /// <summary>Degrees of longitude per frame. At zoom 16 this crosses tiles every few frames.</summary>
-        private const double StepPerFrame = 0.0012;
-        private const int PanFrames = 120;
+        /// <summary>
+        /// The pan is driven by wall-clock time, not by a frame count. A test loop that yields null
+        /// with nothing to render runs at well over a thousand frames a second, so a 120-frame pan
+        /// completed in 81 ms - less than half of one 200 ms debounce window. Nothing ever matured,
+        /// nothing dispatched, and the result read as "the debounce skipped 100% of the work" when it
+        /// had simply not been given long enough to do anything at all.
+        /// </summary>
+        private const float PanSeconds = 3f;
+
+        /// <summary>Degrees of longitude per second. At zoom 16 this crosses a tile roughly 3x a second.</summary>
+        private const double DegreesPerSecond = 0.05;
         private const int SampleCount = 3;
 
         private static MapboxContext _mapboxContext;
@@ -86,19 +94,23 @@ namespace Mapbox.PerformanceTests
             // Unmeasured: pans the whole path once so the sqlite and file caches hold every tile the
             // samples will touch. Without it this measures the network, and cancellation counts would
             // reflect request latency rather than the debounce.
-            yield return PanOnce(null, null, null);
+            yield return PanOnce(null, null, null, null);
 
             var started = new SampleGroup("FastPan.TasksStarted", SampleUnit.Undefined);
             var cancelled = new SampleGroup("FastPan.CancelledBeforeRunning", SampleUnit.Undefined);
             var duration = new SampleGroup("FastPan.DurationMs", SampleUnit.Millisecond);
+            // Reported so a future reader can tell at a glance whether the pan ran long enough for
+            // the debounce to matter, rather than inferring it from a suspiciously round result.
+            var frames = new SampleGroup("FastPan.Frames", SampleUnit.Undefined);
 
             for (var i = 0; i < SampleCount; i++)
             {
-                yield return PanOnce(started, cancelled, duration);
+                yield return PanOnce(started, cancelled, duration, frames);
             }
         }
 
-        private IEnumerator PanOnce(SampleGroup startedGroup, SampleGroup cancelledGroup, SampleGroup durationGroup)
+        private IEnumerator PanOnce(SampleGroup startedGroup, SampleGroup cancelledGroup,
+            SampleGroup durationGroup, SampleGroup framesGroup = null)
         {
             var mapInfo = new MapInformation(StartLatLng);
             mapInfo.SetInformation(null, 16, 45, null, 1000);
@@ -149,9 +161,13 @@ namespace Mapbox.PerformanceTests
 
             var stopwatch = Stopwatch.StartNew();
             var origin = Conversions.StringToLatLon(StartLatLng);
-            for (var frame = 0; frame < PanFrames; frame++)
+            var panStart = UnityEngine.Time.realtimeSinceStartup;
+            float elapsed;
+            var frames = 0;
+            while ((elapsed = UnityEngine.Time.realtimeSinceStartup - panStart) < PanSeconds)
             {
-                map.ChangeView(new LatitudeLongitude(origin.Latitude, origin.Longitude + StepPerFrame * frame));
+                map.ChangeView(new LatitudeLongitude(origin.Latitude, origin.Longitude + DegreesPerSecond * elapsed));
+                frames++;
                 yield return null;
             }
             stopwatch.Stop();
@@ -164,9 +180,13 @@ namespace Mapbox.PerformanceTests
                 Measure.Custom(startedGroup, startedCount);
                 Measure.Custom(cancelledGroup, cancelledCount);
                 Measure.Custom(durationGroup, stopwatch.Elapsed.TotalMilliseconds);
+                Measure.Custom(framesGroup, frames);
 
                 Assert.Greater(startedCount + cancelledCount, 0,
                     "The pan queued no tasks at all, so nothing about the debounce can be concluded from it.");
+                Assert.Greater(stopwatch.Elapsed.TotalMilliseconds, 1000,
+                    "The pan finished in under a second. It has to outlast several dispatch delays, or "
+                    + "zero started tasks means the pan was too short rather than the debounce working.");
             }
 
             map.OnDestroy();
