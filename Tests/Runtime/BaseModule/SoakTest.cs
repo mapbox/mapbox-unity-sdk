@@ -31,9 +31,20 @@ namespace Tests.Runtime.BaseModule
     /// below has been validated against a real run yet - they are a first cut, not a calibrated gate.
     /// Read the logged per-lap table before trusting the assertions.</para>
     ///
-    /// <para><b>Downloads live data by default</b> for whichever tiles the shared warm-up pass and
-    /// laps have not already resolved from the shared, in-run cache - see
-    /// <see cref="PreCacheBeforeMeasuring"/> for what that pass buys and what it costs.</para>
+    /// <para><b><see cref="Warm"/> and <see cref="Cold"/> are two tests, not a flag, but they cannot
+    /// mean "every lap is warm" versus "every lap is cold": <c>Setup()</c> builds one cache instance
+    /// and shares it across every lap in a run, deliberately - that sharing across a long-lived map
+    /// and scene is the whole point of a soak test, and rebuilding the map each lap to force it cold
+    /// would just make this N independent short cold-cache runs instead. So only lap 1 can ever be
+    /// genuinely cold; by lap 2 the tour's tiles are already resolved either way. What the two tests
+    /// actually control is whether that one cold lap happens before the measured comparison
+    /// (<see cref="Warm"/>) or as its first entry, visible in the table
+    /// (<see cref="Cold"/>) - and <see cref="Cold"/>'s growth check correctly excludes lap 1 from the
+    /// comparison rather than pretending it's representative.</b> <see cref="Warm"/> cannot see a leak
+    /// specific to the fetch/decode path, since <c>GetInstantData</c> resolves every tile before
+    /// <c>DataFetchingManager</c>'s queue or <c>PbfSource</c>/<c>ImageSource</c>'s <c>_waitingList</c>
+    /// are ever touched once warm; <see cref="Cold"/> exercises that path for its own cold lap 1, at
+    /// the cost of one lap's numbers being a known outlier rather than useful trend data.</para>
     /// </summary>
     public class SoakTest
     {
@@ -52,26 +63,6 @@ namespace Tests.Runtime.BaseModule
         private const int SystemStatsMaxFrames = 500_000;
 
         /// <summary>
-        /// On by default. <c>Setup()</c> constructs one cache instance and shares it across every
-        /// lap in the run - so without this, lap 1 is a genuine cold/network lap and every lap after
-        /// it is already served from what lap 1 just populated. That is not "the same workload
-        /// repeated six times", it is "one cold lap followed by five warm ones", and comparing lap 1
-        /// against the last lap under that mismatch conflates cache temperature with drift.
-        ///
-        /// With this on, one full untimed pass through the tour warms the cache before lap 1 starts,
-        /// so all <see cref="LapCount"/> measured laps are equally warm and directly comparable - the
-        /// comparison this test's whole methodology depends on.
-        ///
-        /// The real tradeoff, not just speed: once warm, GetInstantData resolves every tile before
-        /// DataFetchingManager's fetch queue or PbfSource/ImageSource's _waitingList are ever touched,
-        /// so this mode cannot see a leak that lives specifically in the fetch/decode path - only in
-        /// repeated local work (mesh generation, GameObject churn, cache bookkeeping). Turn this off to
-        /// soak-test the network layer too, but then judge growth lap-to-lap among the later laps once
-        /// they've settled, not against lap 1.
-        /// </summary>
-        private const bool PreCacheBeforeMeasuring = true;
-
-        /// <summary>
         /// One lap: each city gets an overview, a street-level dive, a flyover, and a return to
         /// overview, before travelling on. The long jump between cities' final and next city's first
         /// waypoint is the "unload everything, load somewhere new" transition this test is watching.
@@ -88,26 +79,47 @@ namespace Tests.Runtime.BaseModule
         private BenchmarkOrchestrator _orchestrator;
         private GameObject _testRoot;
 
+        /// <summary>
+        /// One untimed pass through the tour warms the shared cache before lap 1, so every measured
+        /// lap - lap 1 included - is equally warm and directly comparable. Cannot see a leak specific
+        /// to the fetch/decode path; see the class doc for why.
+        /// </summary>
         [UnityTest]
-        public IEnumerator RepeatedLapsDoNotAccumulate()
+        public IEnumerator Warm()
         {
             yield return Setup();
 
-            if (PreCacheBeforeMeasuring)
-            {
-                Debug.Log("[SoakTest] Warm-up pass: touring once, unmeasured, to warm the shared cache "
-                    + "before any lap is measured.");
-                yield return _orchestrator.RunBenchmark();
-                Assert.AreEqual(BenchmarkOrchestrator.Phase.Complete, _orchestrator.CurrentPhase,
-                    "The warm-up pass did not reach Complete.");
-            }
+            Debug.Log("[SoakTest:Warm] Warm-up pass: touring once, unmeasured, before any lap is measured.");
+            yield return _orchestrator.RunBenchmark();
+            Assert.AreEqual(BenchmarkOrchestrator.Phase.Complete, _orchestrator.CurrentPhase,
+                "The warm-up pass did not reach Complete.");
 
+            yield return RunMeasuredLaps("Warm", excludeFirstLapFromComparison: false);
+        }
+
+        /// <summary>
+        /// No warm-up: lap 1 reaches the network for everything and is a genuine cold lap, exercising
+        /// DataFetchingManager's queue and PbfSource/ImageSource's _waitingList the way <see cref="Warm"/>
+        /// never does. From lap 2 on, the shared cache is already warm from lap 1 - same as every lap
+        /// in <see cref="Warm"/> - so the growth check compares lap 2 against the last lap, not lap 1,
+        /// which would be comparing a cold lap against warm ones and calling the difference "drift".
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Cold()
+        {
+            yield return Setup();
+
+            yield return RunMeasuredLaps("Cold", excludeFirstLapFromComparison: true);
+        }
+
+        private IEnumerator RunMeasuredLaps(string label, bool excludeFirstLapFromComparison)
+        {
             var laps = new List<JObject>();
             var gameObjectCountsPerLap = new List<int>();
 
             for (var lap = 0; lap < LapCount; lap++)
             {
-                Debug.Log($"[SoakTest] Lap {lap + 1}/{LapCount} starting.");
+                Debug.Log($"[SoakTest:{label}] Lap {lap + 1}/{LapCount} starting.");
 
                 yield return _orchestrator.RunBenchmark();
                 Assert.AreEqual(BenchmarkOrchestrator.Phase.Complete, _orchestrator.CurrentPhase,
@@ -117,8 +129,15 @@ namespace Tests.Runtime.BaseModule
                 gameObjectCountsPerLap.Add(Object.FindObjectsOfType<GameObject>().Length);
             }
 
-            LogLapTable(laps, gameObjectCountsPerLap);
-            AssertNoUnboundedGrowth(laps, gameObjectCountsPerLap);
+            LogLapTable(label, laps, gameObjectCountsPerLap);
+
+            var baselineIndex = excludeFirstLapFromComparison ? 1 : 0;
+            if (excludeFirstLapFromComparison)
+            {
+                Debug.Log($"[SoakTest:{label}] Comparing lap 2 against the last lap; lap 1 was the "
+                    + "cold outlier and is excluded from the growth check, not averaged into it.");
+            }
+            AssertNoUnboundedGrowth(label, laps, gameObjectCountsPerLap, baselineIndex);
 
             yield return Cleanup();
         }
@@ -233,39 +252,45 @@ namespace Tests.Runtime.BaseModule
 
         /// <summary>
         /// First-cut thresholds, not a calibrated gate - see the class doc. Compares the last lap
-        /// against the first rather than lap-to-lap, since a single noisy lap (one slow network
-        /// request, one GC pause landing badly) shouldn't fail the run; a sustained difference
-        /// between first and last is much harder to explain away as noise.
+        /// against a chosen baseline lap rather than lap-to-lap, since a single noisy lap (one slow
+        /// network request, one GC pause landing badly) shouldn't fail the run; a sustained difference
+        /// between the baseline and the last lap is much harder to explain away as noise.
         /// </summary>
-        private static void AssertNoUnboundedGrowth(List<JObject> laps, List<int> gameObjectCounts)
+        private static void AssertNoUnboundedGrowth(string label, List<JObject> laps, List<int> gameObjectCounts,
+            int baselineIndex)
         {
-            var first = laps[0];
+            var baseline = laps[baselineIndex];
             var last = laps[laps.Count - 1];
+            var baselineLapNumber = baselineIndex + 1;
 
-            AssertBoundedGrowth("peakManagedHeapMB", (float)first["system"]["peakManagedHeapMB"],
-                (float)last["system"]["peakManagedHeapMB"], maxGrowthFraction: 0.5f);
+            AssertBoundedGrowth(label, "peakManagedHeapMB", baselineLapNumber,
+                (float)baseline["system"]["peakManagedHeapMB"], (float)last["system"]["peakManagedHeapMB"],
+                maxGrowthFraction: 0.5f);
 
-            AssertBoundedGrowth("avgTileCount", (float)first["tiles"]["avgTileCount"],
-                (float)last["tiles"]["avgTileCount"], maxGrowthFraction: 0.5f);
+            AssertBoundedGrowth(label, "avgTileCount", baselineLapNumber,
+                (float)baseline["tiles"]["avgTileCount"], (float)last["tiles"]["avgTileCount"],
+                maxGrowthFraction: 0.5f);
 
-            AssertBoundedGrowth("gameObjectCount", gameObjectCounts[0], gameObjectCounts[gameObjectCounts.Count - 1],
+            AssertBoundedGrowth(label, "gameObjectCount", baselineLapNumber,
+                gameObjectCounts[baselineIndex], gameObjectCounts[gameObjectCounts.Count - 1],
                 maxGrowthFraction: 0.5f);
         }
 
-        private static void AssertBoundedGrowth(string metric, float firstValue, float lastValue,
-            float maxGrowthFraction)
+        private static void AssertBoundedGrowth(string label, string metric, int baselineLapNumber,
+            float baselineValue, float lastValue, float maxGrowthFraction)
         {
-            if (firstValue <= 0f)
+            if (baselineValue <= 0f)
             {
-                Debug.LogWarning($"[SoakTest] {metric} started at {firstValue}; skipping the growth check for it.");
+                Debug.LogWarning(
+                    $"[SoakTest:{label}] {metric} started at {baselineValue}; skipping the growth check for it.");
                 return;
             }
 
-            var growth = (lastValue - firstValue) / firstValue;
+            var growth = (lastValue - baselineValue) / baselineValue;
             Assert.LessOrEqual(growth, maxGrowthFraction,
-                $"{metric} grew {growth:P0} from lap 1 ({firstValue:F1}) to the last lap ({lastValue:F1}), " +
-                $"over {maxGrowthFraction:P0} for an identical repeated workload. Read the full per-lap "
-                + "table above before treating this as confirmed - it may mean the threshold needs "
+                $"{metric} grew {growth:P0} from lap {baselineLapNumber} ({baselineValue:F1}) to the last lap "
+                + $"({lastValue:F1}), over {maxGrowthFraction:P0} for an identical repeated workload. Read the "
+                + "full per-lap table above before treating this as confirmed - it may mean the threshold needs "
                 + "calibrating against a real run, not that something is actually unbounded.");
         }
 
