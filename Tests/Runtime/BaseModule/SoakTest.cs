@@ -30,6 +30,10 @@ namespace Tests.Runtime.BaseModule
     /// <para><b>First run this at 2 laps, not <see cref="LapCount"/>.</b> Nothing about the thresholds
     /// below has been validated against a real run yet - they are a first cut, not a calibrated gate.
     /// Read the logged per-lap table before trusting the assertions.</para>
+    ///
+    /// <para><b>Downloads live data by default</b> for whichever tiles the shared warm-up pass and
+    /// laps have not already resolved from the shared, in-run cache - see
+    /// <see cref="PreCacheBeforeMeasuring"/> for what that pass buys and what it costs.</para>
     /// </summary>
     public class SoakTest
     {
@@ -46,6 +50,26 @@ namespace Tests.Runtime.BaseModule
         /// silently truncating the very data this test exists to look at is the worse failure.
         /// </summary>
         private const int SystemStatsMaxFrames = 500_000;
+
+        /// <summary>
+        /// On by default. <c>Setup()</c> constructs one cache instance and shares it across every
+        /// lap in the run - so without this, lap 1 is a genuine cold/network lap and every lap after
+        /// it is already served from what lap 1 just populated. That is not "the same workload
+        /// repeated six times", it is "one cold lap followed by five warm ones", and comparing lap 1
+        /// against the last lap under that mismatch conflates cache temperature with drift.
+        ///
+        /// With this on, one full untimed pass through the tour warms the cache before lap 1 starts,
+        /// so all <see cref="LapCount"/> measured laps are equally warm and directly comparable - the
+        /// comparison this test's whole methodology depends on.
+        ///
+        /// The real tradeoff, not just speed: once warm, GetInstantData resolves every tile before
+        /// DataFetchingManager's fetch queue or PbfSource/ImageSource's _waitingList are ever touched,
+        /// so this mode cannot see a leak that lives specifically in the fetch/decode path - only in
+        /// repeated local work (mesh generation, GameObject churn, cache bookkeeping). Turn this off to
+        /// soak-test the network layer too, but then judge growth lap-to-lap among the later laps once
+        /// they've settled, not against lap 1.
+        /// </summary>
+        private const bool PreCacheBeforeMeasuring = true;
 
         /// <summary>
         /// One lap: each city gets an overview, a street-level dive, a flyover, and a return to
@@ -68,6 +92,15 @@ namespace Tests.Runtime.BaseModule
         public IEnumerator RepeatedLapsDoNotAccumulate()
         {
             yield return Setup();
+
+            if (PreCacheBeforeMeasuring)
+            {
+                Debug.Log("[SoakTest] Warm-up pass: touring once, unmeasured, to warm the shared cache "
+                    + "before any lap is measured.");
+                yield return _orchestrator.RunBenchmark();
+                Assert.AreEqual(BenchmarkOrchestrator.Phase.Complete, _orchestrator.CurrentPhase,
+                    "The warm-up pass did not reach Complete.");
+            }
 
             var laps = new List<JObject>();
             var gameObjectCountsPerLap = new List<int>();
