@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Interfaces;
@@ -131,7 +133,7 @@ namespace Mapbox.PerformanceTests
         {
             Runnable.EnableRunnableInEditor();
 
-            yield return DriveOnce(true, null, null, null, null);
+            yield return DriveOnce(true, _sqliteCache, _fileCache, null, null, null, null);
 
             var started = new SampleGroup("FastZoom.TasksStarted", SampleUnit.Undefined);
             var cancelled = new SampleGroup("FastZoom.CancelledBeforeRunning", SampleUnit.Undefined);
@@ -140,25 +142,152 @@ namespace Mapbox.PerformanceTests
 
             for (var i = 0; i < SampleCount; i++)
             {
-                yield return DriveOnce(true, started, cancelled, duration, frames);
+                yield return DriveOnce(true, _sqliteCache, _fileCache, started, cancelled, duration, frames);
             }
+        }
+
+        /// <summary>
+        /// The counterpart the warm-cache drives above cannot be: this is the regime the dispatch
+        /// delay's cancellation was actually built for. Every read here reaches a real Mapbox tile
+        /// endpoint - no pre-warm, and a fresh, never-touched cache per sample - so a tile leaving
+        /// the cover mid-pan has a genuine in-flight fetch to cancel, rather than a cache read that
+        /// already finished before the next frame ran.
+        ///
+        /// <c>PbfSource</c>/<c>ImageSource.RetainTiles</c> only ever calls
+        /// <c>CancelActiveRequests</c> for a tile it finds in its own <c>_waitingList</c>, and a tile
+        /// only enters that dictionary while its network request is outstanding - so this is also
+        /// the only regime in this assembly where that branch can run at all.
+        ///
+        /// Reaches the live API. Slower and noisier than the warm-cache drives by nature; run this one
+        /// occasionally, not on every change - it belongs to the same `MapLoadPerformance` category.
+        /// </summary>
+        [UnityTest, Performance]
+        public IEnumerator FastPanColdCache()
+        {
+            Runnable.EnableRunnableInEditor();
+
+            var started = new SampleGroup("FastPanColdCache.TasksStarted", SampleUnit.Undefined);
+            var cancelled = new SampleGroup("FastPanColdCache.CancelledBeforeRunning", SampleUnit.Undefined);
+            var duration = new SampleGroup("FastPanColdCache.DurationMs", SampleUnit.Millisecond);
+            var frames = new SampleGroup("FastPanColdCache.Frames", SampleUnit.Undefined);
+
+            for (var i = 0; i < SampleCount; i++)
+            {
+                // Fresh, empty caches per sample - reusing one across samples would let the second
+                // and third samples warm up on the first's leftovers, right back to zero in-flight
+                // fetches for exactly the tiles this test needs to still be in flight.
+                var coldSqlite = new MockSqliteCache(_taskManager);
+                coldSqlite.ReadySqliteDatabase();
+                var coldFile = new MockFileCache(_taskManager);
+
+                yield return DriveOnce(false, coldSqlite, coldFile, started, cancelled, duration, frames,
+                    requireCancellation: true);
+            }
+        }
+
+        /// <summary>Cold-cache counterpart to <see cref="FastPanColdCache"/> for the zoom sweep.</summary>
+        [UnityTest, Performance]
+        public IEnumerator FastZoomColdCache()
+        {
+            Runnable.EnableRunnableInEditor();
+
+            var started = new SampleGroup("FastZoomColdCache.TasksStarted", SampleUnit.Undefined);
+            var cancelled = new SampleGroup("FastZoomColdCache.CancelledBeforeRunning", SampleUnit.Undefined);
+            var duration = new SampleGroup("FastZoomColdCache.DurationMs", SampleUnit.Millisecond);
+            var frames = new SampleGroup("FastZoomColdCache.Frames", SampleUnit.Undefined);
+
+            for (var i = 0; i < SampleCount; i++)
+            {
+                var coldSqlite = new MockSqliteCache(_taskManager);
+                coldSqlite.ReadySqliteDatabase();
+                var coldFile = new MockFileCache(_taskManager);
+
+                yield return DriveOnce(true, coldSqlite, coldFile, started, cancelled, duration, frames,
+                    requireCancellation: true);
+            }
+        }
+
+        /// <summary>
+        /// Not a pixel/screenshot test - a data-level check for the exact defect class the
+        /// "prevents flickers from buildings appearing in temp tiles" comment on
+        /// <c>VectorLayerModule.RetainTiles</c> describes. A visual popping into existence for a
+        /// tile that has already left the cover, then disappearing again next frame, is a flicker;
+        /// checking pixels to see that is unnecessary when the SDK already tells you exactly when
+        /// and where a visual was created, via <c>BuildingComponentVisualizer.OnBuildingMeshCreated</c>.
+        ///
+        /// <b>Known gap going in, not discovered by surprise</b>: <c>RetainTiles</c> cancels a mesh-gen
+        /// task by setting <c>TaskWrapper.IsCancelled</c>, and <c>TaskManager</c> only reads that flag
+        /// when a task is dequeued, before it dispatches - nowhere in the completion path is it
+        /// checked again. A task already running on a worker thread when its tile leaves the cover
+        /// finishes anyway and creates the visual regardless of cancellation. So this test may well
+        /// fail on a long enough or fast enough drive; that is a real finding about the mechanism, not
+        /// a bug in the test. Warm cache, same as `FastPan`/`FastZoom` - this checks task-completion
+        /// timing against the movement-gated dispatch delay, which is independent of where tile bytes
+        /// came from.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator FastPanNoStaleVisuals()
+        {
+            yield return NoStaleVisualsOnce(false);
+        }
+
+        /// <summary>Zoom counterpart to <see cref="FastPanNoStaleVisuals"/> - the more sensitive case,
+        /// since a zoom crossing discards the whole cover in one step rather than just an edge column.</summary>
+        [UnityTest]
+        public IEnumerator FastZoomNoStaleVisuals()
+        {
+            yield return NoStaleVisualsOnce(true);
+        }
+
+        private IEnumerator NoStaleVisualsOnce(bool zoom)
+        {
+            Runnable.EnableRunnableInEditor();
+
+            // Unmeasured, same reason as FastPan/FastZoom's own warm-up: without it the first drive
+            // pays for network fetches instead of exercising the cancellation timing this checks.
+            yield return DriveOnce(zoom, _sqliteCache, _fileCache, null, null, null, null);
+
+            var violations = new List<string>();
+
+            void Subscribe(MapboxMap map, BuildingComponentVisualizer viz)
+            {
+                viz.OnBuildingMeshCreated += (tileId, go, meshData) =>
+                {
+                    var currentCover = new HashSet<CanonicalTileId>(map.TileCover.Tiles.Select(t => t.Canonical));
+                    if (!currentCover.Contains(tileId))
+                    {
+                        violations.Add($"{tileId} created outside the current cover ({currentCover.Count} tiles retained)");
+                    }
+                };
+            }
+
+            for (var i = 0; i < SampleCount; i++)
+            {
+                yield return DriveOnce(zoom, _sqliteCache, _fileCache, null, null, null, null, onReady: Subscribe);
+            }
+
+            Assert.IsEmpty(violations,
+                $"{violations.Count} building visual(s) created for a tile no longer in the cover - "
+                + $"a real flicker, not a test artifact:\n{string.Join("\n", violations.Take(5))}");
         }
 
         private IEnumerator PanOnce(SampleGroup startedGroup, SampleGroup cancelledGroup,
             SampleGroup durationGroup, SampleGroup framesGroup = null)
         {
-            return DriveOnce(false, startedGroup, cancelledGroup, durationGroup, framesGroup);
+            return DriveOnce(false, _sqliteCache, _fileCache, startedGroup, cancelledGroup, durationGroup, framesGroup);
         }
 
-        private IEnumerator DriveOnce(bool zoom, SampleGroup startedGroup, SampleGroup cancelledGroup,
-            SampleGroup durationGroup, SampleGroup framesGroup = null)
+        private IEnumerator DriveOnce(bool zoom, MockSqliteCache sqliteCache, MockFileCache fileCache,
+            SampleGroup startedGroup, SampleGroup cancelledGroup,
+            SampleGroup durationGroup, SampleGroup framesGroup = null, bool requireCancellation = false,
+            Action<MapboxMap, BuildingComponentVisualizer> onReady = null)
         {
             var mapInfo = new MapInformation(StartLatLng);
             mapInfo.SetInformation(null, 16, 45, null, 1000);
             mapInfo.Initialize();
 
             var dataManager = new DataFetchingManager(_mapboxContext.GetAccessToken(), _mapboxContext.GetSkuToken);
-            var cacheManager = new MapboxCacheManager(_unityContext, new MemoryCache(), _fileCache, _sqliteCache);
+            var cacheManager = new MapboxCacheManager(_unityContext, new MemoryCache(), fileCache, sqliteCache);
             var mapService = new MapUnityService(
                 _unityContext, _mapboxContext, new UnityFixedAreaTileProvider(), cacheManager, dataManager);
 
@@ -173,17 +302,16 @@ namespace Mapbox.PerformanceTests
 
             var vectorTileset = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreetsV8);
             var vectorSettings = new VectorSourceSettings { TilesetId = vectorTileset.Id, ClampDataLevelToMax = 15 };
+            var buildingVisualizer = new BuildingComponentVisualizer("building", mapInfo, _unityContext);
             visualizer.LayerModules.Add(new MapboxComponentsModule(
                 mapInfo, mapService.GetVectorSource(vectorSettings), _unityContext,
                 new Dictionary<string, List<IVectorLayerVisualizer>>
                 {
-                    {
-                        "building",
-                        new List<IVectorLayerVisualizer>
-                            { new BuildingComponentVisualizer("building", mapInfo, _unityContext) }
-                    }
+                    { "building", new List<IVectorLayerVisualizer> { buildingVisualizer } }
                 },
                 new VectorModuleSettings { DataSettings = vectorSettings }));
+
+            onReady?.Invoke(map, buildingVisualizer);
 
             yield return map.Initialize();
 
@@ -260,6 +388,21 @@ namespace Mapbox.PerformanceTests
                 Assert.Greater(stopwatch.Elapsed.TotalMilliseconds, 1000,
                     "The pan finished in under a second. It has to outlast several dispatch delays, or "
                     + "zero started tasks means the pan was too short rather than the debounce working.");
+
+                if (requireCancellation)
+                {
+                    // The warm-cache drives above always report zero here, by construction: a cache
+                    // read completes before a tile can ever leave the cover, so there is nothing to
+                    // cancel. This is the regime where that stops being true - real network fetches
+                    // are in flight when the view moves on - so a zero here means the cancellation
+                    // path itself is broken, not that the debounce found nothing to do.
+                    Assert.Greater(cancelledCount, 0,
+                        "Cold-cache drive cancelled nothing. Either no fetch was still in flight when "
+                        + "a tile left the cover (network faster than expected - try a longer pan or "
+                        + "more frequent tile crossings), or PbfSource/ImageSource.RetainTiles -> "
+                        + "CancelActiveRequests -> UnitySource.CancelFetching is not reaching the "
+                        + "tracked task the way it's meant to.");
+                }
             }
 
             map.OnDestroy();
