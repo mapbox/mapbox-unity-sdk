@@ -7,6 +7,7 @@ using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Interfaces;
 using Mapbox.BaseModule.Data.Platform.Cache;
 using Mapbox.BaseModule.Data.Tasks;
+using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Data.Vector2d;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Unity;
@@ -181,7 +182,7 @@ namespace Mapbox.PerformanceTests
                 var coldFile = new MockFileCache(_taskManager);
 
                 yield return DriveOnce(false, coldSqlite, coldFile, started, cancelled, duration, frames,
-                    requireCancellation: true);
+                    requireCancellation: true, waitForInitialLoad: false);
             }
         }
 
@@ -203,7 +204,7 @@ namespace Mapbox.PerformanceTests
                 var coldFile = new MockFileCache(_taskManager);
 
                 yield return DriveOnce(true, coldSqlite, coldFile, started, cancelled, duration, frames,
-                    requireCancellation: true);
+                    requireCancellation: true, waitForInitialLoad: false);
             }
         }
 
@@ -280,7 +281,7 @@ namespace Mapbox.PerformanceTests
         private IEnumerator DriveOnce(bool zoom, MockSqliteCache sqliteCache, MockFileCache fileCache,
             SampleGroup startedGroup, SampleGroup cancelledGroup,
             SampleGroup durationGroup, SampleGroup framesGroup = null, bool requireCancellation = false,
-            Action<MapboxMap, BuildingComponentVisualizer> onReady = null)
+            Action<MapboxMap, BuildingComponentVisualizer> onReady = null, bool waitForInitialLoad = true)
         {
             var mapInfo = new MapInformation(StartLatLng);
             mapInfo.SetInformation(null, 16, 45, null, 1000);
@@ -317,7 +318,19 @@ namespace Mapbox.PerformanceTests
 
             var loaded = false;
             Runnable.Instance.StartCoroutine(map.LoadMapViewCoroutine(() => loaded = true));
-            yield return TestWait.Until(() => loaded, $"{(zoom ? "FastZoom" : "FastPan")}: the initial view to load", 120f);
+
+            if (waitForInitialLoad)
+            {
+                yield return TestWait.Until(() => loaded, $"{(zoom ? "FastZoom" : "FastPan")}: the initial view to load", 120f);
+            }
+            else
+            {
+                // The cold-cache tests want the opposite: the initial cover's fetches still in flight
+                // when the drive starts moving the view, since draining them first would warm the
+                // cache before a single tile ever has a chance to be cancelled. One frame is enough
+                // to let LoadMapViewCoroutine actually issue its requests before anything is measured.
+                yield return null;
+            }
 
             // Counters are attached only for the pan itself, so the initial load above does not
             // contribute - it has nothing to cancel, which is the whole point of measuring separately.
