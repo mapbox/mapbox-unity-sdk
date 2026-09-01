@@ -148,19 +148,19 @@ namespace Tests.Runtime.BaseModule
             _orchestrator.SystemStats.MaxFrames = SystemStatsMaxFrames;
         }
 
-        private static List<BenchmarkOrchestrator.CameraWaypoint> BuildLapWaypoints()
+        private static List<CameraWaypoint> BuildLapWaypoints()
         {
-            var points = new List<BenchmarkOrchestrator.CameraWaypoint>();
+            var points = new List<CameraWaypoint>();
             foreach (var pair in CityCenters)
             {
                 var c = pair.Value;
-                points.Add(new BenchmarkOrchestrator.CameraWaypoint(c.Latitude, c.Longitude, 11f, 30f, 0f));
-                points.Add(new BenchmarkOrchestrator.CameraWaypoint(c.Latitude, c.Longitude, 17f, 60f, 0f));
-                points.Add(new BenchmarkOrchestrator.CameraWaypoint(
+                points.Add(new CameraWaypoint(c.Latitude, c.Longitude, 11f, 30f, 0f));
+                points.Add(new CameraWaypoint(c.Latitude, c.Longitude, 17f, 60f, 0f));
+                points.Add(new CameraWaypoint(
                     c.Latitude, c.Longitude - 0.006, 16.5f, 65f, 90f));
-                points.Add(new BenchmarkOrchestrator.CameraWaypoint(
+                points.Add(new CameraWaypoint(
                     c.Latitude, c.Longitude + 0.006, 16.5f, 65f, 90f));
-                points.Add(new BenchmarkOrchestrator.CameraWaypoint(c.Latitude, c.Longitude, 11f, 30f, 0f));
+                points.Add(new CameraWaypoint(c.Latitude, c.Longitude, 11f, 30f, 0f));
             }
             // Close the loop so every lap starts and ends at the same place.
             var first = points[0];
