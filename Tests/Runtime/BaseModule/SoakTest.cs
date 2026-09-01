@@ -232,7 +232,7 @@ namespace Tests.Runtime.BaseModule
             };
         }
 
-        private static void LogLapTable(List<JObject> laps, List<int> gameObjectCounts)
+        private static void LogLapTable(string label, List<JObject> laps, List<int> gameObjectCounts)
         {
             var rows = new List<string>
             {
@@ -247,7 +247,7 @@ namespace Tests.Runtime.BaseModule
                     $"{(float)t["avgTileCount"],8:F1}  {(int)t["maxTileCount"],8}  " +
                     $"{(int)s["gcCollections"],13}  {gameObjectCounts[i],11}");
             }
-            Debug.Log("[SoakTest] Per-lap trend:\n" + string.Join("\n", rows));
+            Debug.Log($"[SoakTest:{label}] Per-lap trend:\n" + string.Join("\n", rows));
         }
 
         /// <summary>
