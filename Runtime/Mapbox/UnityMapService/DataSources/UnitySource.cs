@@ -171,8 +171,7 @@ namespace Mapbox.UnityMapService.DataSources
             }
             else
             {
-                TrackTask(taskWrapper);
-                taskWrapper.DataCompleted += ((resultTask, result) => CompleteTask(taskWrapper));
+                TrackUntilComplete(taskWrapper);
             }
             return taskWrapper;
         }
@@ -188,13 +187,22 @@ namespace Mapbox.UnityMapService.DataSources
             // that was abandoned - the map destroyed mid-read, the owner stopped - would make that
             // tile look permanently in flight and it would never be requested again. DataCompleted
             // fires on cancellation as well as on success, so the entry always comes back out.
+            //
+            // GetBlobCoroutine is virtual and always hands back a DataTaskWrapper<T1> today, but the
+            // cast is not just defensive dressing: if that ever stopped holding, silently tracking
+            // without a matching untrack would reintroduce this exact leak one level up, with nothing
+            // to say why.
             yield return _cacheManager.GetBlobCoroutine<T1>(tileId, tilesetid, priority, data, callback,
                 task =>
                 {
-                    TrackTask(task);
                     if (task is DataTaskWrapper<T1> typed)
                     {
-                        typed.DataCompleted += (resultTask, result) => CompleteTask(task);
+                        TrackUntilComplete(typed);
+                    }
+                    else
+                    {
+                        Debug.LogError($"{task.GetType()} is not a DataTaskWrapper<{typeof(T1)}>; "
+                            + "it cannot be tracked for cancellation and will never be untracked.");
                     }
                 });
         }
@@ -214,6 +222,12 @@ namespace Mapbox.UnityMapService.DataSources
         //     return z >= _sourceZoomRange[0] && z <= _sourceZoomRange[1];
         // }
         
+        private void TrackUntilComplete<T1>(DataTaskWrapper<T1> task) where T1 : MapboxTileData, new()
+        {
+            TrackTask(task);
+            task.DataCompleted += (resultTask, result) => CompleteTask(task);
+        }
+
         private void TrackTask(TaskWrapper task)
         {
             if (!_activeTasks.ContainsKey(task.TileId))
