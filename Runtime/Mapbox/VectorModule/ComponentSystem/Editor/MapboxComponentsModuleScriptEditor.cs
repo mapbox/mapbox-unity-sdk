@@ -15,8 +15,21 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
         private GUIStyle _boxStyle;
         private List<Type> _visualizerTypes;
 
-        private void OnEnable()
+                private bool _editorInitialized;
+
+        // Editor.OnEnable can run while the target is null - entering Play mode destroys and recreates
+        // the inspected object - and touching serializedObject then throws
+        // SerializedObjectNotCreatableException, which cannot be recovered from inside the callback.
+        // Initialization is retried from OnInspectorGUI, which only runs once the target is real.
+        private void TryInitializeEditor()
         {
+            if (_editorInitialized || target == null)
+            {
+                return;
+            }
+
+            _editorInitialized = true;
+
             _layerVisualizersProp = serializedObject.FindProperty("_layerVisualizers");
 
             // Find all ScriptableObject types that implement IPerformanceLayerVisualizer
@@ -28,8 +41,19 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
                 .ToList();
         }
 
+        private void OnEnable()
+        {
+            TryInitializeEditor();
+        }
+
         public override void OnInspectorGUI()
         {
+            TryInitializeEditor();
+            if (!_editorInitialized)
+            {
+                return;
+            }
+
             serializedObject.Update();
 
             DrawPropertiesOtherThanVisualizerList();
