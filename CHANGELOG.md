@@ -28,6 +28,10 @@ Correctness work across the tile pipeline, independent of any one feature module
 
   A feature that lacks the property is now not a match, which for an inverting filter means it passes.
 
+- The custom imagery module's `Source Type` and `Custom Source Id` never reached the Inspector. `CustomApiLayerModuleScriptEditor` draws its fields by hand, and those two were not in the list, so choosing a Mapbox style through this module was not possible from the Editor at all - the dropdown existed on the class and nothing showed it. Both are drawn now, with the url fields shown only for source type `Custom`, since a Mapbox style needs no url.
+
+- The custom imagery module's `Source Type` dropdown did nothing, and every custom imagery layer shared one cache namespace. `CustomApiLayerModuleScript` resolved the chosen style into `Settings.DataSettings.TilesetId` and then built its source from a fresh `ImageSourceSettings` with a hardcoded `"CustomImagery"` id, discarding the resolved style along with the retina, cache-size and data-level-clamp settings next to it. So a custom imagery layer only worked with an explicit `UrlFormat`, picking `Mapbox Streets` had no effect, and two custom layers on different URLs collided in the cache because they keyed on the same name. `DataSettings` is now passed through, falling back to `"CustomImagery"` only when nothing resolved an id (source type `None`, or `Custom` with the id left empty) so the cache still has something to key on.
+
 - Asking for a vector tileset the map does not carry failed silently. `MapUnityService.GetVectorSource` returns the one shared vector source - deliberate, since the Vector Tiles API composes tilesets and a second source means a second request and cache entry per tile - but whoever calls first defines the tileset for everyone after them. A module asking for `mapbox-terrain-v2` after something took `mapbox-streets-v8` received a source that would never carry a layer it needed, with no error and its tileset id discarded. It now logs an error naming both ids, the tilesets actually missing, and the composed id to use instead. Behaviour is unchanged otherwise; composing the ids is still the caller's job.
 
 - The Inspector's enable toggle on filters and modifiers did nothing. `FilterBaseObject`, `ScriptableMeshModifierObject` and `ScriptableGameObjectModifierObject` each carry an `m_Active` field that the filter- and modifier-stack Inspectors draw as a tickbox, and no runtime code read it - so an unticked filter still filtered and an unticked modifier still ran. Inactive entries are now dropped when the stack is built, which also costs nothing per feature. Empty slots in `GoModifiers` are dropped with them: `ModifierStack.RunGoModifiers` does not null-check, unlike its mesh counterpart.
@@ -72,6 +76,32 @@ Correctness work across the tile pipeline, independent of any one feature module
 - `Mapbox.BaseModule.Utilities.MvtProperties.NormalizeIntegers`, public for anyone reading feature properties off their own decode path and hitting the same unsigned-int64 problem described above.
 
 - `UnitySource<T>.TilesetId`, so a caller can see which tileset - or which composed, comma-separated list of tilesets - a source it was handed actually fetches.
+
+- `IMapInformation.TryGetViewCenterPosition` / `TryGetViewCenterMercator` / `TryGetViewCenterLatLng`, reporting what the camera is actually looking at - where a ray through the centre of the viewport meets the map plane. The map's own centre is not always the view centre: a camera that pans by recentring the map keeps the two together, while one that keeps the map origin fixed and moves itself does not, and then `CenterMercator` is the world origin rather than anything on screen. They report `false` instead of a placeholder when there is no such point, which is the honest answer for a camera pitched at or above the horizon, where the centre ray is parallel to the plane or points away from it. Computed on demand rather than cached on the map, so no reader can see a stale value. The plane is world y = 0, matching the rest of the SDK's screen-to-map math, so a moved, rotated or reparented MapRoot is not accounted for, and terrain height is ignored.
+
+- A custom imagery layer can now sit on the map without drawing on it, and can fetch coarser than the map draws. `CustomApiLayerModuleScript` gains `Mode` - `Display` (unchanged), `DisplayNonBlocking` (draws, but never holds a tile back), `DataOnly` (fetches and caches, draws nothing) - and `DataZoomOffset`.
+
+  `DataOnly` is what makes a second imagery source possible at all: a tile has one imagery slot, so two drawing layers overwrite each other and the visible map, not just the second consumer, ends up wrong. Read such a layer with the new `RasterSourceMinimapTileSource`, and a minimap can show a different style from the map it mirrors - streets on the minimap over satellite on the map.
+
+  `DataZoomOffset` of -2 fetches one tile per 16 map tiles, cutting requests and cache entries by the same factor for a quarter of the linear detail, which a minimap drawing the imagery small does not miss. Placement needs no work at either end: consumers already derive the sub-rect from the fetched tile's own id, the same way terrain shares one data tile across sixteen render tiles. Nothing in the imagery module changed - the new `CustomImageryLayerModule` overrides only members that were already virtual.
+
+- A minimap component in the imagery module: `MinimapScript` for drop-in use, and the pieces it delegates to for anything beyond that. `IMinimapTileSource` decides what a tile shows (`TerrainHeightMinimapTileSource` and `ImageryMinimapTileSource` ship; implement it for fog-of-war, team colours, or any per-tile texture of your own), `IMinimapRenderer` decides how it is drawn (`RawImageMinimapRenderer` draws pooled UI images; implement it for world-space or render-texture minimaps), and `MinimapProjection` is the layout math on its own, free of both. `MinimapView` ties them together and can be driven directly without the MonoBehaviour.
+
+  `SourceModule` is a dropdown of the scene's imagery, custom-imagery and terrain modules, not an object field. It has to be: modules are components, several sit on one GameObject, and dragging that object makes Unity take whichever `ModuleConstructorScript` is ordered first. The scan covers the whole scene because a module need not be on the map - `CompositeLayerModuleScript` builds a list of module scripts wherever they live - and each entry names its owning GameObject. Composite, vector and component modules are left out, since a minimap cannot draw them. A module that is in the scene but that the map never builds is labelled and explained rather than silently producing an empty minimap. It has to be: every layer module is a component on the map's own GameObject, so dragging that GameObject onto an object field cannot say which module was meant - Unity takes whichever `ModuleConstructorScript` is ordered first. The dropdown names each module by type, numbers duplicates, and marks disabled ones as ones that will not build.
+
+  Drop a layer module on `SourceModule` to draw that module's data rather than whatever the map left on the tile - the Inspector route to a minimap on a different style, with no code. An imagery or custom-imagery module resolves to its raster source, a terrain module to the terrain height texture, and anything else logs what it was and falls back. Leave it empty for the zero-config case, where `Source` picks between the terrain and imagery already on the tile.
+
+  Set `ViewCenterCamera` to the map camera for any camera that moves rather than recentring the map - `Moving3dCamera` and most 3D rigs. The minimap then centres on what that camera is looking at. Prefer it over `ViewCenter` for any pitched view: the camera sits behind and above the point it is looking at, by 100 units of ground distance at 45 degrees of pitch and over 1100 at 5 degrees, so centring on the camera's own position pushes the view centre off toward the edge of the panel. `ViewCenter` remains for centring on a thing rather than a view - a player marker, say.
+
+  Either is needed because those cameras never report a centre back to the map for any camera that moves itself rather than recentring the map - `Moving3dCamera` and most 3D rigs. Those never report a centre back to the map, so `MapInformation.CenterMercator` stays at the start position for the whole session while the view travels away from it; a minimap centred on it holds the origin while the tiles march off the panel. Leave `ViewCenter` empty for `SlippyMapCamera`, which does report its centre.
+
+  `ZoomOffset` is fractional, not whole levels: it only reaches the tile-size exponent, so -1.5 is a valid step. Tile alignment is unaffected - that is the reference zoom's job.
+
+  `BorderThickness` and `BorderColor` drive an optional ring around the panel. Thickness is per-edge pixels rather than a raw scale, since the border is a uniformly scaled copy of the panel and the scale that yields a given width depends on the panel's size (7.5px on a 300px panel is a scale of 1.05). Zero thickness or a transparent colour hides it, and it updates in the scene view without entering play mode.
+
+  A `Minimap.prefab` ships with it, ready to drop under a Canvas: a circular-masked 300x300 panel with the content, rotation and mask nodes already wired to the component. Assign a map to it and it works; everything else is optional. The circular mask is a generated sprite, so swapping the shape is one field on the mask Image.
+
+  Three things in it are less obvious than they look, and are the reason this is a component rather than a snippet in a sample. It reconciles against `MapVisualizer.ActiveTiles` every frame instead of following `TileLoaded`/`TileUnloading`: the dictionary is complete at every instant it can be read, whereas mirroring it from two events with different latencies reintroduces the one-frame hole that shows up as flicker on every zoom change. Tiles are laid out in units of one reference zoom taken from the camera, not from the active tiles, so the routine mix of coarse stand-ins and fine tiles aligns, and a tile that never unloads cannot freeze the minimap's scale. And the tile-size conversion scales by the fractional part of the zoom, so the minimap does not hold one size per zoom level and pop at each integer tick.
 
 ### v3.1.1
 
@@ -345,7 +375,6 @@ Minor-version bump per semver: this release contains source-breaking API changes
 - Removed the Point Layer Visualizer, which became unnecessary after the structural changes above.
 - Removed the Terrain Type setting, as it now only had a single valid option after recent updates.
 
-
 ### v3.0.5
 Bug fixes, performance improvements, vector module changes, and core library updates for Android 16KB page size compatibility.
 
@@ -462,7 +491,6 @@ Improvements
 
 ### v3.0.1
 ### v3.0.0
-
 
 ### v2.1.2
 ### Bug Fixes
@@ -721,7 +749,6 @@ Improvements
 - If you have issues with missing libraries in Xcode, please check that you are not using `symlink` in your Unity build settings and that your min. target OS is 8.
 - Requesting too many tiles at once (on client) will often lead to many failed tile requests. We recommend that you distribute these requests over many frames!
 
-
 ### v.1.2.0
 
 *09/26/2017*
@@ -848,7 +875,6 @@ Improvements
 - Terrain generation in Unity 5.5+ should be much faster and allocate less memory
 
 ##### New Features
-
 
 - Added new retina-resolution raster tiles
 - Added mipmap, compression, and retina-resolution support to `MapImageFactory`
