@@ -26,6 +26,13 @@ namespace Mapbox.ImageModule.Terrain
     {
         private TerrainLayerModuleSettings _settings;
         private Source<TerrainData> _rasterSource;
+        /// <summary>
+        /// The terrain data behind this module, for reading elevation rasters without going
+        /// through a tile. A tile holds one terrain slot filled by whichever module drew it, so
+        /// anything wanting a specific module's data - a second, data-only source at another
+        /// tileset, say - has to ask the module.
+        /// </summary>
+        public Source<TerrainData> RasterSource => _rasterSource;
         private HashSet<CanonicalTileId> _retainedTerrainTiles;
         private TerrainStrategy _terrainStrategy;
         // Owns the Min/MaxElevation bookkeeping that used to live in MapboxMapVisualizer.
