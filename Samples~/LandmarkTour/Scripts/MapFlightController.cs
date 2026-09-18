@@ -24,7 +24,7 @@ namespace Mapbox.Samples.LandmarkTour
     /// altitude, means the tiles requested are a few dozen coarse ones per zoom level over
     /// two fixed locations. Second, zoom and pitch are never animated in the same phase —
     /// tilting always happens at a fixed zoom, and zoom-walking always happens at a fixed
-    /// pitch. See the note on <see cref="WalkZoom"/> for why: blending them let
+    /// pitch. See the note on <see cref="BuildZoomStep"/> for why: blending them let
     /// <c>UnityTileProvider</c>'s quadtree split decision flip between "split into 4
     /// children" and "don't split" across consecutive frames — and each flip drops tiles out
     /// of the retained set for a frame, which is enough for the fetch pipeline to cancel an
@@ -56,6 +56,9 @@ namespace Mapbox.Samples.LandmarkTour
 
         [Tooltip("Seconds of camera motion per zoom step. The climb or descent lasts this times the number of steps it spans, run as one uninterrupted eased sweep.")]
         public float SecondsPerStep = 0.35f;
+
+        [Tooltip("Seconds the climb, cruise, and descent phases overlap with their neighbour so the camera never comes to a full stop between them. Clamped to the shorter of the two phases at each boundary. Only ever overlaps zoom with pan - the two tilt phases are never crossfaded with anything, since blending pitch with zoom is what causes the tile flip-flop documented on BuildZoomStep.")]
+        public float CrossfadeSeconds = 0.25f;
 
         [Tooltip("Longest a background tile refresh may run before it is abandoned, in seconds. 0 disables tile refreshing entirely. The camera never waits on this — it only bounds how long a refresh keeps polling.")]
         public float TileWaitTimeout = 0.8f;
@@ -171,42 +174,43 @@ namespace Mapbox.Samples.LandmarkTour
 
             if (CameraBehaviour != null) CameraBehaviour.enabled = false;
 
-            // Phase 1a — tilt to looking straight down, before any zoom change, at the
-            // starting point. See the note on UnityTileProvider's near-90 pitch behaviour
-            // on TiltPitch and WalkZoom below for why this has to be a separate phase
-            // rather than blended with the zoom-out.
+            // Phase 1a — tilt to looking straight down, before any zoom or pan starts, at
+            // the starting point. Never crossfaded with what follows — see the note on
+            // BuildZoomStep for why pitch can never safely move in the same frame as zoom.
             yield return TiltPitch(start, startZoom, startPitch, cruisePitch, startBearing);
 
-            // Phase 1b — climb over the starting point to cruise altitude, one step at a
-            // time, pitch held at cruisePitch throughout.
-            yield return WalkZoom(start, startZoom, cruiseZoom, cruisePitch, startBearing);
+            // Phase 1b/2/3a — climb to cruise altitude, travel, and descend onto the
+            // destination, each boundary crossfaded into the next so the camera never comes
+            // to a full stop mid-flight. Pitch is held at cruisePitch across all three, so
+            // zoom and pan overlap each other here but never overlap a pitch change.
+            var curCenter = start;
+            var curZoom = startZoom;
+            var curBearing = startBearing;
 
-            // Phase 2 — travel at cruise altitude. The only phase that moves the centre, so
-            // the only one that can stream a corridor of tiles, and it runs at the zoom where
-            // the whole route fits on screen. Bearing swings here, where it is free.
-            yield return RunPhase(cruise, progress =>
+            var climb = BuildZoomStep(startZoom, cruiseZoom, z => curZoom = z);
+            var descend = BuildZoomStep(cruiseZoom, targetZoom, z => curZoom = z);
+
+            void ApplyCruise(float progress)
             {
                 var eased = Mathf.SmoothStep(0f, 1f, progress);
-                _map.ChangeView(
-                    new LatitudeLongitude(
-                        start.Latitude + (target.Latitude - start.Latitude) * eased,
-                        start.Longitude + (target.Longitude - start.Longitude) * eased),
-                    cruiseZoom,
-                    cruisePitch,
-                    Mathf.LerpAngle(startBearing, targetBearing, eased));
-            });
+                curCenter = new LatitudeLongitude(
+                    start.Latitude + (target.Latitude - start.Latitude) * eased,
+                    start.Longitude + (target.Longitude - start.Longitude) * eased);
+                curBearing = Mathf.LerpAngle(startBearing, targetBearing, eased);
+            }
 
-            // Nudge the destination's coarse tiles along before starting down, but do not
-            // hold the camera for them: a blocking wait here is a dead stop of up to
-            // TileWaitTimeout right at the top of the arc, which is the most visible place
-            // in the whole flight to stop moving.
-            RefreshTilesInBackground();
+            // descend's onStart re-fires the same background tile nudge the old sequential
+            // code fired explicitly between cruise and descent — it now lands during
+            // cruise's tail instead of strictly after it, since the two overlap.
+            yield return CrossfadeChain(
+                CrossfadeSeconds,
+                () => _map.ChangeView(curCenter, curZoom, cruisePitch, curBearing),
+                (climb.duration, climb.apply, climb.onStart),
+                (cruise, (Action<float>)ApplyCruise, (Action)null),
+                (descend.duration, descend.apply, descend.onStart));
 
-            // Phase 3a — descend onto the destination, centre already fixed, pitch held at
-            // cruisePitch throughout.
-            yield return WalkZoom(target, cruiseZoom, targetZoom, cruisePitch, targetBearing);
-
-            // Phase 3b — tilt onto the destination's own pitch only once zoom has settled.
+            // Phase 3b — tilt onto the destination's own pitch only once zoom and pan have
+            // fully settled, for the same reason as phase 1a.
             yield return TiltPitch(target, targetZoom, cruisePitch, targetPitch, targetBearing);
 
             // Land exactly on the requested view rather than wherever the last frame fell.
@@ -231,8 +235,13 @@ namespace Mapbox.Samples.LandmarkTour
         }
 
         /// <summary>
-        /// Sweeps zoom from one value to another in a single continuous eased motion, with
-        /// the centre AND the pitch held still throughout — see the pitch note below.
+        /// Builds the (duration, per-frame apply, on-start) triple for a single continuous
+        /// eased zoom sweep from one value to another, leaving the centre and pitch to
+        /// whoever calls <paramref name="setZoom"/> — a fixed value while this sweep runs
+        /// alone, or a concurrently-running phase's own state while it overlaps one, as in
+        /// the crossfaded climb/cruise/descend chain in <see cref="Fly"/>. Returned rather
+        /// than run immediately so the caller can drive it inside a
+        /// <see cref="CrossfadeChain"/> without duplicating the step/refresh bookkeeping.
         ///
         /// The sweep is deliberately one phase rather than one phase per zoom step. Stepping
         /// the camera was an earlier attempt at the tile problem below, and it cost far more
@@ -253,7 +262,9 @@ namespace Mapbox.Samples.LandmarkTour
         /// Detail lags the camera by up to a step's worth of levels while it catches up,
         /// which is the trade: a lagging texture reads far better than a stalling camera.
         ///
-        /// Pitch is a single fixed value, not a from/to pair, and that is deliberate.
+        /// Pitch must stay a single fixed value across this sweep, never a from/to pair
+        /// interpolated at the same time — that is deliberate and is the one thing the
+        /// crossfade in <see cref="Fly"/> deliberately does NOT relax.
         /// UnityTileProvider.ShouldSplit special-cases a camera looking straight down: with
         /// no horizontal forward component, every tile's corners project to ~zero distance
         /// along that forward, which the split test treats as "behind the camera" and
@@ -271,15 +282,13 @@ namespace Mapbox.Samples.LandmarkTour
         /// ends, since nothing calls ChangeView again until the user provides real input.
         /// That is why landmarks would silently fail to load on the scripted flight and only
         /// ever appear after a manual pan or click — manual mouse-wheel zoom never touches
-        /// pitch at all, so it never triggers the flip-flop. Callers tilt to the cruise pitch
-        /// before starting a zoom walk and tilt away from it only after the walk finishes, so
-        /// pitch and zoom are never both moving in the same frame.
+        /// pitch at all, so it never triggers the flip-flop. <see cref="Fly"/> tilts to the
+        /// cruise pitch before this sweep group starts and tilts away from it only after the
+        /// whole group finishes, so pitch and zoom are still never both moving in the same
+        /// frame — only zoom and pan (which this sweep does not touch) now are.
         /// </summary>
-        private IEnumerator WalkZoom(
-            LatitudeLongitude center,
-            float fromZoom, float toZoom,
-            float pitch,
-            float bearing)
+        private (float duration, Action<float> apply, Action onStart) BuildZoomStep(
+            float fromZoom, float toZoom, Action<float> setZoom)
         {
             var span = Mathf.Abs(toZoom - fromZoom);
             var perStep = Mathf.Max(0.25f, ZoomLevelsPerStep);
@@ -290,16 +299,10 @@ namespace Mapbox.Samples.LandmarkTour
             var duration = steps * Mathf.Max(0f, SecondsPerStep);
             var nextRefreshStep = 1;
 
-            RefreshTilesInBackground();
-
-            yield return RunPhase(duration, progress =>
+            void Apply(float progress)
             {
                 var t = Mathf.SmoothStep(0f, 1f, progress);
-                _map.ChangeView(
-                    center,
-                    Mathf.Lerp(fromZoom, toZoom, t),
-                    pitch,
-                    bearing);
+                setZoom(Mathf.Lerp(fromZoom, toZoom, t));
 
                 // Fired as the sweep passes each step boundary rather than on a timer, so
                 // the refreshes track zoom levels actually crossed. The easing means the
@@ -310,12 +313,76 @@ namespace Mapbox.Samples.LandmarkTour
                     nextRefreshStep++;
                     RefreshTilesInBackground();
                 }
-            });
+            }
+
+            return (duration, Apply, RefreshTilesInBackground);
         }
 
         /// <summary>
-        /// Tilts pitch at a fixed zoom and centre. Kept separate from WalkZoom so the two
-        /// never animate at once — see the pitch note on WalkZoom for why that matters.
+        /// Runs a sequence of phases back to back, but starts each one
+        /// <paramref name="overlapSeconds"/> before the previous one finishes instead of
+        /// waiting for a full stop, so consecutive phases blend rather than jerk. Each
+        /// phase's own apply delegate should only ever write the parameters it owns (e.g.
+        /// zoom, or centre+bearing) into shared state — <paramref name="commit"/> is called
+        /// once per frame, after every active phase has applied, to push that shared state
+        /// into <see cref="MapboxMap.ChangeView"/> a single time. This is what lets two
+        /// phases overlap safely: as long as they own disjoint parameters, there is nothing
+        /// to reconcile between them.
+        ///
+        /// This is only ever used to overlap zoom with pan — never zoom with pitch. See the
+        /// note on <see cref="BuildZoomStep"/> for why the latter has to stay hard-separated.
+        /// </summary>
+        private static IEnumerator CrossfadeChain(
+            float overlapSeconds,
+            Action commit,
+            params (float duration, Action<float> apply, Action onStart)[] phases)
+        {
+            var starts = new float[phases.Length];
+            for (var i = 1; i < phases.Length; i++)
+            {
+                var overlap = Mathf.Max(0f, Mathf.Min(overlapSeconds, Mathf.Min(phases[i - 1].duration, phases[i].duration)));
+                starts[i] = starts[i - 1] + phases[i - 1].duration - overlap;
+            }
+
+            var started = new bool[phases.Length];
+            var total = starts[starts.Length - 1] + phases[phases.Length - 1].duration;
+            var elapsed = 0f;
+
+            while (elapsed < total)
+            {
+                for (var i = 0; i < phases.Length; i++)
+                {
+                    var local = elapsed - starts[i];
+                    if (local < 0f) continue;
+
+                    if (!started[i])
+                    {
+                        started[i] = true;
+                        phases[i].onStart?.Invoke();
+                    }
+
+                    var duration = phases[i].duration;
+                    phases[i].apply(duration <= 0f ? 1f : Mathf.Clamp01(local / duration));
+                }
+
+                commit();
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            for (var i = 0; i < phases.Length; i++)
+            {
+                if (!started[i]) phases[i].onStart?.Invoke();
+                phases[i].apply(1f);
+            }
+
+            commit();
+        }
+
+        /// <summary>
+        /// Tilts pitch at a fixed zoom and centre. Kept separate from the zoom sweep so the
+        /// two never animate at once — see the pitch note on <see cref="BuildZoomStep"/> for
+        /// why that matters.
         /// </summary>
         private IEnumerator TiltPitch(LatitudeLongitude center, float zoom, float fromPitch, float toPitch, float bearing)
         {
