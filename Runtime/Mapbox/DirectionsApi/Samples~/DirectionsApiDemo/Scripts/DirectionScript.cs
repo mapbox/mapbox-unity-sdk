@@ -95,7 +95,7 @@ namespace Mapbox.DirectionsApi.Samples
 					if (Label != null) Label.SetActive(false);
 					foreach (var go in _gos)
 					{
-						Destroy(go);
+						DestroyRouteSegment(go);
 					}
 
 					_gos.Clear();
@@ -164,6 +164,25 @@ namespace Mapbox.DirectionsApi.Samples
 			var dirNorm = ray.direction / ray.direction.y;
 			var intersectionPos = ray.origin - dirNorm * ray.origin.y;
 			return intersectionPos;
+		}
+
+		/// <summary>
+		/// Destroys a rendered route-segment GameObject along with the Mesh instance
+		/// <see cref="CongestionRouteRenderer"/> created for it. The GameObject's Mesh is unique to it
+		/// (never shared), so it is not freed by destroying the GameObject alone - only its MeshFilter is.
+		/// Materials are cached and reused by the renderer, so they are intentionally left alone here.
+		/// </summary>
+		private static void DestroyRouteSegment(GameObject go)
+		{
+			if (go == null) return;
+
+			var meshFilter = go.GetComponent<MeshFilter>();
+			if (meshFilter != null && meshFilter.sharedMesh != null)
+			{
+				Destroy(meshFilter.sharedMesh);
+			}
+
+			Destroy(go);
 		}
 	}
 }

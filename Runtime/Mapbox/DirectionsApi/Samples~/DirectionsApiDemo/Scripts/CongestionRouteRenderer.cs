@@ -32,32 +32,17 @@ namespace Mapbox.DirectionsApi.Samples
 		[Tooltip("Color for 'severe' congestion, numeric 80-100 (near-standstill). Suggested: red.")]
 		public Color Severe = new Color(0.85f, 0.20f, 0.20f, 1f);
 
-		/// <summary> Maps a congestion level key to its configured color. </summary>
-		public Color ColorFor(string level)
+		/// <summary> Maps a congestion level to its configured color. </summary>
+		public Color ColorFor(CongestionLevel level)
 		{
-			switch ((level ?? string.Empty).ToLowerInvariant())
+			switch (level)
 			{
-				case "low": return Low;
-				case "moderate": return Moderate;
-				case "heavy": return Heavy;
-				case "severe": return Severe;
+				case CongestionLevel.Low: return Low;
+				case CongestionLevel.Moderate: return Moderate;
+				case CongestionLevel.Heavy: return Heavy;
+				case CongestionLevel.Severe: return Severe;
 				default: return Unknown;
 			}
-		}
-
-		/// <summary>
-		/// Buckets a <c>congestion_numeric</c> value (0-100, or null for unknown) into a level key.
-		/// Thresholds match the Mapbox Navigation SDK defaults: 0-39 low, 40-59 moderate, 60-79 heavy, 80-100 severe.
-		/// </summary>
-		public static string LevelForNumeric(int? value)
-		{
-			if (value == null) return "unknown";
-
-			var v = value.Value;
-			if (v < 40) return "low";
-			if (v < 60) return "moderate";
-			if (v < 80) return "heavy";
-			return "severe";
 		}
 	}
 
@@ -99,13 +84,18 @@ namespace Mapbox.DirectionsApi.Samples
 				.ToList();
 
 			// One sub-polyline list per congestion level, so each level becomes a single colored mesh.
-			var pointsByLevel = new Dictionary<string, List<List<Vector3>>>();
+			var pointsByLevel = new Dictionary<CongestionLevel, List<List<Vector3>>>();
 
-			var congestion = CombineCongestionLevels(route);
-			if (congestion == null || congestion.Count != positions.Count - 1)
+			var congestion = CombineCongestionLevels(route, out var congestionFailureReason);
+			if (congestion == null)
 			{
-				// No/misaligned congestion data (e.g. non-traffic profile): draw the whole route in one color.
-				AddRun(pointsByLevel, "unknown", positions, 0, positions.Count - 1);
+				Debug.LogWarning($"CongestionRouteRenderer: {congestionFailureReason} Drawing the whole route in the 'Unknown' color.");
+				AddRun(pointsByLevel, CongestionLevel.Unknown, positions, 0, positions.Count - 1);
+			}
+			else if (congestion.Count != positions.Count - 1)
+			{
+				Debug.LogWarning($"CongestionRouteRenderer: congestion segment count ({congestion.Count}) does not match geometry segment count ({positions.Count - 1}). Drawing the whole route in the 'Unknown' color.");
+				AddRun(pointsByLevel, CongestionLevel.Unknown, positions, 0, positions.Count - 1);
 			}
 			else
 			{
@@ -134,37 +124,49 @@ namespace Mapbox.DirectionsApi.Samples
 		}
 
 		/// <summary>
-		/// Concatenates each leg's numeric congestion annotation in order and buckets it into level keys,
-		/// or returns null if any leg lacks the annotation.
+		/// Concatenates each leg's numeric congestion annotation in order and buckets it into congestion levels,
+		/// or returns null (with a reason in <paramref name="failureReason"/>) if the data isn't usable.
 		/// </summary>
-		private static List<string> CombineCongestionLevels(Route route)
+		private static List<CongestionLevel> CombineCongestionLevels(Route route, out string failureReason)
 		{
 			if (route.Legs == null || route.Legs.Count == 0)
-				return null;
-
-			var combined = new List<string>();
-			foreach (var leg in route.Legs)
 			{
-				var numeric = leg?.Annotation?.CongestionNumeric;
-				if (numeric == null)
-					return null;
-
-				foreach (var value in numeric)
-					combined.Add(CongestionColors.LevelForNumeric(value));
+				failureReason = "Route has no legs.";
+				return null;
 			}
 
-			return combined.Count > 0 ? combined : null;
+			var combined = new List<CongestionLevel>();
+			for (var i = 0; i < route.Legs.Count; i++)
+			{
+				var numeric = route.Legs[i]?.Annotation?.CongestionNumeric;
+				if (numeric == null)
+				{
+					failureReason = $"Leg {i} has no congestion_numeric annotation (was the route requested with AnnotationOptions.CongestionNumeric and the driving-traffic profile?).";
+					return null;
+				}
+
+				foreach (var value in numeric)
+					combined.Add(CongestionLevelUtility.LevelForNumeric(value));
+			}
+
+			if (combined.Count == 0)
+			{
+				failureReason = "Congestion annotation arrays were all empty.";
+				return null;
+			}
+
+			failureReason = null;
+			return combined;
 		}
 
 		/// <summary> Adds the sub-polyline of geometry points [startPoint .. endPoint] to the given level's bucket. </summary>
-		private static void AddRun(Dictionary<string, List<List<Vector3>>> pointsByLevel, string level,
+		private static void AddRun(Dictionary<CongestionLevel, List<List<Vector3>>> pointsByLevel, CongestionLevel level,
 			List<Vector3> positions, int startPoint, int endPoint)
 		{
-			var key = (level ?? string.Empty).ToLowerInvariant();
-			if (!pointsByLevel.TryGetValue(key, out var runs))
+			if (!pointsByLevel.TryGetValue(level, out var runs))
 			{
 				runs = new List<List<Vector3>>();
-				pointsByLevel[key] = runs;
+				pointsByLevel[level] = runs;
 			}
 
 			runs.Add(positions.GetRange(startPoint, endPoint - startPoint + 1));
@@ -180,11 +182,8 @@ namespace Mapbox.DirectionsApi.Samples
 			var meshData = new MeshData();
 			var lineMeshCore = new LineMeshCore(new LineMeshParameters { Width = _width }, _mapInformation);
 
-			vectorEntity.Mesh = new Mesh();
-			vectorEntity.Mesh.SetMeshValues(meshData);
 			vectorEntity.GameObject = new GameObject("CongestionSegment");
 			vectorEntity.MeshFilter = vectorEntity.GameObject.AddComponent<MeshFilter>();
-			vectorEntity.MeshFilter.mesh = vectorEntity.Mesh;
 			vectorEntity.MeshRenderer = vectorEntity.GameObject.AddComponent<MeshRenderer>();
 
 			lineMeshCore.Run(vectorEntity.Feature, meshData);
@@ -192,17 +191,19 @@ namespace Mapbox.DirectionsApi.Samples
 			if (meshData.Vertices.Count == 0 || meshData.Triangles.Count == 0 || !AllFinite(meshData.Vertices))
 			{
 				// Skip degenerate/invalid runs rather than let Unity throw on an invalid mesh bounds.
+				Debug.LogWarning("CongestionRouteRenderer: skipping a run because the generated mesh was empty or contained non-finite vertices.");
 				UnityEngine.Object.Destroy(vectorEntity.GameObject);
 				return null;
 			}
 
-			vectorEntity.MeshFilter.mesh = new Mesh
+			vectorEntity.Mesh = new Mesh
 			{
 				vertices = meshData.Vertices.ToArray(),
 				triangles = meshData.Triangles[0].ToArray()
 			};
+			vectorEntity.MeshFilter.sharedMesh = vectorEntity.Mesh;
 			vectorEntity.GameObject.transform.position += new Vector3(0.0f, 1 / _mapInformation.Scale, 0.0f);
-			vectorEntity.MeshRenderer.material = GetMaterial(color);
+			vectorEntity.MeshRenderer.sharedMaterial = GetMaterial(color);
 			return vectorEntity.GameObject;
 		}
 
