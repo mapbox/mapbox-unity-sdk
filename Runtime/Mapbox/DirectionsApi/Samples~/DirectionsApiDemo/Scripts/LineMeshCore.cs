@@ -235,12 +235,8 @@ namespace Mapbox.DirectionsApi.Samples
 							var direction = (_prevNormal.x * _nextNormal.z - _prevNormal.z * _nextNormal.x) > 0
 								? -1
 								: 1;
-							// (_prevNormal - _nextNormal).magnitude is 0 only when the two normals are equal
-							// (collinear, angle 0 between them), but that same condition forces miterLength to 1
-							// (cosHalfAngle = 1), and this branch only runs for miterLength > 2 (Bevel promotes to
-							// Flipbevel only above that threshold, checked above). So the two normals can never be
-							// equal here and this denominator can never be zero - unlike the Math.Sqrt clamp above,
-							// which guards a genuinely reachable case.
+							// The denominator is 0 only for equal normals, which forces miterLength to 1 - and this
+							// branch only runs above 2. Unreachable, so unlike the Math.Sqrt above it needs no clamp.
 							var bevelLength = miterLength * (_prevNormal + _nextNormal).magnitude /
 							                  (_prevNormal - _nextNormal).magnitude;
 							joinNormal = joinNormal.Perpendicular() * (bevelLength * direction);

@@ -86,10 +86,13 @@ namespace Mapbox.DirectionsApi.Samples
 			// One sub-polyline list per congestion level, so each level becomes a single colored mesh.
 			var pointsByLevel = new Dictionary<CongestionLevel, List<List<Vector3>>>();
 
-			var congestion = CombineCongestionLevels(route, out var congestionFailureReason);
+			var congestion = CombineCongestionLevels(route, out var congestionFailureReason, out var annotationAbsent);
 			if (congestion == null)
 			{
-				Debug.LogWarning($"CongestionRouteRenderer: {congestionFailureReason} Drawing the whole route in the 'Unknown' color.");
+				var message = $"CongestionRouteRenderer: {congestionFailureReason} Drawing the whole route in the 'Unknown' color.";
+				// An absent annotation is the documented result of requesting a non-traffic profile, so it is
+				// reported without the warning severity the genuinely anomalous cases get.
+				if (annotationAbsent) Debug.Log(message); else Debug.LogWarning(message);
 				AddRun(pointsByLevel, CongestionLevel.Unknown, positions, 0, positions.Count - 1);
 			}
 			else if (congestion.Count != positions.Count - 1)
@@ -126,9 +129,14 @@ namespace Mapbox.DirectionsApi.Samples
 		/// <summary>
 		/// Concatenates each leg's numeric congestion annotation in order and buckets it into congestion levels,
 		/// or returns null (with a reason in <paramref name="failureReason"/>) if the data isn't usable.
+		/// <paramref name="annotationAbsent"/> distinguishes "the route was never asked for congestion data",
+		/// which is an expected outcome, from data that arrived malformed.
 		/// </summary>
-		private static List<CongestionLevel> CombineCongestionLevels(Route route, out string failureReason)
+		private static List<CongestionLevel> CombineCongestionLevels(Route route, out string failureReason,
+			out bool annotationAbsent)
 		{
+			annotationAbsent = false;
+
 			if (route.Legs == null || route.Legs.Count == 0)
 			{
 				failureReason = "Route has no legs.";
@@ -142,6 +150,7 @@ namespace Mapbox.DirectionsApi.Samples
 				if (numeric == null)
 				{
 					failureReason = $"Leg {i} has no congestion_numeric annotation (was the route requested with AnnotationOptions.CongestionNumeric and the driving-traffic profile?).";
+					annotationAbsent = true;
 					return null;
 				}
 
