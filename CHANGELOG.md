@@ -139,6 +139,10 @@ The `LandmarkTour` sample's `MapFlightController` gained crossfaded climb, cruis
 
   A tile merely dropping out of the retained set is **not** cancelled, and that is deliberate rather than an omission: `LoadTileCoverToMemory` legitimately generates tiles outside `_retainedBuildingTiles`, so cancelling on un-retain would abort the flight controller's own preloading.
 
+- `DirectionResource.Annotations` is now a non-nullable `AnnotationOptions` (previously `AnnotationOptions?`), defaulting to `AnnotationOptions.None`. `null` and `AnnotationOptions.None` already meant the same thing - "omit the `annotations` parameter" - so the nullable added nothing but a redundant state to check. **Breaking** only for code that read `Annotations` as a `Nullable<AnnotationOptions>` (calling `.Value`, comparing to `null`, and so on); assigning a plain `AnnotationOptions` value is unaffected.
+
+- `DirectionResource.GetUrl()` now throws when `Annotations` is set to anything other than `AnnotationOptions.None` while `Overview` is not `Overview.Full`. The Directions API rejects that combination with a 422; the resource previously only warned about it in its XML doc, leaving every other invalid combination in this class (coordinate count, bearing count, radius count/sign) to throw while this one shipped a bad request. **Breaking** for any caller relying on that request silently going out and failing server-side.
+
 #### Removed
 
 - Five commented-out extension-point source files - `TypeFilterObject`, `PolygonCollisionFilterObject`, `FeatureIdFilterObject`, `MeshOnPointModifierObject` and `MeshOnLineModifierObject`. Each was commented out top to bottom, `CreateAssetMenu` attribute included, so they contributed no type, no menu entry and no asset - only the impression, to anyone reading the source for extension points, that these existed. Residue of the v3.0.4/3.0.6 passes; git history keeps them.
@@ -207,6 +211,12 @@ The `LandmarkTour` sample's `MapFlightController` gained crossfaded climb, cruis
 - Click-to-select, wired into a scene and able to say which landmark was clicked. `LandmarkHighlightBehaviour` already raycast, tinted and raised an event, but it appeared in no sample and a hit could not be traced back to a landmark - the tile publishes an id on each building node, and nothing downstream recorded it. It is now a component on the `LandmarkDemo` map with its shipped defaults, `LandmarkComponent` carries `LandmarkId`, and the behaviour exposes `SelectedLandmarkId` for an Inspector-wired handler that only receives the GameObject. Selection is still whole-mesh: feature ids are decoded per-vertex and drive per-part appearance in the shader, but mapping a hit back to one would need the exact render mesh as a collider rather than the convex hull that keeps load cost down.
 
 - `LandmarksLayerModuleScript.TilesetId`, so the 3D tileset the module fetches from is an Inspector field rather than a constant compiled into the SDK. It defaults to `Constants.Map.LandmarksTilesetId` and falls back to it when left empty, so a scene saved before the field existed is unaffected.
+
+- Traffic congestion support for the Directions API wrapper. `AnnotationOptions` is a new `[Flags]` enum (`Distance`, `Duration`, `Speed`, `Congestion`, `CongestionNumeric`, `MaxSpeed`) requested via `DirectionResource.Annotations` and returned on `Response.Leg.Annotation` - `CongestionNumeric` in particular is an `int?[]` (0 = free-flowing, 100 = maximum, `null` = unknown), one entry per pair of coordinates in the leg's geometry. `RoutingProfile.DrivingTraffic` requests the `mapbox/driving-traffic` profile, which `Congestion`/`CongestionNumeric` require.
+
+- `Mapbox.DirectionsApi.CongestionLevel`, an enum (`Unknown`/`Low`/`Moderate`/`Heavy`/`Severe`) bucketing a `congestion_numeric` value into the same thresholds the Directions Demo uses to color a route (0-39 low, 40-59 moderate, 60-79 heavy, 80-100 severe, `null` unknown), and `CongestionLevelUtility.LevelForNumeric` to do the bucketing. Moved out of the Directions API demo (`Samples~`, which UPM excludes from compilation) into the `MapboxDirections` runtime assembly so the bucketing is unit-testable and reusable without pulling in the demo's Unity rendering code. The demo's `CongestionColors` (Inspector-exposed `UnityEngine.Color` fields) stays in `Samples~` and now keys off `CongestionLevel` instead of a `low`/`moderate`/`heavy`/`severe` string.
+
+- The Directions API demo (`Runtime/Mapbox/DirectionsApi/Samples~/DirectionsApiDemo`) draws the requested route colored by traffic congestion instead of a single color, via the new `CongestionRouteRenderer` and shared `LineMeshCore` extrusion helper.
 
 #### Tests
 
