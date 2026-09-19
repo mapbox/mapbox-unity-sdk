@@ -45,7 +45,7 @@ namespace Mapbox.DirectionsApi
 		private bool? steps;
 
 		// Optional
-		private AnnotationOptions? annotations;
+		private AnnotationOptions annotations = AnnotationOptions.None;
 
 		/// <summary> Initializes a new instance of the <see cref="DirectionResource" /> class.</summary>
 		/// <param name="coordinates">
@@ -204,12 +204,14 @@ namespace Mapbox.DirectionsApi
 
 		/// <summary>
 		///     Gets or sets the annotations option. Requests additional per-segment metadata along the route,
-		///     exposed on <see cref="Response.Leg.Annotation"/>. Requesting annotations requires
-		///     <see cref="Overview"/> to be set to <see cref="Overview.Full"/>, otherwise the API returns an error.
-		///     Congestion annotations are only available for the <c>mapbox/driving-traffic</c> profile
-		///     (<see cref="RoutingProfile.DrivingTraffic"/>).
+		///     exposed on <see cref="Response.Leg.Annotation"/>. Requesting annotations (any value other than
+		///     <see cref="AnnotationOptions.None"/>) requires <see cref="Overview"/> to be set to
+		///     <see cref="Overview.Full"/>; <see cref="GetUrl"/> throws otherwise, since the API itself
+		///     rejects the combination. Congestion annotations are only available for the
+		///     <c>mapbox/driving-traffic</c> profile (<see cref="RoutingProfile.DrivingTraffic"/>).
+		///     Defaults to <see cref="AnnotationOptions.None"/>, which omits the parameter entirely.
 		/// </summary>
-		public AnnotationOptions? Annotations {
+		public AnnotationOptions Annotations {
 			get {
 				return this.annotations;
 			}
@@ -257,9 +259,14 @@ namespace Mapbox.DirectionsApi
 				opts.Add("steps", this.Steps.ToString().ToLower());
 			}
 
-			if (this.Annotations != null && this.Annotations.Value != AnnotationOptions.None)
+			if (this.Annotations != AnnotationOptions.None)
 			{
-				opts.Add("annotations", this.Annotations.Value.ToQueryString());
+				if (!ReferenceEquals(this.Overview, Overview.Full))
+				{
+					throw new Exception("Requesting annotations requires Overview to be set to Overview.Full.");
+				}
+
+				opts.Add("annotations", this.Annotations.ToQueryString());
 			}
 
 			return Constants.Map.BaseAPI +

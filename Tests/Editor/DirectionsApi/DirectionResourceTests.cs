@@ -351,10 +351,10 @@ namespace Mapbox.DirectionsApiTests
         }
 
         [Test]
-        public void Annotations_DefaultsToNull()
+        public void Annotations_DefaultsToNone()
         {
             var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
-            Assert.IsNull(resource.Annotations);
+            Assert.AreEqual(AnnotationOptions.None, resource.Annotations);
         }
 
         [Test]
@@ -363,7 +363,7 @@ namespace Mapbox.DirectionsApiTests
             var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
             resource.Annotations = AnnotationOptions.Congestion;
 
-            Assert.AreEqual(AnnotationOptions.Congestion, resource.Annotations.Value);
+            Assert.AreEqual(AnnotationOptions.Congestion, resource.Annotations);
         }
 
         [Test]
@@ -371,6 +371,7 @@ namespace Mapbox.DirectionsApiTests
         {
             var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
             resource.Annotations = AnnotationOptions.Congestion;
+            resource.Overview = Overview.Full;
             var url = resource.GetUrl();
 
             Assert.IsTrue(url.Contains("annotations=congestion"));
@@ -391,11 +392,40 @@ namespace Mapbox.DirectionsApiTests
         {
             var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
             resource.Annotations = AnnotationOptions.Congestion | AnnotationOptions.Speed;
+            resource.Overview = Overview.Full;
             var url = resource.GetUrl();
 
             Assert.IsTrue(url.Contains("annotations="));
             Assert.IsTrue(url.Contains("congestion"));
             Assert.IsTrue(url.Contains("speed"));
+        }
+
+        [Test]
+        public void GetUrl_ThrowsException_WhenAnnotationsSetWithoutOverviewFull()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.CongestionNumeric;
+
+            Assert.Throws<Exception>(() => resource.GetUrl());
+        }
+
+        [Test]
+        public void GetUrl_ThrowsException_WhenAnnotationsSetWithOverviewSimplified()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.CongestionNumeric;
+            resource.Overview = Overview.Simplified;
+
+            Assert.Throws<Exception>(() => resource.GetUrl());
+        }
+
+        [Test]
+        public void GetUrl_DoesNotThrow_WhenAnnotationsNoneWithoutOverview()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.None;
+
+            Assert.DoesNotThrow(() => resource.GetUrl());
         }
 
         [Test]
