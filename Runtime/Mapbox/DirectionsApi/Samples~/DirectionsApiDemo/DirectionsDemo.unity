@@ -1086,7 +1086,7 @@ MonoBehaviour:
   MapCore: {fileID: 1316629399}
   Label: {fileID: 246213450}
   _labelFormat: 'Distance : {0}'
-  RoutingOption: 0
+  RoutingOption: 3
 --- !u!4 &1976003820
 Transform:
   m_ObjectHideFlags: 0
