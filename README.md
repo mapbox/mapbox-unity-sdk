@@ -5,7 +5,7 @@ Map rendering, location services, directions, and geocoding for Unity. Distribut
 | | |
 | --- | --- |
 | **Package name** | `com.mapbox.sdk` |
-| **Current version** | `3.1.0` |
+| **Current version** | `3.2.0` |
 | **Vendor** | Mapbox — <https://www.mapbox.com/> |
 | **Minimum Unity** | `2022.3` LTS |
 | **Build targets** | iOS, Android |
@@ -48,6 +48,8 @@ Resolved automatically by UPM:
 | `com.unity.nuget.newtonsoft-json` | `3.2.1` | Yes | JSON parsing for tile metadata and API responses. |
 | `com.unity.burst` | `1.8.12` | Yes | Burst-compiled terrain decode and collider job. First-time domain reload pays a one-shot AOT compile. |
 | `com.unity.inputsystem` | `1.7.0` | Yes | Camera input backend selection is controlled by Player Settings → Active Input Handling, not by this dependency; "Old" (default) keeps legacy `UnityEngine.Input` behavior. See `Documentation~/CameraSystem.md`. |
+| `com.unity.cloud.gltfast` | `6.18.0` (minimum) | Yes | Loads the glTF binaries the Landmarks Module fetches for 3D landmark buildings. 6.18.0 is the last release supporting Unity 2022.3 — declared as a minimum, not a pin, so projects on Unity 6 may raise it in their own manifest without further changes. |
+| `com.unity.meshopt.decompress` | `0.2.0-exp.1` | Yes | Decodes the `EXT_meshopt_compression` buffer views that landmark glTF tiles use, and that the tiles list in `extensionsRequired` — glTFast aborts a load when a required extension has no decoder, so this is a hard requirement rather than an optional accelerator. Currently an experimental (`-exp`) package. |
 
 ---
 
@@ -75,7 +77,7 @@ Every Mapbox API call (tiles, geocoding, directions) requires a Mapbox access to
 
 ## Demo scenes
 
-Five samples ship with the SDK. To import: open the Package Manager, select the Mapbox Unity SDK, go to the **Samples** tab, and click **Import** next to the one you want.
+Eight samples ship with the SDK. To import: open the Package Manager, select the Mapbox Unity SDK, go to the **Samples** tab, and click **Import** next to the one you want.
 
 | Sample | What it demonstrates |
 | --- | --- |
@@ -84,6 +86,9 @@ Five samples ship with the SDK. To import: open the Package Manager, select the 
 | **MapboxComponents** | High-performance component-system-based layer rendering (Buildings + Areas + Roads). |
 | **DirectionsApiDemo** | Calling the Directions API + rendering a route on the map. |
 | **GeocodingApiDemo** | Forward and reverse geocoding. |
+| **LandmarkDemo** | 3D landmark buildings (Landmarks Module), with the Components Module supplying the basic buildings around them and having its overlapping ones suppressed. Also the click-to-select sample: clicking a landmark highlights it and reports its id. |
+| **LandmarkDemoWithVector** | The same single-landmark setup as `LandmarkDemo`, but suppressing overlapping basic buildings through the Vector Module's filter stack instead of the Components Module. |
+| **LandmarkTour** | Flies the camera between famous landmarks across continental Europe — satellite imagery for the ground, Components-Module buildings and landmarks filling in close up — demonstrating a scripted multi-destination camera flight built on the Landmarks Module. |
 
 After import each sample lives under `Assets/Samples/Mapbox Unity SDK/<version>/<SampleName>/`. You can copy the relevant pieces into your own project layout and delete the `Samples` folder.
 
@@ -177,6 +182,7 @@ The SDK is organized into module assemblies. Each is a separate `.asmdef` and ca
 | `MapboxLocationModule` | `Runtime/Mapbox/LocationModule/` | GPS / compass via `AbstractLocationProvider`. Unity + static (editor) implementations. |
 | `MapboxImageModule` | `Runtime/Mapbox/ImageModule/` | Raster tile imagery (satellite, streets). Terrain strategies (flat / elevated). |
 | `MapboxVectorModule` | `Runtime/Mapbox/VectorModule/` | Vector tile rendering — buildings, roads, areas. Modifier-stack mesh generation + Component System. |
+| `MapboxLandmarksModule` | `Runtime/Mapbox/LandmarksModule/` | **Preview.** 3D landmark meshes from the Mapbox 3D Buildings tileset, rendered via glTFast, with overlap suppression against both the Vector and Components building pipelines. |
 | `MapboxCustomImageryModule` | `Runtime/Mapbox/CustomImageryModule/` | Custom tileset support (non-Mapbox sources via TMS or arbitrary URL templates). |
 | `MapboxDirections` | `Runtime/Mapbox/DirectionsApi/` | Directions API wrapper. |
 | `MapboxGeocoding` | `Runtime/Mapbox/GeocodingApi/` | Forward / reverse geocoding API wrapper. |
@@ -213,6 +219,11 @@ In-package documentation lives under `Documentation~/`. Grouped by what you're t
 - [`VectorLayerModule.md`](Documentation~/VectorLayerModule.md) — building / road / area visualizers, modifier stacks.
 - [`ComponentsModule.md`](Documentation~/ComponentsModule.md) — high-performance component-based vector pipeline.
 - [`WorkingWithPois.md`](Documentation~/WorkingWithPois.md) — point-of-interest features.
+
+**Landmarks**
+- [`LandmarksModule.md`](Documentation~/LandmarksModule.md) — setup, overlap suppression, the Landmark Tour sample.
+- [`LandmarksModuleInternals.md`](Documentation~/LandmarksModuleInternals.md) — collision detection, coordinate space transforms, tile edge handling, event lifecycle.
+- [`LandmarksModuleKnownGaps.md`](Documentation~/LandmarksModuleKnownGaps.md) — what the module does not do yet, including unsupported dynamic map scaling and selection that cannot pick a part of a landmark, only the whole of one.
 
 **APIs**
 - [`UsingDirectionsApi.md`](Documentation~/UsingDirectionsApi.md) — Directions API wrapper.

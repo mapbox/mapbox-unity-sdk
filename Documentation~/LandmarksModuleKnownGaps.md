@@ -32,23 +32,33 @@ Related and worth deciding at the same time: landmark geometry uses `metres / (S
 
 ---
 
-### Selection is implemented but wired to nothing
+### Selection cannot go below a whole landmark
 
-`LandmarkHighlightBehaviour` raycasts, tags hit meshes with `LandmarkComponent`, and tints the hit building. It appears in **no scene** — not `LandmarkDemo`, `LandmarkDemoWithVector`, or `LandmarkTour` — so it has never been exercised. Anyone wanting click-to-select today has to add the component themselves and discover the wiring from source.
+`LandmarkHighlightBehaviour` is now on the `Map` GameObject in `LandmarkDemo`, and a raycast hit can be resolved to a landmark id: `LandmarksLayerModule.BuildingLoaded` carries the id the tile publishes for each mesh, `LandmarkComponent.LandmarkId` stamps it onto the GameObject as it loads, and `LandmarkHighlightBehaviour.SelectedLandmarkId` exposes whichever one is currently highlighted. What remains is picking a *part* of a landmark rather than the whole thing.
 
-Missing to make it usable:
+Feature ids are already present at the granularity selection would need. `FeatureIdColorTable` decodes them per vertex from the tile's `_FEATURE_ID_RGBA4444` buffer view, and `FeatureIdMeshWriter.Apply` writes them onto each converted mesh as a Color vertex stream — one packed id per vertex, per primitive, already consumed by the shader through `SubpartIdTypeSelector` to vary per-part appearance. Nothing, however, maps a raycast hit back to one of those ids, so every hit today resolves to "this landmark" and never to "this wall of this landmark."
 
-- A sample that demonstrates it.
-- **Per-part selection.** Feature IDs are already decoded per-vertex (`FeatureIdColorTable` → `FeatureIdMeshWriter`) and consumed by the shader through `SubpartIdTypeSelector`, but only to pick per-part appearance. Nothing maps a raycast hit back to a feature id, so selection is whole-mesh only even though the data for finer granularity is present in the vertex stream.
-- **A way to ask what was clicked.** The tile publishes a landmark id (`mapbox:footprint:id` on the footprint node, `id` on the building node). `LandmarkAnchor.LandmarkId` captures it, but nothing surfaces it, so "which landmark is this" is unanswerable from a hit.
+The real obstacle is the collider, not the data. Recovering a feature id from a hit needs `RaycastHit.triangleIndex` against the exact triangle that was hit, read back against the same vertex buffer `FeatureIdMeshWriter` wrote into — which only works if the collider *is* the render mesh. `AddCollidersForSelection` cooks a `MeshCollider` for exactly this reason, but `UseConvexColliders` (on by default, and the only setting that keeps landmark loading affordable) replaces the real geometry with a convex hull before cooking, and a convex hull's `triangleIndex` values do not correspond to the render mesh's triangles at all. Per-part selection would mean giving up the convex-hull collider — and paying its cost, per landmark, everywhere selection is wanted — or finding a way to resolve a hit point to a feature id without going through `triangleIndex`.
 
 ---
 
-### Generation is not cancellable
+### Generation is cancellable only when a tile's data is evicted
 
-`GltfVisualizer.Generate` has no cancellation. When `RetainTiles` drops a tile, the vector and pbf sources cancel their in-flight fetches, but a glTF load already under way runs to completion and reports a tile the map no longer wants; the module caches a visual for it until the next sweep releases it. Wasted work rather than incorrect output, and most visible during fast zoom sweeps where the cover churns — the `LandmarkTour` flight is exactly that pattern.
+`GltfVisualizer` keeps a `CancellationTokenSource` per in-flight tile (`_activeLoads`, a dictionary now rather than the bare `HashSet<CanonicalTileId>` it used to be) and threads the token through both `gltf.Load` and `gltf.InstantiateSceneAsync`. A cancelled load unwinds through a caught `OperationCanceledException`, releases the import and the partially-built root it had created, and reports `TaskResultType.Cancelled` — which `LandmarksLayerModule.GenerateTask`'s result callback returns on before it would ever reach `RecordGenerationFailure`, so a cancelled load is never counted as a failed attempt; the tile is simply left unresolved and regenerated if it comes back into the cover. `GltfVisualizer.Cancel(CanonicalTileId)` is called from exactly two places: `LandmarksLayerModule.ClearDisposedDataVisual`, when a tile's data is evicted from the cache while its load is still running, and `GltfVisualizer.OnDestroy`, which cancels everything still in flight on teardown.
 
-Doing this properly needs a real task handle stored per tile and an un-retain hook to trigger it. `_activeTasks` is a `HashSet<CanonicalTileId>` precisely so it does not imply otherwise.
+What is deliberately **not** cancelled is a tile merely dropping out of the retained set. `LoadTileCoverToMemory` (the path behind `GetTileCoverCoroutines`) legitimately generates tiles that are not in `_retainedBuildingTiles` — that is how the flight controller's own preloading gets a tile ready before the camera arrives at it — so cancelling generation the moment a tile leaves the retained set would abort that preloading rather than avoid wasted work. This is a deliberate scope boundary, not an oversight: a glTF load already under way for a tile that is un-retained but not evicted runs to completion and reports a tile the map may not currently want, and the module caches its visual until the next sweep either reuses or releases it. Wasted work rather than incorrect output, and most visible during fast zoom sweeps where the cover churns — the `LandmarkTour` flight is exactly that pattern.
+
+---
+
+### The overlap test is approximate at the edges
+
+Both connectors decide whether a basic building is hidden by `MapboxGeometryUtilities.PolygonsIntersect`, and two of its edge cases are now pinned down by `MapboxGeometryUtilitiesTests` rather than left to be rediscovered. Neither is wrong enough to be visible today, and both matter if the algorithm is revisited.
+
+- **Two polygons sharing exactly one edge report as intersecting, but by accident.** The shared edge is exactly collinear, and `LineSegmentsIntersect` rejects parallel segments outright, so that pair contributes nothing. What actually returns true is a different pair of edges meeting at the shared corner, because the segment test's parameter ranges include their endpoints. Buildings abutting a landmark footprint - very common - are therefore suppressed on a coincidence rather than on a rule.
+
+- **`IsPointInPolygon` uses the standard half-open ray-cast convention**, so a polygon's own vertex and one of the two edges meeting at it count as inside, while the opposite edge counts as outside. Asymmetric, conventional, and fine for area tests; worth knowing before it is used for anything that cares about the boundary itself.
+
+`PolygonsIntersect` also tests only the first vertex of each polygon for containment before walking edges, so a ring wholly contained inside another whose first vertex happens to fall in a hole is missed. Its doc comment states the other precondition explicitly: callers must have already passed a bounding-box test.
 
 ---
 
@@ -57,7 +67,6 @@ Doing this properly needs a real task handle stored per tile and an un-retain ho
 - **No GPU instancing.** `LandmarkMaterialGLTF` has `m_EnableInstancingVariants: 0`. Landmarks are distinct meshes so instancing cannot merge draw calls between them, but it also rules out the property-block batching path, which matters if per-landmark tinting is ever used at scale.
 - **Colliders could use the footprint mesh.** Collider cooking is opt-in and defaults to a convex hull, which is cheap. The already-extracted planar footprint would be cheaper still, but it is not reachable from `LandmarkHighlightBehaviour` today — it arrives on the module's `TileFinished`, keyed by tile, while the footprint GameObjects are deactivated children.
 - **`FlipYZ` round-trips managed arrays.** It reads `mesh.vertices` and `mesh.normals` (a full copy each), rewrites them, assigns both back, and calls `RecalculateBounds` — once per primitive, on the load path. Going through the mesh data API, or folding the transform into what glTFast already applies, would remove two array allocations per mesh.
-- **Colliders could use the footprint mesh.** Collider cooking is now opt-in and defaults to a convex hull, which is cheap. Using the already-extracted planar footprint instead would be cheaper still, but the footprint geometry is not reachable from `LandmarkHighlightBehaviour` today — it arrives on the module's `TileFinished`, keyed by tile, while the footprint GameObjects are deactivated children.
 
 ---
 

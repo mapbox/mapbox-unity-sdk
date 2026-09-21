@@ -4,7 +4,7 @@
 
 Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, single values standing in for several different outcomes, and - in the removals below - public surfaces that advertised access to tile data they could never return.
 
-Adds the Landmarks Module: 3D landmark meshes fetched from the Mapbox 3D Buildings tileset, with overlap suppression against both the Vector and Components building pipelines. glTFast is consumed as a normal package dependency rather than bundled, and two new hard dependencies are declared: `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`.
+Adds the Landmarks Module, shipping as **preview** in this release; see `Documentation~/LandmarksModuleKnownGaps.md` for what preview does not yet cover. The module fetches 3D landmark meshes from the Mapbox 3D Buildings tileset, with overlap suppression against both the Vector and Components building pipelines. Landmark types live in the `Mapbox.LandmarksModule` namespace, with the MonoBehaviour wrappers under `Mapbox.LandmarksModule.Unity`. glTFast is consumed as a normal package dependency rather than bundled, and two new hard dependencies are declared: `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`.
 
 #### Why the dependency shape matters
 
@@ -13,6 +13,16 @@ Landmark tiles are glTF binaries whose buffer views are compressed with `EXT_mes
 Feature IDs (`_FEATURE_ID_RGBA4444`) arrive in their own dedicated meshopt buffer view — roughly 7 KB compressed per tile — and are needed after glTFast has released its load-time buffers. Rather than patching glTFast to extend that buffer lifetime, the module decompresses that single buffer view directly from the tile bytes it already holds, using the same public meshoptimizer API glTFast itself calls. This duplicates none of glTFast's geometry decoding and keeps glTFast an unmodified package dependency.
 
 The decompressed bytes are held for the duration of scene instantiation and unpacked to `Color` exactly once, straight into each mesh's final vertex buffer. On a representative z14 tile that is about 430 KB held plus a single 1.7 MB color write, rather than materializing a `Color` array per primitive and copying it again to group by mesh.
+
+#### Terrain snapping
+
+Landmark buildings are now driven onto elevated terrain by writing their transform, rather than baking elevation into vertices at generation time. `LandmarkTerrainSnapper`, owned by `LandmarksLayerModule`, samples terrain height per building and writes it as a local Y on the building's transform; a building generated before its terrain tile has arrived is corrected the moment terrain does land, at the cost of one assignment. Compare this to what happens to vector features today: `SnapTerrainModifier` bakes elevation into `MeshData` once, at generation time, and nothing ever re-snaps, so a vector building generated a frame too early stays at sea level on a hillside for the rest of the session.
+
+Elevation is cached in metres rather than in Unity units, so a map scale change - which happens on every zoom step under `DynamicScalingMapInformation` - only changes the divisor used to convert metres to Unity Y, and needs no re-sampling of terrain at all. Only terrain actually arriving triggers a re-query, and then only for buildings that don't already have a reading.
+
+A building snaps to the lowest point sampled across its footprint, not the point under its centre, so it beds into a slope the way a real foundation does: snapping to the centre height would leave the downhill edge floating above the terrain on any slope. It falls back to the anchor point when a tile published no footprint for that landmark.
+
+The `LandmarkTour` sample's `MapFlightController` gained crossfaded climb, cruise, and descend phases in the same pass, so the camera never comes to a full stop between them while flying between landmarks.
 
 #### Security
 
@@ -70,15 +80,49 @@ The decompressed bytes are held for the duration of scene instantiation and unpa
 
   Two related defects in the same method are fixed alongside. Footprints are now collected in `AddPrimitive` rather than `EndScene`, which means a footprint node with more than one primitive contributes all of them instead of only primitive 0, and a footprint node nested below a root node is collected instead of being missed entirely. `EndScene` now walks the node hierarchy to deactivate nested footprint geometry, while still normalising only root-level transforms — rewriting a child's transform would detach it from its parent's placement.
 
+- Every landmark tile leaked its meshes, materials and textures for the rest of the session. `GltfVisualizer` created a `MapboxGltfImport` per tile and dropped the reference, and disposing that import is the only thing that destroys what glTFast built for it - Unity reclaims a `Mesh`, `Material` or `Texture2D` only on a non-additive scene load, so destroying the tile's GameObjects left the whole PBR texture set resident. On iOS and Android, the only supported build targets, panning across a city was an unbounded climb toward an out-of-memory kill. The import now travels with the visuals it produced, on `GltfGenerationTaskResult.Import`, and is disposed by `LandmarksLayerModule` at the moment it destroys them - not earlier, since Dispose destroys the very meshes the live renderers are using.
+
+- A glTF load that finished after the map was torn down, or after its own tile's data had been evicted, was recorded as though nothing had happened. Generation cannot be cancelled, so the continuation resumed into a scene that no longer existed: it parented into a destroyed hierarchy, cached visuals into a dictionary `OnDestroy` had just cleared, and raised `TileFinished` for a tile that would never raise `TileDisposed` - leaving both overlap connectors suppressing vector and component buildings at that location permanently. Both the visualizer and the module now carry a destroyed flag checked after every await, the module records a tile whose data is disposed mid-load, and a result with nowhere to go is released on arrival instead of cached.
+
+- A landmark tile that failed to generate was retried forever. Nothing remembered a failure, so a tile absent from the visual cache and not in work looked exactly like one nobody had tried yet, and `DataProcessingFailure` additionally invalidated the cached bytes - which drops them from memory *and* disk, so the next sweep re-downloaded them. A genuinely malformed tile therefore re-downloaded, re-failed and logged an error on every sweep for the whole session. Generation is now capped at two attempts per tile, the second failure gives up and says so once, and the counters reset if the tile's data is re-fetched. `GameObjectFailure` no longer invalidates data that parsed correctly.
+
+- `GltfVisualizer.FlipYZ` read `matrix[0]`, `[5]`, `[12]` and `[13]` off a glTF node with no guard, and wrote a normal per vertex without checking there were any. glTF lets a node carry TRS instead of a matrix, and a primitive may have positions and no `NORMAL` attribute; either threw inside `AddPrimitive`, was swallowed by the catch in `Generate`, and blanked the entire tile. Both are guarded, and the matrix case warns rather than failing silently. `CaptureAnchor` had the matrix guard already - `FlipYZ` did not.
+
+- `EndScene` and `HideNestedFootprints` indexed glTFast's node dictionary directly. It only holds nodes glTFast actually materialised a GameObject for, and it is free not to materialise one, so a tile shaped that way threw `KeyNotFoundException`. Both use `TryGetValue` now, as `CaptureAnchor` already did.
+
+- Exceptions thrown by the generation result callback were lost. The callback runs outside `Generate`'s own try/catch by design, so anything it threw was captured into a `Task` that `GenerateVisualsForTile` discarded and `CreateVisualCoroutine` polled without ever reading `Exception` - and the coroutine's `Status` test treated a faulted task as finished, reporting success to the tile pipeline. Both paths now surface the fault.
+
+- `LandmarkToVectorConnector` never received the hardening its sibling connector did. It dereferenced all four of its Inspector fields unconditionally, so an unassigned one was a `NullReferenceException` in `Awake`, and it subscribed a closure to `Map.Initialized` that `OnDestroy` could not detach - `Initialized` is a plain `Action` field, so the closure kept the destroyed component alive and ran against it. It now warns and disables itself on a missing reference, subscribes a named method, and detaches it. `LandmarkHighlightBehaviour` had the same problem twice over and no `OnDestroy` at all, so a destroyed selection component carried on adding a `LandmarkComponent` and cooking a `MeshCollider` for every landmark that loaded.
+
+- A landmark module with no Base Material assigned fell through to `new Material(Shader.Find("Standard"))`. `Standard` is the built-in render pipeline's shader and this SDK requires URP, where `Shader.Find` returns null in a player build - so the fallback produced either a material with no shader or magenta geometry, and leaked one material per import. `LandmarksLayerModuleScript` now logs an error against the component, and the visualizer reports every tile as empty rather than throwing its way through the cover.
+
+- Importing the `LandmarkDemo` sample on its own gave a scene with missing materials. Its ground material and three road materials resolved to assets that live in the `MapboxComponents` sample, and Package Manager samples are imported individually - so the one sample the Quick Start tells a new user to import was the one that did not work alone. It now references its own copies, which were already in the folder and already used by its road style sheet; only the scene and the road preset pointed elsewhere.
+
+- `LandmarkDemoWithVector`'s building material carried a hidden HDRP `AssetVersion` sub-asset in a URP-only package, which logged a missing-script warning on import.
+
 #### Changed
 
 - `ILayerModule.Initialize` now takes an `ITileLifecycleSource`, replacing the separate `ITileLifecycleObserver` hook. A module previously had no reference to whatever was driving it - neither the constructor nor `ConstructModule` supplies one - so an extra opt-in interface existed purely to hand the visualizer over. **Breaking** for anyone implementing `ILayerModule` directly or subclassing an SDK module and overriding `Initialize`. Nothing here is serialized, so no scene or prefab data is affected.
 
 - `CanonicalTileId.ParentAt` no longer mutates the tile it is called on. It walked `this` up through `MoveToParent` and returned itself, so on a struct `var parent = id.ParentAt(11)` silently changed `id` as well - a trap the SDK's own callers defended against by copying the struct first, and one its sibling `UnwrappedTileId.ParentAt` never had. **Breaking** only for code that relied on the side effect; every call site in the SDK used the return value. `MoveToParent()` is unchanged for anyone who wants the mutation.
 
-- `TaskResultType` gained `AlreadyGenerated` and `AlreadyInProgress`, so "nothing to do because it is done" and "nothing to do because someone else is doing it" are no longer both reported as `Success` - the one member that promises generated objects are attached.
+- `TaskResultType` gained `AlreadyGenerated`, `AlreadyInProgress`, and `NoData`, so "nothing to do because it is done", "nothing to do because someone else is doing it", and "nothing to do because there was genuinely nothing to build" are no longer all reported as `Success` - the one member that promises generated objects are attached. `NoData` covers a source finding nothing to build for a tile - most tiles contain no landmarks - which is a legitimate, common outcome and explicitly not a failure: the data is correct and must not be invalidated or re-fetched, unlike `DataProcessingFailure`. A caller should still record the tile as resolved on `NoData`, or it will regenerate it forever.
 
 - `MapboxComponentsModuleScript` exposes `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` as serialized fields. It built its `VectorModuleSettings` entirely in code, so the Components module drew nothing below zoom 12 and the only way to change that was to subclass it and reimplement the whole build method. Defaults match the previous hardcoded values, so existing scenes are unaffected. `GetVectorLayerModule` remains virtual for what the Inspector cannot express, such as a different tileset.
+
+- Landmark selection's two Inspector fields are renamed before the API freezes: `LandmarkHighlightBehaviour.HightlightColor` loses its typo and becomes `HighlightColor`, and the public `UnityEvent` `_visualSelectedEvent` - a serialized field carrying a private field's name, declared below the private methods - becomes `VisualSelected`. Neither has shipped, so no scene data is affected; renaming either after release would have broken both source and serialized scenes.
+
+- The module's internals are no longer public API. `GltfVisualizer`, `GltfGenerationTaskResult`, `MapboxGltfImport`, `MapboxGltfMaterialGenerator`, `LandmarkAnchor`, `LandmarkPolygonFilter`, `FeatureIdColorTable`, `FeatureIdDecoder` and `FeatureIdMeshWriter` are `internal`, joining `LandmarkTerrainSnapper`, `GlbBinaryChunk` and `MeshoptBufferViewDecoder`, which already were. Nothing outside the assembly constructed or called any of them. The glTF schema types stay public: they are Newtonsoft deserialization targets, and that is the one place where narrowing accessibility fails at runtime rather than at compile time.
+
+- `MapboxLandmarksModule.asmdef` is gated on glTFast being installed. It carries no define constraint before now, so a project whose manifest lacks `com.unity.cloud.gltfast` - a hand-edited manifest, a stale lockfile, an air-gapped or scoped-registry setup - failed to compile *entirely*, for a user who never touched landmarks. A `versionDefines` entry raises `MAPBOX_GLTFAST_PRESENT` and `defineConstraints` requires it, so the assembly is simply left out instead. The trade is worth stating: scenes referencing landmark components then show missing-script references rather than a compile error, which is the better of the two failures.
+
+- The landmark data zoom is one constant, `LandmarksLayerModule.LandmarkDataZoom`, rather than a literal `14` repeated across the module, the polygon filter and both overlap connectors.
+
+- `LandmarksLayerModule.BuildingLoaded` carries the landmark id: `Action<GameObject, string>` rather than `Action<GameObject>`. It is also raised by walking out from each building's anchor rather than down from the tile root, because the anchor is the only thing that knows which id a mesh belongs to. `BuildingUnloaded` is removed with it - see Removed.
+
+- Landmark glTF loads can be cancelled. `GltfVisualizer` keeps a `CancellationTokenSource` per in-flight tile and threads the token through both `Load` and `InstantiateSceneAsync`; a cancelled load unwinds, releases its own import and GameObjects, and reports `TaskResultType.Cancelled`, which the module deliberately does not count as a failure - the tile is left unresolved and regenerated if it returns to the cover. `Cancel` is called when a tile's data is evicted mid-load, and for everything still running at teardown.
+
+  A tile merely dropping out of the retained set is **not** cancelled, and that is deliberate rather than an omission: `LoadTileCoverToMemory` legitimately generates tiles outside `_retainedBuildingTiles`, so cancelling on un-retain would abort the flight controller's own preloading.
 
 #### Removed
 
@@ -91,6 +135,16 @@ The decompressed bytes are held for the duration of scene instantiation and unpa
 
   A read path for vector features is worth having; these were not it, and a developer could reasonably spend hours believing otherwise.
 
+- `LandmarksLayerModule.LandmarkFootprintCreated` and `LandmarkMeshResults`. Both were public `Action` fields that nothing ever invoked - the only code that would have raised them was commented out in the constructor - so they read as supported extension points and could never fire. `TileFinished` carries the footprints and is live.
+
+- `GltfGenerationTaskResult.InvalidateAndRetry`, never written and never read.
+
+- The tile-root object pool in `GltfVisualizer`. It pre-warmed twenty GameObjects, but the success path hands each root to the module, which destroys it on release rather than returning it - so the pool recycled nothing and only deferred the first twenty allocations.
+
+- The unreferenced `Areas` visualizer assets and materials left in the `LandmarkTour` sample when its water and landuse visualizers were dropped from the scene, and two orphaned ground materials.
+
+- `LandmarksLayerModule.BuildingUnloaded`. It had no subscribers, and despite the name it fired once per tile root rather than once per building - which `TileDisposed` already reports, at the same moment, with the tile id a caller actually needs.
+
 #### Added
 
 - `IMapInformation.TryQueryElevation`, which reports whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". The existing `QueryElevation` remains for callers with no useful response to "unknown".
@@ -101,16 +155,11 @@ The decompressed bytes are held for the duration of scene instantiation and unpa
 
 - `MapboxLandmarksModule` assembly: `LandmarksLayerModule` plus its `LandmarksLayerModuleScript` MonoBehaviour wrapper, driven by `Constants.Map.LandmarksTilesetId`.
 - Overlap suppression: `LandmarkToVectorConnector` + `LandmarkPolygonFilterObject` reject colliding footprints before mesh generation; `LandmarkToBuildingComponentConnector` zeroes colliding vertices after generation, since the Components module merges buildings into a single mesh.
+- `Mapbox.BaseModule.Utilities.MapboxGeometryUtilities` now ships in `MapboxBaseModule`, where its namespace always said it lived. It was public already, but it was compiled into the landmarks assembly, so nothing could reach it without referencing that. Its contents are unchanged: 2D X-Z polygon intersection, point-in-polygon tests, bounds, boundary-ring extraction, and convex hull, for anyone else needing the same collision-detection primitives the landmark overlap connectors use.
 - Feature ID support, split across `FeatureIdSchema` (captures the custom vertex attribute via `JsonExtensionData`), `GlbBinaryChunk`, `MeshoptBufferViewDecoder`, `FeatureIdColorTable`, `FeatureIdDecoder`, and `FeatureIdMeshWriter` (adds Color as an extra vertex stream, because glTFast builds meshes through the low-level mesh API).
-- `LandmarkDemo` and `LandmarkDemoWithVector` samples.
-- Documentation: `LandmarksModule.md` and `LandmarksModuleInternals.md`.
-
-#### Dependencies
-
-- `com.unity.cloud.gltfast` (6.18.0). 6.18.0 is the last release supporting Unity 2022.3; 6.19.0 and later require Unity 6.0 LTS. This is declared as a minimum, not a pin: the module uses no glTFast API that changed in 6.19.0 and no API marked obsolete, so projects on Unity 6 may raise the version in their own manifest without further changes.
-- `com.unity.meshopt.decompress` (0.2.0-exp.1). `MapboxLandmarksModule.asmdef` gates feature ID decoding on a `MESHOPT_IS_RECENT` `versionDefines` entry, so removing the package degrades to landmarks without feature IDs rather than a compile error.
-
-Note that the dependency on glTFast is not code-only: `glTF-pbrMetallicRoughness-Clearcoat_MAPBOX.shadergraph` and `PBR_metallic_roughness_advanced_MAPBOX.shadersubgraph` reference seven of glTFast's shader subgraphs (`ScreenGrab`, `MetallicRoughness`, `Clearcoat`, `Normal`, `TextureTransform`, `Occlusion`, `Emission`) by asset GUID, so glTFast's `Runtime/Shader` tree is load-bearing for the landmark material.
+- `LandmarkHighlightBehaviour`, a raycast-and-tint selection behaviour for landmark buildings. Ships as code only: it is on none of the three sample scenes, so click-to-select needs the component wired in by hand until a sample demonstrates it.
+- `LandmarkDemo` and `LandmarkDemoWithVector` samples, plus `LandmarkTour`, which flies the camera between famous landmarks. `LandmarkTourController` and `LandmarkTourDestination` build and drive the destination list from a UI prefab, `MapFlightController` runs the flight itself (climb, cruise, descend, each phase crossfaded into the next), and `MapCameraClipPlaneDriver` scales the camera's near and far planes to match, for a scene spanning zoom 4 to 17.
+- Documentation: `LandmarksModule.md`, `LandmarksModuleInternals.md`, and `LandmarksModuleKnownGaps.md`.
 
 - `IMapInformation.TryGetViewCenterPosition` / `TryGetViewCenterMercator` / `TryGetViewCenterLatLng`, reporting what the camera is actually looking at - where a ray through the centre of the viewport meets the map plane. The map's own centre is not always the view centre: a camera that pans by recentring the map keeps the two together, while one that keeps the map origin fixed and moves itself does not, and then `CenterMercator` is the world origin rather than anything on screen. They report `false` instead of a placeholder when there is no such point, which is the honest answer for a camera pitched at or above the horizon, where the centre ray is parallel to the plane or points away from it. Computed on demand rather than cached on the map, so no reader can see a stale value. The plane is world y = 0, matching the rest of the SDK's screen-to-map math, so a moved, rotated or reparented MapRoot is not accounted for, and terrain height is ignored.
 
@@ -139,6 +188,23 @@ Note that the dependency on glTFast is not code-only: `glTF-pbrMetallicRoughness
   Three things in it are less obvious than they look, and are the reason this is a component rather than a snippet in a sample. It reconciles against `MapVisualizer.ActiveTiles` every frame instead of following `TileLoaded`/`TileUnloading`: the dictionary is complete at every instant it can be read, whereas mirroring it from two events with different latencies reintroduces the one-frame hole that shows up as flicker on every zoom change. Tiles are laid out in units of one reference zoom taken from the camera, not from the active tiles, so the routine mix of coarse stand-ins and fine tiles aligns, and a tile that never unloads cannot freeze the minimap's scale. And the tile-size conversion scales by the fractional part of the zoom, so the minimap does not hold one size per zoom level and pop at each integer tick.
 
 - `ShiftMapForDistance.OnRecentered`, raised once per recenter with a `MapRecenteredArgs` carrying the previous and new centre and the offset every geographic point moved by, in both map-local (`LocalOffset`) and world (`WorldOffset`) space. It is for objects the Inspector cannot list: markers, route lines, other players' avatars, cached world positions. It fires after the map and `TransformsToShift` are in the new frame, so a handler can either subtract the offset or place objects again with `ConvertLatLngToPosition`. It also fires after the tile cover is built, so transforms a tile provider follows still belong in `TransformsToShift`. Documented in `RecenteringLocationBasedMaps.md`. Both `LocationBasedGame` sample scenes now list the astronaut, `CharTarget` and `CameraRoot` in `TransformsToShift`, so the sample recenters without the walk-back.
+
+- Click-to-select, wired into a scene and able to say which landmark was clicked. `LandmarkHighlightBehaviour` already raycast, tinted and raised an event, but it appeared in no sample and a hit could not be traced back to a landmark - the tile publishes an id on each building node, and nothing downstream recorded it. It is now a component on the `LandmarkDemo` map with its shipped defaults, `LandmarkComponent` carries `LandmarkId`, and the behaviour exposes `SelectedLandmarkId` for an Inspector-wired handler that only receives the GameObject. Selection is still whole-mesh: feature ids are decoded per-vertex and drive per-part appearance in the shader, but mapping a hit back to one would need the exact render mesh as a collider rather than the convex hull that keeps load cost down.
+
+- `LandmarksLayerModuleScript.TilesetId`, so the 3D tileset the module fetches from is an Inspector field rather than a constant compiled into the SDK. It defaults to `Constants.Map.LandmarksTilesetId` and falls back to it when left empty, so a scene saved before the field existed is unaffected.
+
+#### Tests
+
+- `MapboxGeometryUtilitiesTests` (13 cases) - the first coverage of any kind for this code, and specifically a regression net under `ExtractBoundaryRings`, which is the fix described above and shipped with none. Covers a quad returning one ring in true boundary order (adjacency, not just membership), an annulus returning two rings walking in opposite senses, a closed mesh falling back to the convex hull of its X-Z projection, and vertices split within the weld tolerance still collapsing into one ring; plus `PolygonsIntersect`, `IsPointInPolygon` and both `BoundsOfVertices` overloads.
+
+  Two of them pin down behaviour rather than assert it is right, and are named so. `PolygonsIntersect` reports two squares sharing exactly one edge as intersecting, but not for the reason it looks like: the shared edge is exactly collinear, which `LineSegmentsIntersect` rejects as parallel, and what actually trips is a different pair of edges meeting at the shared corner, since the segment test's parameter ranges are inclusive of their endpoints. And `IsPointInPolygon` uses the standard half-open ray-cast convention, so a vertex and one of the two edges meeting at it count as inside while the opposite edge counts as outside. Both are worth knowing before the overlap algorithm is revisited.
+
+#### Dependencies
+
+- `com.unity.cloud.gltfast` (6.18.0). 6.18.0 is the last release supporting Unity 2022.3; 6.19.0 and later require Unity 6.0 LTS. This is declared as a minimum, not a pin: the module uses no glTFast API that changed in 6.19.0 and no API marked obsolete, so projects on Unity 6 may raise the version in their own manifest without further changes.
+- `com.unity.meshopt.decompress` (0.2.0-exp.1). Mandatory, with no degraded mode: the landmarks API is meshopt-only, the tiles list `EXT_meshopt_compression` in `extensionsRequired`, and glTFast aborts any load whose required extension has no decoder - so without this package there are no landmarks at all, not landmarks without feature IDs. `MapboxLandmarksModule.asmdef` therefore requires it through `defineConstraints`, exactly as it requires glTFast, and a project without it gets no landmarks assembly rather than a broken one. The separate `MESHOPT_IS_RECENT` `versionDefines` entry is a narrower thing: it gates only the module's own feature-ID decode path, which needs a meshopt API newer than the 0.1.x package exposed. An older-but-present package therefore still draws landmarks, just untinted by feature id.
+
+Note that the dependency on glTFast is not code-only: `glTF-pbrMetallicRoughness-Clearcoat_MAPBOX.shadergraph` and `PBR_metallic_roughness_advanced_MAPBOX.shadersubgraph` reference seven of glTFast's shader subgraphs (`ScreenGrab`, `MetallicRoughness`, `Clearcoat`, `Normal`, `TextureTransform`, `Occlusion`, `Emission`) by asset GUID, so glTFast's `Runtime/Shader` tree is load-bearing for the landmark material.
 
 ### v3.1.1
 
