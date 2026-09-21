@@ -5,7 +5,7 @@ using Mapbox.BaseModule.Utilities;
 using Mapbox.VectorModule.Filters;
 using UnityEngine;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
     [CreateAssetMenu(menuName = "Mapbox/Filters/Landmark Polygon Filter")]
     public class LandmarkPolygonFilterObject : FilterBaseObject
@@ -52,7 +52,7 @@ namespace Mapbox.LandmarkModule
     /// check, which rejects 99%+ of features. Only features near a landmark pay for the full polygon
     /// transform and intersection test.
     /// </summary>
-    public class LandmarkPolygonFilter : FilterBase
+    internal class LandmarkPolygonFilter : FilterBase
     {
         /// <summary>
         /// Current polygon set, treated as immutable once published. Readers take the reference once
@@ -90,13 +90,8 @@ namespace Mapbox.LandmarkModule
             if (landmarks.Count == 0)
                 return true;
 
-            // IMPORTANT: CanonicalTileId is a struct and ParentAt() mutates it in place.
-            // We must save the original tile ID before calling ParentAt, otherwise
-            // the scale/offset calculation would use z14→z14 (identity) instead of
-            // the correct zN→z14 transform.
             var featureTileId = feature.TileId;
-            var z14Parent = new CanonicalTileId(featureTileId.Z, featureTileId.X, featureTileId.Y)
-                .ParentAt(14);
+            var z14Parent = featureTileId.ParentAt(LandmarksLayerModule.LandmarkDataZoom);
 
             // Compute the scale/offset to transform feature coordinates to z14 space
             // For z14 features this is identity (scale=1, offset=0)

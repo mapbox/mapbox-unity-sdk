@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
     /// <summary>
     /// One landmark building and the point on the ground it stands at, produced during glTF
@@ -11,7 +11,7 @@ namespace Mapbox.LandmarkModule
     /// vertices, so once instantiation finishes the only record of where a building sits inside its
     /// tile is the geometry itself.
     /// </summary>
-    public struct LandmarkAnchor
+    internal struct LandmarkAnchor
     {
         /// <summary>
         /// The building's own GameObject. Its parent chain has unit Y scale (the landmark tile root

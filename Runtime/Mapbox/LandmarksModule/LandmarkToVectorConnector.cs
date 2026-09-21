@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
-using Mapbox.LandmarkModule.Unity;
+using Mapbox.LandmarksModule.Unity;
 using Mapbox.VectorModule;
 using Mapbox.VectorModule.Unity;
 using UnityEngine;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
     /// <summary>
     /// Connects the LandmarksModule to the VectorModule to prevent overlapping OSM buildings.
@@ -46,9 +46,16 @@ namespace Mapbox.LandmarkModule
     /// </summary>
     public class LandmarkToVectorConnector : MonoBehaviour
     {
+        [Tooltip("Map whose initialization gates the wiring below. Required - leave it unassigned and this connector does nothing.")]
         public MapBehaviourCore Map;
+
+        [Tooltip("Landmarks module supplying the footprint polygons fed into the filter. Required.")]
         public LandmarksLayerModuleScript LandmarksLayerModuleScript;
+
+        [Tooltip("Vector module whose building layer is reloaded when landmark footprints arrive after it has already processed a tile. Required.")]
         public VectorLayerModuleScript VectorModuleScript;
+
+        [Tooltip("Filter asset sitting in the vector building layer's filter stack that rejects features overlapping a landmark. Required - without it landmark footprints have nowhere to go and OSM buildings will keep overlapping landmarks.")]
         public LandmarkPolygonFilterObject LandmarkFilter;
 
         private VectorLayerModule _vectorLayerModule;
@@ -57,15 +64,27 @@ namespace Mapbox.LandmarkModule
 
         private void Awake()
         {
-            Map.Initialized += _ =>
+            if (Map == null || LandmarksLayerModuleScript == null || VectorModuleScript == null || LandmarkFilter == null)
             {
-                _vectorLayerModule =
-                    (VectorLayerModule)VectorModuleScript.ModuleImplementation;
+                Debug.LogWarning($"{nameof(LandmarkToVectorConnector)} needs Map, Landmarks Layer Module Script, Vector Module Script and Landmark Filter assigned. Landmark/vector-building overlap suppression is disabled.", this);
+                enabled = false;
+                return;
+            }
 
-                _landmarksLayerModule = (LandmarksLayerModule)LandmarksLayerModuleScript.ModuleImplementation;
-                _landmarksLayerModule.TileFinished += OnLandmarkTileFinished;
-                _landmarksLayerModule.TileDisposed += OnLandmarkTileDisposed;
-            };
+            // Named method rather than a lambda so OnDestroy can detach it. As a closure it could not
+            // be unsubscribed, so destroying this component before the map initialized left the body
+            // to run against a dead component.
+            Map.Initialized += OnMapInitialized;
+        }
+
+        private void OnMapInitialized(MapboxMap map)
+        {
+            _vectorLayerModule =
+                (VectorLayerModule)VectorModuleScript.ModuleImplementation;
+
+            _landmarksLayerModule = (LandmarksLayerModule)LandmarksLayerModuleScript.ModuleImplementation;
+            _landmarksLayerModule.TileFinished += OnLandmarkTileFinished;
+            _landmarksLayerModule.TileDisposed += OnLandmarkTileDisposed;
         }
 
         private void OnLandmarkTileFinished(CanonicalTileId z14TileId, List<Vector3[]> polygons)
@@ -82,10 +101,7 @@ namespace Mapbox.LandmarkModule
             _tilesToReload.Clear();
             foreach (var readyTile in _vectorLayerModule.GetReadyTiles())
             {
-                // IMPORTANT: ParentAt() mutates the struct in place.
-                // Create an explicit copy to avoid corrupting the iteration variable.
-                var parentTile = new CanonicalTileId(readyTile.Z, readyTile.X, readyTile.Y)
-                    .ParentAt(14);
+                var parentTile = readyTile.ParentAt(LandmarksLayerModule.LandmarkDataZoom);
                 if (parentTile.Equals(z14TileId))
                 {
                     _tilesToReload.Add(readyTile);
@@ -105,6 +121,8 @@ namespace Mapbox.LandmarkModule
 
         private void OnDestroy()
         {
+            if (Map != null) Map.Initialized -= OnMapInitialized;
+
             if (_landmarksLayerModule != null)
             {
                 _landmarksLayerModule.TileFinished -= OnLandmarkTileFinished;

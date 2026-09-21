@@ -11,51 +11,83 @@ using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Unity;
 using UnityEngine;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
 	public class LandmarksLayerModule : ILayerModule
 	{
+		/// <summary>
+		/// Zoom the landmarks tileset publishes at. Render tiles are mapped up to this level to find
+		/// the tile that carries their landmarks, and the overlap connectors transform building
+		/// geometry into this level's tile space to test it against landmark footprints.
+		/// </summary>
+		public const int LandmarkDataZoom = 14;
+
+		/// <summary>
+		/// How many times a tile may fail to generate before it is given up on. The first failure is
+		/// worth a retry - a truncated download decodes as a malformed glTF - but a tile that is
+		/// genuinely broken must stop being retried, or it re-downloads, re-fails and logs an error
+		/// on every sweep for the rest of the session.
+		/// </summary>
+		private const int MaxGenerationAttempts = 2;
+
 		private Source<BuildingData> _buildingSource;
 		private UnityContext _unityContext;
 		private IMapInformation _mapInformation;
+
 		/// <summary>
 		/// Landmark visuals per data tile. Presence of a key means the tile is resolved and needs
-		/// no further generation; the value is the visuals it produced.
+		/// no further generation; the value is the visuals it produced and the import that built
+		/// them.
 		///
-		/// Values are never null - a resolved tile with no visuals holds an empty collection. That
-		/// is an invariant, not a coincidence: three of the four readers here iterate the value
-		/// directly without a null check, so a null would NRE on the next reposition, cull, or
-		/// dispose. An empty collection carries the same information ("resolved, nothing to show")
-		/// and every reader handles it correctly for free.
+		/// Values are never null - a resolved tile with no visuals holds an entry with an empty
+		/// object collection. That is an invariant, not a coincidence: three of the four readers
+		/// here iterate the value directly without a null check, so a null would NRE on the next
+		/// reposition, cull, or dispose. An empty collection carries the same information
+		/// ("resolved, nothing to show") and every reader handles it correctly for free.
 		/// </summary>
-		private Dictionary<CanonicalTileId, IEnumerable<GameObject>> _visualCache;
+		private Dictionary<CanonicalTileId, LandmarkTileVisuals> _visualCache;
 		private GltfVisualizer _meshGenerationUnit;
 
 		private HashSet<CanonicalTileId> _retainedBuildingTiles;
+
+		// Tiles that failed to generate, and how often. Kept because nothing else remembers a
+		// failure: a tile that is absent from the visual cache and not in work looks exactly like a
+		// tile nobody has tried yet, so RetainTiles would start it again on every sweep.
+		private Dictionary<CanonicalTileId, int> _failedAttempts;
+
+		// Tiles that have exhausted MaxGenerationAttempts. Treated as resolved-with-nothing-to-show
+		// so they stop being regenerated and stop holding LoadInstant back, without pretending a
+		// visual exists for them.
+		private HashSet<CanonicalTileId> _unbuildableTiles;
+
+		// Tiles whose data was disposed while their glTF load was still running. The result arrives
+		// afterwards with nothing left to attach it to, and the callback releases it on sight
+		// instead of caching it - see ClearDisposedDataVisual.
+		private HashSet<CanonicalTileId> _disposedWhileGenerating;
 
 		// Constructed in Initialize from the tile-lifecycle source handed in there, disposed in
 		// OnDestroy. Null when no source was supplied, so every use is guarded - landmarks then
 		// simply stay at ground level, which is the pre-terrain behaviour.
 		private LandmarkTerrainSnapper _terrainSnapper;
 
+		// Set by OnDestroy. A glTF load already in flight cannot be cancelled, so its result still
+		// arrives after teardown; this is what stops the callback re-populating structures OnDestroy
+		// has just cleared and raising TileFinished for a tile that will never be disposed.
+		private bool _destroyed;
+
 		public LandmarksLayerModule(UnityContext unityContext, IMapInformation mapInformation, MapService mapService,
 			string sourceId, Material buildingMaterial) : base()
 		{
 			_unityContext = unityContext;
 			_mapInformation = mapInformation;
-			_visualCache = new Dictionary<CanonicalTileId, IEnumerable<GameObject>>();
+			_visualCache = new Dictionary<CanonicalTileId, LandmarkTileVisuals>();
 			_retainedBuildingTiles = new HashSet<CanonicalTileId>();
+			_failedAttempts = new Dictionary<CanonicalTileId, int>();
+			_unbuildableTiles = new HashSet<CanonicalTileId>();
+			_disposedWhileGenerating = new HashSet<CanonicalTileId>();
 			_buildingSource = mapService.GetBuildingSource(new VectorSourceSettings() { TilesetId = sourceId });
 			_buildingSource.CacheItemDisposed += ClearDisposedDataVisual;
 			_meshGenerationUnit = new GltfVisualizer(_unityContext, _mapInformation, buildingMaterial);
-			// _meshGenerationUnit.LandmarkMeshResults += (id, results) =>
-			// {
-			// 	LandmarkMeshResults(id, results);
-			// };
-			// _meshGenerationUnit.LandmarkFootprintCreated += (id, results) =>
-			// {
-			// 	LandmarkFootprintCreated(id, results);
-			// };
 		}
 
 		public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
@@ -80,7 +112,7 @@ namespace Mapbox.LandmarkModule
 		{
 			if (GetDataId(unityTile.CanonicalTileId, out var targetId))
 			{
-				return _visualCache.ContainsKey(targetId);
+				return IsResolved(targetId);
 			}
 
 			return true;
@@ -97,14 +129,14 @@ namespace Mapbox.LandmarkModule
 			{
 				if (GetDataId(tileId, out var targetId))
 				{
-					// Skip tiles whose mesh is already generated or already being generated.
-					// Without this, every call to LoadTileCoverToMemory (e.g. MapFlightController
+					// Skip tiles whose mesh is already generated, already being generated, or given
+					// up on. Without this, every call to LoadTileCoverToMemory (e.g. MapFlightController
 					// re-checking readiness after each animated step) re-ran the full glTF mesh
 					// generation for every already-finished landmark in the cover, not just new
 					// ones - GenerateTask has no guard of its own and even calling it again would
 					// have thrown on the second _visualCache.Add for the same key. Mirrors the
 					// same check EnsureRetainedTilesReady already uses for the RetainTiles path.
-					if (!_visualCache.ContainsKey(targetId) && !_meshGenerationUnit.IsInWork(targetId))
+					if (!IsResolved(targetId) && !_meshGenerationUnit.IsInWork(targetId))
 					{
 						yield return LoadAndProcessTileCoroutine(targetId);
 					}
@@ -139,8 +171,12 @@ namespace Mapbox.LandmarkModule
 		{
 			foreach (var pair in _visualCache)
 			{
-				foreach (var gameObject in pair.Value)
+				foreach (var gameObject in pair.Value.Objects)
 				{
+					// Destroyed-object check, not a null-reference one: reading .transform off a
+					// destroyed GameObject throws, so anything that destroyed a landmark from
+					// outside would otherwise take every future reposition down with it.
+					if (gameObject == null) continue;
 					PositionBuilding(pair.Key, gameObject.transform);
 				}
 			}
@@ -155,6 +191,10 @@ namespace Mapbox.LandmarkModule
 
 		public void OnDestroy()
 		{
+			// Set before anything is torn down. Loads still in flight resume after this and check
+			// it; the visualizer has its own copy of the same flag for the same reason.
+			_destroyed = true;
+
 			_terrainSnapper?.Dispose();
 			_terrainSnapper = null;
 
@@ -164,18 +204,19 @@ namespace Mapbox.LandmarkModule
 
 			// Visuals for tiles never released through ClearDisposedDataVisual are still parented
 			// under the generation root. GltfVisualizer.OnDestroy takes its own root with it, but
-			// these are the ones tracked here, so clearing them keeps the two views consistent.
+			// the imports that built these are held here, and only disposing them destroys the
+			// meshes, materials and textures glTFast created for them.
 			foreach (var pair in _visualCache)
 			{
-				foreach (var visual in pair.Value)
-				{
-					if (visual != null) GameObject.Destroy(visual);
-				}
+				pair.Value.Release();
 			}
 			_visualCache.Clear();
+			_failedAttempts.Clear();
+			_unbuildableTiles.Clear();
+			_disposedWhileGenerating.Clear();
 
-			// Owns a GameObject and a pre-warmed pool of 20, neither of which anything else
-			// references - re-initializing a map in one session used to leak a full set each time.
+			// Owns the "gltf root" GameObject, which nothing else references - re-initializing a map
+			// in one session used to leak one each time.
 			_meshGenerationUnit.OnDestroy();
 			_buildingSource.OnDestroy();
 		}
@@ -200,9 +241,9 @@ namespace Mapbox.LandmarkModule
 			{
 				if (!_retainedBuildingTiles.Contains(visual.Key))
 				{
-					foreach (var o in visual.Value)
+					foreach (var o in visual.Value.Objects)
 					{
-						o.SetActive(false);
+						if (o != null) o.SetActive(false);
 					}
 				}
 			}
@@ -212,42 +253,55 @@ namespace Mapbox.LandmarkModule
 		{
 			foreach (var tileId in _retainedBuildingTiles)
 			{
-				if (!_visualCache.ContainsKey(tileId) && !_meshGenerationUnit.IsInWork(tileId))
-				{
-					GenerateVisualsForTile(tileId);
-				}
-				else if (_visualCache.TryGetValue(tileId, out var visuals))
+				if (_visualCache.TryGetValue(tileId, out var visuals))
 				{
 					// No null check needed: cached values are never null, and a resolved tile with
 					// no visuals is an empty collection this loop simply skips.
-					foreach (var visual in visuals)
+					foreach (var visual in visuals.Objects)
 					{
-						visual.SetActive(true);
+						if (visual != null) visual.SetActive(true);
 					}
-					//state, output is in the visual cache or mesh generation is currently happening
 				}
+				else if (!_unbuildableTiles.Contains(tileId) && !_meshGenerationUnit.IsInWork(tileId))
+				{
+					GenerateVisualsForTile(tileId);
+				}
+				//else: mesh generation is currently happening, or the tile has been given up on
 			}
 		}
 
 		private IEnumerator CreateVisualCoroutine(CanonicalTileId tileId, BuildingData buildingData)
 		{
 			var task = GenerateTask(tileId, buildingData);
-			while (task.Status < TaskStatus.RanToCompletion)
+			while (!task.IsCompleted)
 			{
 				yield return null;
 			}
+
+			ReportIfFaulted(tileId, task);
 		}
 
 		private void GenerateVisualsForTile(CanonicalTileId tileId)
 		{
 			if (_buildingSource.GetInstantData(tileId, out var vectorData))
 			{
-				GenerateTask(tileId, vectorData);
+				// Fire and forget, but not unobserved. The result callback runs outside Generate's
+				// own try/catch by design, so anything it throws is captured into this Task and
+				// would otherwise be lost entirely - there is no await and nobody reads Exception.
+				GenerateTask(tileId, vectorData).ContinueWith(
+					t => ReportIfFaulted(tileId, t),
+					TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
 			}
 			else
 			{
 				//state, data isn't available yet
 			}
+		}
+
+		private static void ReportIfFaulted(CanonicalTileId tileId, Task task)
+		{
+			if (!task.IsFaulted) return;
+			Debug.LogError($"Landmark generation for tile {tileId} threw: {task.Exception}");
 		}
 
 		private Task GenerateTask(CanonicalTileId tileId, BuildingData vectorData)
@@ -264,10 +318,29 @@ namespace Mapbox.LandmarkModule
 					return;
 				}
 
+				// The module was destroyed, or this tile's data was evicted, while the load ran.
+				// Either way there is nothing left to attach the result to and nothing that will
+				// ever release it, so it is released here instead of being cached. Caching it was
+				// how landmark GameObjects ended up surviving their own tile's disposal, invisible
+				// and unreachable, with the snapper still walking their transforms every frame.
+				if (_destroyed || _disposedWhileGenerating.Remove(tileId))
+				{
+					new LandmarkTileVisuals(result.GeneratedObjects, result.Import).Release();
+					return;
+				}
+
+				// Abandoned on purpose, so it is not a failure and must not be counted as one.
+				// The tile is simply left unresolved: if it comes back into the cover it will be
+				// generated again, and if it does not, nothing was owed for it.
+				if (result.ResultType == TaskResultType.Cancelled)
+				{
+					return;
+				}
+
 				if (result.ResultType == TaskResultType.DataProcessingFailure ||
 				    result.ResultType == TaskResultType.GameObjectFailure)
 				{
-					_buildingSource.InvalidateData(tileId);
+					RecordGenerationFailure(tileId, result.ResultType);
 					return;
 				}
 
@@ -282,29 +355,50 @@ namespace Mapbox.LandmarkModule
 				// returns on that value before ever reaching this line.
 				if (result.GeneratedObjects == null)
 				{
-					_visualCache.Add(tileId, Enumerable.Empty<GameObject>());
+					_visualCache.Add(tileId, new LandmarkTileVisuals(null, result.Import));
 					return;
 				}
 
 				foreach (var gameObject in result.GeneratedObjects)
 				{
-					var tr = gameObject.transform;
-					if (tr == null) continue;
+					if (gameObject == null) continue;
 
+					var tr = gameObject.transform;
 					tr.gameObject.SetActive(true);
 					tr.gameObject.name = tileId.ToString();
 					PositionBuilding(tileId, tr);
+				}
 
-					foreach (var meshObject in gameObject.GetComponentsInChildren<MeshFilter>())
+				// Announced per building, walking out from the anchors rather than down from the
+				// tile root, because the anchor is the only thing that knows a mesh's landmark id -
+				// the tile publishes it on the building node and nothing downstream can recover it
+				// from the geometry. A building with several primitives, or with mesh nodes nested
+				// below its root, contributes all of them and they all carry the same id.
+				//
+				// This inherits the module's existing assumption that every building is a scene
+				// root node carrying its own primitive, since that is what produces an anchor: a
+				// root node with no primitive of its own would have no anchor, and its meshes would
+				// go unannounced here. The same node would already be unsnappable to terrain and
+				// mispositioned by FlipYZ, so it is one assumption, not a new one.
+				//
+				// No active check: GetComponentsInChildren skips inactive objects by default, and
+				// footprints - the only geometry that must not be announced - were deactivated in
+				// EndScene before this runs.
+				foreach (var anchor in result.Anchors)
+				{
+					if (anchor.Transform == null) continue;
+
+					foreach (var meshObject in anchor.Transform.GetComponentsInChildren<MeshFilter>())
 					{
-						if (meshObject.gameObject.activeSelf)
-						{
-							BuildingLoaded(meshObject.gameObject);
-						}
+						BuildingLoaded(meshObject.gameObject, anchor.LandmarkId);
 					}
 				}
 
-				_visualCache.Add(tileId, result.GeneratedObjects);
+				// The import comes with the visuals and is disposed with them. It is the only thing
+				// that destroys the meshes, materials and textures glTFast built for this tile, and
+				// Unity reclaims none of those on its own.
+				_visualCache.Add(tileId, new LandmarkTileVisuals(result.GeneratedObjects, result.Import));
+				_failedAttempts.Remove(tileId);
 
 				// After the roots are positioned, since snapping writes each building's local Y
 				// relative to a root that PositionBuilding has already placed.
@@ -312,6 +406,49 @@ namespace Mapbox.LandmarkModule
 
 				TileFinished(tileId, result.FootprintResults);
 			});
+		}
+
+		/// <summary>
+		/// Counts a failed generation and, once a tile has used up its attempts, stops trying.
+		///
+		/// The retry itself has to invalidate the cached bytes, since a glTF that will not parse is
+		/// most often a truncated download - but invalidating drops the tile from memory and disk,
+		/// so the next sweep re-downloads it. That is the right thing to do once and the wrong thing
+		/// to do forever: a tile that is genuinely malformed would otherwise re-download, re-fail and
+		/// log an error on every sweep for the rest of the session.
+		///
+		/// A GameObject failure is counted but never invalidated. The bytes parsed; re-fetching them
+		/// cannot change the outcome.
+		/// </summary>
+		private void RecordGenerationFailure(CanonicalTileId tileId, TaskResultType resultType)
+		{
+			_failedAttempts.TryGetValue(tileId, out var attempts);
+			attempts++;
+			_failedAttempts[tileId] = attempts;
+
+			if (attempts >= MaxGenerationAttempts)
+			{
+				_unbuildableTiles.Add(tileId);
+				Debug.LogError(
+					$"Giving up on landmark tile {tileId} after {attempts} attempts ({resultType}). " +
+					"It will be retried if its data is re-fetched.");
+				return;
+			}
+
+			if (resultType == TaskResultType.DataProcessingFailure)
+			{
+				_buildingSource.InvalidateData(tileId);
+			}
+		}
+
+		/// <summary>
+		/// Whether this tile needs no further generation - either it produced visuals, or it failed
+		/// often enough that it never will. Both answers are "stop asking"; only one of them has
+		/// something to show.
+		/// </summary>
+		private bool IsResolved(CanonicalTileId tileId)
+		{
+			return _visualCache.ContainsKey(tileId) || _unbuildableTiles.Contains(tileId);
 		}
 
 		private void PositionBuilding(CanonicalTileId tileId, Transform tr)
@@ -332,24 +469,33 @@ namespace Mapbox.LandmarkModule
 			// the visual cache entry has already gone.
 			_terrainSnapper?.Unregister(tileId);
 
-			if (_visualCache.TryGetValue(tileId, out var gameObjects))
-			{
-				foreach (var o in gameObjects)
-				{
-					BuildingUnloaded(o);
-					GameObject.Destroy(o);
-				}
+			// The data is gone, so whatever made this tile unbuildable is gone with it. A re-fetch
+			// deserves a fresh set of attempts.
+			_failedAttempts.Remove(tileId);
+			_unbuildableTiles.Remove(tileId);
 
+			if (_visualCache.TryGetValue(tileId, out var visuals))
+			{
+				visuals.Release();
 				_visualCache.Remove(tileId);
 				TileDisposed(tileId);
+			}
+			else if (_meshGenerationUnit.IsInWork(tileId))
+			{
+				// Disposed mid-load. Cancel it - the bytes it is decoding have just been evicted, so
+				// finishing would build a tile with nowhere to go. The load still reports back,
+				// which is what the marker below is for: the result lands after this call, the
+				// cache has no entry to find it by, and CacheItemDisposed will not fire again.
+				_meshGenerationUnit.Cancel(tileId);
+				_disposedWhileGenerating.Add(tileId);
 			}
 		}
 
 		private bool GetDataId(CanonicalTileId tileId, out CanonicalTileId targetId)
 		{
-			if (tileId.Z >= 14)
+			if (tileId.Z >= LandmarkDataZoom)
 			{
-				targetId = tileId.ParentAt(14);
+				targetId = tileId.ParentAt(LandmarkDataZoom);
 				return true;
 			}
 			else
@@ -359,11 +505,59 @@ namespace Mapbox.LandmarkModule
 			}
 		}
 
+		/// <summary>
+		/// One resolved tile's visuals, together with the glTF import that produced them.
+		///
+		/// The two are kept in one place because they have to be released in one step, in one order:
+		/// destroying the GameObjects first, then disposing the import. Disposing the import is what
+		/// destroys the meshes, materials and textures glTFast created, and Unity never reclaims
+		/// those on its own - so dropping the import leaks the whole tile's geometry and PBR texture
+		/// set for the rest of the session. Disposing it before the GameObjects are gone would
+		/// instead pull the meshes out from under renderers that are still using them.
+		/// </summary>
+		private class LandmarkTileVisuals
+		{
+			public readonly IEnumerable<GameObject> Objects;
+
+			private readonly MapboxGltfImport _import;
+
+			public LandmarkTileVisuals(IEnumerable<GameObject> objects, MapboxGltfImport import)
+			{
+				Objects = objects ?? Enumerable.Empty<GameObject>();
+				_import = import;
+			}
+
+			/// <summary>
+			/// Destroys the visuals, then disposes the import. In that order, and never the other
+			/// way round: Dispose destroys the meshes the renderers being torn down are still
+			/// using.
+			/// </summary>
+			public void Release()
+			{
+				foreach (var o in Objects)
+				{
+					if (o == null) continue;
+					GameObject.Destroy(o);
+				}
+
+				_import?.Dispose();
+			}
+		}
+
 		public Action<CanonicalTileId, List<Vector3[]>> TileFinished = (id, list) =>  { };
 		public Action<CanonicalTileId> TileDisposed = (id) => { };
-		public Action<CanonicalTileId, List<Vector3[]>> LandmarkFootprintCreated = (id, polygons) => { };
-		public Action<CanonicalTileId, List<Mesh>> LandmarkMeshResults = (id, results) => { };
-		public Action<GameObject> BuildingLoaded = (s) => { };
-		public Action<GameObject> BuildingUnloaded = (s) => { };
+		/// <summary>
+		/// Raised once for every landmark mesh brought on screen, with the GameObject carrying the
+		/// mesh and the id the tile publishes for the landmark it belongs to.
+		///
+		/// The id is the only way to ask "which landmark is this" from a raycast hit: the footprint
+		/// and building nodes of a landmark publish it under different keys, it is captured during
+		/// instantiation, and nothing about the resulting geometry records it.
+		///
+		/// There is no matching per-building unloaded event. Visuals are released a whole tile at a
+		/// time, which <see cref="TileDisposed"/> already reports, and a subscriber holding a
+		/// landmark GameObject can compare it against null like any other destroyed Unity object.
+		/// </summary>
+		public Action<GameObject, string> BuildingLoaded = (go, landmarkId) => { };
 	}
 }

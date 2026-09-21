@@ -19,7 +19,7 @@ namespace Mapbox.LandmarksModule
     /// The attribute data itself is decoded from the tile's own GLB bytes; see
     /// <see cref="FeatureId.FeatureIdColorTable"/>.
     /// </summary>
-    public class MapboxGltfImport : GltfImportBase<FeatureIdRoot>
+    internal class MapboxGltfImport : GltfImportBase<FeatureIdRoot>
     {
         /// <inheritdoc cref="GltfImportBase(IDownloadProvider,IDeferAgent,IMaterialGenerator,ICodeLogger)"/>
         public MapboxGltfImport(

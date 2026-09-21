@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
-using Mapbox.LandmarkModule;
-using Mapbox.LandmarkModule.Unity;
+using Mapbox.LandmarksModule.Unity;
 using Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer;
 using Mapbox.VectorModule.ComponentSystem.Data;
 using UnityEngine;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
 public class LandmarkToBuildingComponentConnector : MonoBehaviour
 {
@@ -86,7 +85,7 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
         _buildingsPerTile[tileId] = buildingData;
 
         // Get the z14 parent tile where this building belongs
-        var buildingAtZ14 = tileId.ParentAt(14);
+        var buildingAtZ14 = tileId.ParentAt(LandmarksLayerModule.LandmarkDataZoom);
 
         // Check against landmarks in the parent z14 tile.
         // Neighbor tile coverage is handled by landmark-side polygon replication in AddLandmarkData —
@@ -372,12 +371,7 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
     {
         if (buildingTileId.Z < landmarkTileId.Z) return false;
 
-        // Fresh copy: ParentAt walks the struct up in place and returns it, so calling it on the
-        // dictionary key itself would corrupt the key we are iterating.
-        var parent = new CanonicalTileId(buildingTileId.Z, buildingTileId.X, buildingTileId.Y)
-            .ParentAt(landmarkTileId.Z);
-
-        return parent.Equals(landmarkTileId);
+        return buildingTileId.ParentAt(landmarkTileId.Z).Equals(landmarkTileId);
     }
 
     private class BuildingData

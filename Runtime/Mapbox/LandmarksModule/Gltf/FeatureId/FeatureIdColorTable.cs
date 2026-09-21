@@ -23,7 +23,7 @@ namespace Mapbox.LandmarksModule.FeatureId
     /// </para>
     /// Owns native memory: dispose once scene instantiation for the tile has finished.
     /// </summary>
-    public class FeatureIdColorTable : IDisposable
+    internal class FeatureIdColorTable : IDisposable
     {
         private const string AttributeName = "_FEATURE_ID_RGBA4444";
 
@@ -270,7 +270,9 @@ namespace Mapbox.LandmarksModule.FeatureId
             _warnedAboutMissingMeshopt = true;
             Debug.LogWarning(
                 "Landmark feature IDs are unavailable: the com.unity.meshopt.decompress package " +
-                "is missing or outdated. Landmark tiles require EXT_meshopt_compression.");
+                "is older than 0.2.0-exp.1 and does not expose the API this decode path needs. " +
+                "Landmarks still draw, untinted by feature id. The package cannot be absent - " +
+                "MapboxLandmarksModule requires it to compile at all.");
         }
 #endif
     }

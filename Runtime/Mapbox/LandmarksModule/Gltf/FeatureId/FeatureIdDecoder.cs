@@ -11,7 +11,7 @@ namespace Mapbox.LandmarksModule.FeatureId
     /// The packed format: each vertex has a 4-byte (float-sized) value where
     /// lower 16 bits encode RGBA4444 color and upper 16 bits encode part ID.
     /// </summary>
-    public static class FeatureIdDecoder
+    internal static class FeatureIdDecoder
     {
         /// <summary>
         /// Unpacks raw accessor bytes straight into a destination color buffer.

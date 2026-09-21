@@ -10,7 +10,7 @@ using UnityEngine;
 // Disambiguates from UnityEngine.TerrainData, which "using UnityEngine" also brings in.
 using TerrainData = Mapbox.BaseModule.Data.DataFetchers.TerrainData;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
 	/// <summary>
 	/// Sits landmark buildings on elevated terrain by driving their transforms, and keeps them there
@@ -275,11 +275,7 @@ namespace Mapbox.LandmarkModule
 			{
 				if (terrainTileId.Z > landmarkTileId.Z) continue;
 
-				// Fresh copy: ParentAt walks the struct up in place and returns it.
-				var ancestor = new CanonicalTileId(landmarkTileId.Z, landmarkTileId.X, landmarkTileId.Y)
-					.ParentAt(terrainTileId.Z);
-
-				if (ancestor.Equals(terrainTileId)) return true;
+				if (landmarkTileId.ParentAt(terrainTileId.Z).Equals(terrainTileId)) return true;
 			}
 
 			return false;

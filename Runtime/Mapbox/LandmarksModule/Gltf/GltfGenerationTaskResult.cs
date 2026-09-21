@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using Mapbox.BaseModule.Data.Tasks;
 using UnityEngine;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
-    public class GltfGenerationTaskResult : TaskResult
+    internal class GltfGenerationTaskResult : TaskResult
     {
         public TaskResultType ResultType;
-        public bool InvalidateAndRetry = false;
         public IEnumerable<GameObject> GeneratedObjects;
 
         /// <summary>
@@ -26,12 +25,29 @@ namespace Mapbox.LandmarkModule
         /// </summary>
         public List<LandmarkAnchor> Anchors;
 
-        public GltfGenerationTaskResult(TaskResultType result, IEnumerable<GameObject> visuals = null, List<Vector3[]> footprintResults = null, List<LandmarkAnchor> anchors = null)
+        /// <summary>
+        /// The import that built <see cref="GeneratedObjects"/>, handed over so the caller can
+        /// dispose it when it destroys them. Null on every result that produced no visuals.
+        ///
+        /// Ownership transfers with this field, and it is not optional. Unity does not garbage
+        /// collect Mesh, Material or Texture2D, and disposing the import is the only thing that
+        /// destroys the ones glTFast created for this tile - so dropping the reference leaks every
+        /// mesh and PBR texture in the tile for the rest of the session. Destroying the GameObjects
+        /// alone does not touch them.
+        ///
+        /// It cannot be disposed inside the visualizer either: Dispose destroys those same meshes,
+        /// which the instantiated renderers are still using. It has to happen at the moment the
+        /// visuals are destroyed, and nothing here knows when that is.
+        /// </summary>
+        public MapboxGltfImport Import;
+
+        public GltfGenerationTaskResult(TaskResultType result, IEnumerable<GameObject> visuals = null, List<Vector3[]> footprintResults = null, List<LandmarkAnchor> anchors = null, MapboxGltfImport import = null)
         {
             ResultType = result;
             GeneratedObjects = visuals;
             FootprintResults = footprintResults ?? new List<Vector3[]>();
             Anchors = anchors ?? new List<LandmarkAnchor>();
+            Import = import;
         }
     }
 }

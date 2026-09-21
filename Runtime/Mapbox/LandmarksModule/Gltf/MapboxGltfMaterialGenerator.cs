@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Material = UnityEngine.Material;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule
 {
-    public class MapboxGltfMaterialGenerator : ShaderGraphMaterialGenerator
+    internal class MapboxGltfMaterialGenerator : ShaderGraphMaterialGenerator
     {
         private Material _buildingMaterial;
         private static readonly int OcclusionMap = Shader.PropertyToID("_OcclusionMap");
@@ -16,14 +16,11 @@ namespace Mapbox.LandmarkModule
 
         public MapboxGltfMaterialGenerator(Material unityContextBuildingMaterial)
         {
-            _buildingMaterial = unityContextBuildingMaterial != null
-                ? unityContextBuildingMaterial
-                : new Material(Shader.Find("Standard"));
+            _buildingMaterial = unityContextBuildingMaterial;
         }
 
         protected override Material GenerateDefaultMaterial(bool pointsSupport = false)
         {
-            //Debug.Log("GenerateDefaultMaterial ran");
             return _buildingMaterial;
         }
 
@@ -46,6 +43,10 @@ namespace Mapbox.LandmarkModule
 
             material.name = gltfMaterial.name;
 
+            // Landmarks deliberately ignore the glTF baseColorFactor. Per-part colour comes from
+            // the feature-ID vertex stream (see FeatureIdMeshWriter), and runtime tint/highlight
+            // is applied over that through a MaterialPropertyBlock on baseColorFactor (see
+            // LandmarkHighlightBehaviour.Tint). Reading the glTF value here would fight both.
             Color baseColorLinear = Color.white;
             RenderQueue? renderQueue = null;
 
@@ -56,12 +57,10 @@ namespace Mapbox.LandmarkModule
                 // (according to extension specification)
                 && gltfMaterial.Extensions?.KHR_materials_pbrSpecularGlossiness == null)
             {
-                //baseColorLinear = gltfMaterial.PbrMetallicRoughness.BaseColor;
-                
                 material.SetFloat(MaterialProperty.Metallic, gltfMaterial.PbrMetallicRoughness.metallicFactor );
                 material.SetFloat(MaterialProperty.RoughnessFactor, gltfMaterial.PbrMetallicRoughness.roughnessFactor );
 
-                if(TrySetTexture(
+                TrySetTexture(
                     gltfMaterial.PbrMetallicRoughness.MetallicRoughnessTexture,
                     material,
                     gltf,
@@ -69,14 +68,9 @@ namespace Mapbox.LandmarkModule
                     MaterialProperty.MetallicRoughnessMapScaleTransform,
                     MaterialProperty.MetallicRoughnessMapRotation,
                     MaterialProperty.MetallicRoughnessMapTexCoord
-                    )) {
-                    // material.EnableKeyword(KW_METALLIC_ROUGHNESS_MAP);
-                }
+                    );
 
                 // TODO: When the occlusionTexture equals the metallicRoughnessTexture, we could sample just once instead of twice.
-                // if (!DifferentIndex(gltfMaterial.occlusionTexture,gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture)) {
-                //    ...
-                // }
             }
 
             if(TrySetTexture(
@@ -88,7 +82,6 @@ namespace Mapbox.LandmarkModule
                 MaterialProperty.NormalTextureRotation,
                 MaterialProperty.NormalTextureTexCoord
                 )) {
-                // material.EnableKeyword(ShaderKeyword.normalMap);
                 material.SetFloat(MaterialProperty.NormalTextureScale,gltfMaterial.NormalTexture.scale);
             }
 

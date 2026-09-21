@@ -14,7 +14,7 @@ namespace Mapbox.LandmarksModule.FeatureId
     /// SetVertexBufferData), so Color has to be added as an additional vertex stream rather
     /// than through <see cref="Mesh.colors"/>.
     /// </summary>
-    public static class FeatureIdMeshWriter
+    internal static class FeatureIdMeshWriter
     {
         private static bool _warned;
 

@@ -1,10 +1,10 @@
 using System;
+using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
-using Mapbox.LandmarkModule.Unity;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Mapbox.LandmarkModule
+namespace Mapbox.LandmarksModule.Unity
 {
     [RequireComponent(typeof(LandmarksLayerModuleScript))]
     public class LandmarkHighlightBehaviour : MonoBehaviour
@@ -13,7 +13,7 @@ namespace Mapbox.LandmarkModule
         public Color DefaultColor = Color.white;
 
         [Tooltip("Colour applied to the landmark under the cursor when clicked. A saturated hue reads best against the untinted neighbours; red is the default.")]
-        public Color HightlightColor = Color.red;
+        public Color HighlightColor = Color.red;
 
         [Tooltip("Build a MeshCollider per landmark so clicks can hit them. ON is required for selection to work at all. Turn it OFF if you only want the events and are doing your own hit-testing - mesh colliders are the most expensive part of loading a landmark, and every landmark in the cover gets one.")]
         public bool AddCollidersForSelection = true;
@@ -21,15 +21,27 @@ namespace Mapbox.LandmarkModule
         [Tooltip("Cook the collider as a convex hull rather than the exact building geometry. Much cheaper, and enough when a click only needs to identify which building was hit. Turn OFF if clicks must follow the real silhouette - a concave building (a courtyard, an arch) will register hits in the gaps with this on.")]
         public bool UseConvexColliders = true;
 
+        [Tooltip("Fires with the landmark GameObject that was just clicked. Highlighting itself is not conditional on anything being subscribed here - it always happens, this is purely a notification for other systems (e.g. a details panel).")]
+        public UnityEvent<GameObject> VisualSelected;
+
         private readonly int _shaderColorPropertyName = Shader.PropertyToID("baseColorFactor");
 
         // Tinting through a property block rather than Renderer.material. Touching .material
         // instantiates a private copy of the material on first access and never frees it, so every
         // selection leaked one Material for the rest of the session.
         private readonly MaterialPropertyBlock _propertyBlock = new MaterialPropertyBlock();
+        /// <summary>
+        /// Id of the landmark currently highlighted, or null when nothing is selected. The same
+        /// value is on the selected GameObject's <see cref="LandmarkComponent"/>; this is here so a
+        /// <see cref="VisualSelected"/> handler wired in the Inspector, which receives only the
+        /// GameObject, does not have to go looking for the component.
+        /// </summary>
+        public string SelectedLandmarkId { get; private set; }
+
         private GameObject _currentlySelectedBuilding;
         private LandmarksLayerModule _module;
         private Camera _camera;
+        private MapBehaviourCore _map;
         private void Start()
         {
             _camera = Camera.main;
@@ -40,23 +52,38 @@ namespace Mapbox.LandmarkModule
                 return;
             }
 
-            var map = FindObjectOfType<MapBehaviourCore>();
-            if (map == null)
+            _map = FindObjectOfType<MapBehaviourCore>();
+            if (_map == null)
             {
                 Debug.LogWarning($"{nameof(LandmarkHighlightBehaviour)} found no {nameof(MapBehaviourCore)} in the scene, so landmark selection is disabled.", this);
                 enabled = false;
                 return;
             }
 
-            map.Initialized += mapboxMap =>
-            {
-                _module = (LandmarksLayerModule)GetComponent<LandmarksLayerModuleScript>().ModuleImplementation;
-                _module.BuildingLoaded += o =>
-                {
-                    o.AddComponent<LandmarkComponent>();
-                    if (AddCollidersForSelection) AddCollidersToVisuals(o);
-                };
-            };
+            // Named method rather than a lambda so OnDestroy can detach it. As a closure it could not
+            // be unsubscribed, so destroying this component before the map initialized left the body
+            // to run against a dead component.
+            _map.Initialized += OnMapInitialized;
+        }
+
+        private void OnMapInitialized(MapboxMap mapboxMap)
+        {
+            _module = (LandmarksLayerModule)GetComponent<LandmarksLayerModuleScript>().ModuleImplementation;
+            _module.BuildingLoaded += OnBuildingLoaded;
+        }
+
+        private void OnBuildingLoaded(GameObject o, string landmarkId)
+        {
+            // The id travels with the event because the geometry does not carry it. Stamping it on
+            // the marker component is what lets a raycast hit answer which landmark it belongs to.
+            o.AddComponent<LandmarkComponent>().LandmarkId = landmarkId;
+            if (AddCollidersForSelection) AddCollidersToVisuals(o);
+        }
+
+        private void OnDestroy()
+        {
+            if (_map != null) _map.Initialized -= OnMapInitialized;
+            if (_module != null) _module.BuildingLoaded -= OnBuildingLoaded;
         }
 
         private void Update()
@@ -64,7 +91,6 @@ namespace Mapbox.LandmarkModule
             if (UnityEngine.Input.GetMouseButtonDown(0))
             {
                 var ray = _camera.ScreenPointToRay(UnityEngine.Input.mousePosition);
-                //(ModuleImplementation as LandmarksLayerModule).SelectionRaycast(ray);
                 if (Physics.Raycast(ray, out var hit))
                 {
                     var buildingComponent = hit.transform.gameObject.GetComponent<LandmarkComponent>();
@@ -74,8 +100,8 @@ namespace Mapbox.LandmarkModule
                         // sit inside a null check on the event, so with nothing wired in the
                         // Inspector clicking a landmark did nothing at all and the component looked
                         // broken.
-                        BuildingSelected(hit.transform.gameObject);
-                        _visualSelectedEvent?.Invoke(hit.transform.gameObject);
+                        BuildingSelected(hit.transform.gameObject, buildingComponent);
+                        VisualSelected?.Invoke(hit.transform.gameObject);
                     }
                     else
                     {
@@ -114,6 +140,7 @@ namespace Mapbox.LandmarkModule
 
         private void ClearSelectedBuilding()
         {
+            SelectedLandmarkId = null;
             Tint(_currentlySelectedBuilding, DefaultColor);
             // Cleared as well as recoloured. Leaving the reference behind meant the next selection
             // re-tinted a building that was already back to its default, and a destroyed one stayed
@@ -121,11 +148,12 @@ namespace Mapbox.LandmarkModule
             _currentlySelectedBuilding = null;
         }
 
-        private void BuildingSelected(GameObject building)
+        private void BuildingSelected(GameObject building, LandmarkComponent component)
         {
             Tint(_currentlySelectedBuilding, DefaultColor);
             _currentlySelectedBuilding = building;
-            Tint(_currentlySelectedBuilding, HightlightColor);
+            SelectedLandmarkId = component != null ? component.LandmarkId : null;
+            Tint(_currentlySelectedBuilding, HighlightColor);
         }
 
         private void Tint(GameObject building, Color color)
@@ -141,7 +169,5 @@ namespace Mapbox.LandmarkModule
             _propertyBlock.SetColor(_shaderColorPropertyName, color);
             renderer.SetPropertyBlock(_propertyBlock);
         }
-        
-        public UnityEvent<GameObject> _visualSelectedEvent;
     }
 }
