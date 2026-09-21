@@ -513,6 +513,7 @@ GameObject:
   - component: {fileID: 1316629406}
   - component: {fileID: 1316629409}
   - component: {fileID: 1316629408}
+  - component: {fileID: 1316629410}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -597,7 +598,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TileMaterials:
-  - {fileID: 2100000, guid: aaf04558f9b104d2ebc4e1c86464fc1c, type: 2}
+  - {fileID: 2100000, guid: 2c79d272c56a949279a190dd31835b3b, type: 2}
   InstanceMaterials: 0
   CacheSize: 25
 --- !u!114 &1316629408
@@ -628,6 +629,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseMaterial: {fileID: 2100000, guid: 691ea1a86a64e406ab5e7c130d871ce5, type: 2}
+--- !u!114 &1316629410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316629397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8b70204fc3c4426bb0c2a5bd951a62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DefaultColor: {r: 1, g: 1, b: 1, a: 1}
+  HighlightColor: {r: 1, g: 0, b: 0, a: 1}
+  AddCollidersForSelection: 1
+  UseConvexColliders: 1
+  VisualSelected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1498144748
 GameObject:
   m_ObjectHideFlags: 0

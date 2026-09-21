@@ -55,7 +55,7 @@ Preset:
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[0].Material
     value: 
-    objectReference: {fileID: 2100000, guid: 8917c0d338e58481388fbe080cf36caf, type: 2}
+    objectReference: {fileID: 2100000, guid: 37183462415314953bb4adfeb41da2c6, type: 2}
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[1].Name
     value: primary
@@ -83,7 +83,7 @@ Preset:
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[1].Material
     value: 
-    objectReference: {fileID: 2100000, guid: 8917c0d338e58481388fbe080cf36caf, type: 2}
+    objectReference: {fileID: 2100000, guid: 37183462415314953bb4adfeb41da2c6, type: 2}
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[2].Name
     value: street,street_limited
@@ -111,7 +111,7 @@ Preset:
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[2].Material
     value: 
-    objectReference: {fileID: 2100000, guid: 8917c0d338e58481388fbe080cf36caf, type: 2}
+    objectReference: {fileID: 2100000, guid: 37183462415314953bb4adfeb41da2c6, type: 2}
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[3].Name
     value: service
@@ -139,7 +139,7 @@ Preset:
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[3].Material
     value: 
-    objectReference: {fileID: 2100000, guid: d449f6eb93a644716baa6f1f4c730813, type: 2}
+    objectReference: {fileID: 2100000, guid: 4c0f9b34ecbe04ac893329bac43121e7, type: 2}
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[4].Name
     value: path
@@ -175,7 +175,7 @@ Preset:
   - target: {fileID: 0}
     propertyPath: Styles.Array.data[4].Material
     value: 
-    objectReference: {fileID: 2100000, guid: c3c69f315ce7c4100a0ff6f40305bfe9, type: 2}
+    objectReference: {fileID: 2100000, guid: b975daeb659d24cb7b4bfc888d44cf96, type: 2}
   - target: {fileID: 0}
     propertyPath: managedReferences[5722777937161748527]
     value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadClassFilter
