@@ -287,6 +287,21 @@ namespace Mapbox.LandmarksModule
             /// </summary>
             private const float TileExtent = 8192f;
 
+            /// <summary>
+            /// Tells the mesh setters below to leave bounds alone, because FlipYZ has already
+            /// computed them from the same pass that rewrote the vertices.
+            /// </summary>
+            private const UnityEngine.Rendering.MeshUpdateFlags KeepBounds =
+                UnityEngine.Rendering.MeshUpdateFlags.DontRecalculateBounds;
+
+            // Reused across every primitive of one tile. glTFast builds each mesh as a single
+            // interleaved vertex buffer, so reading mesh.vertices or mesh.normals allocates a fresh
+            // managed array and deinterleaves into it - two allocations per primitive, on the load
+            // path, for every landmark in the cover. GetVertices/GetNormals fill these instead and
+            // resize them to fit, so the cost is one growth per tile rather than per primitive.
+            private readonly List<Vector3> _positionBuffer = new List<Vector3>();
+            private readonly List<Vector3> _normalBuffer = new List<Vector3>();
+
             public List<Vector3[]> FootprintResults = new List<Vector3[]>();
 
             /// <summary>
@@ -584,26 +599,49 @@ namespace Mapbox.LandmarksModule
                     return;
                 }
 
-                var verts = mesh.vertices;
-                var norms = mesh.normals;
+                mesh.GetVertices(_positionBuffer);
+                if (_positionBuffer.Count == 0) return;
 
-                // A primitive with positions but no NORMAL attribute gives an empty normals array,
+                mesh.GetNormals(_normalBuffer);
+
+                // A primitive with positions but no NORMAL attribute gives an empty normals list,
                 // which the loop below would index straight past the end of.
-                var hasNormals = norms != null && norms.Length == verts.Length;
+                var hasNormals = _normalBuffer.Count == _positionBuffer.Count;
 
-                for (int i = 0; i < verts.Length; i ++)
+                var heightDivisor = _mapInformation.Scale *
+                    (float)Conversions.LatitudeElevationCompensation(_mapInformation.LatitudeLongitude.Latitude);
+
+                var min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                var max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+                for (int i = 0; i < _positionBuffer.Count; i ++)
                 {
-                    var vert = verts[i];
-                    verts[i] = new Vector3(
+                    var vert = _positionBuffer[i];
+                    var moved = new Vector3(
                         (matrix[12] / TileExtent) + (-vert.x / TileExtent) * matrix[0],
-                        vert.z / (_mapInformation.Scale * (float)Conversions.LatitudeElevationCompensation(_mapInformation.LatitudeLongitude.Latitude)), 
+                        vert.z / heightDivisor,
                         (-matrix[13] / TileExtent) + (vert.y / TileExtent) * -matrix[5]);
-                    if (hasNormals) norms[i] = new Vector3(-norms[i].x, norms[i].z, norms[i].y);
+                    _positionBuffer[i] = moved;
+
+                    // Bounds accumulated here rather than left to RecalculateBounds, which would
+                    // walk every vertex a second time immediately after this loop finishes.
+                    if (moved.x < min.x) min.x = moved.x;
+                    if (moved.y < min.y) min.y = moved.y;
+                    if (moved.z < min.z) min.z = moved.z;
+                    if (moved.x > max.x) max.x = moved.x;
+                    if (moved.y > max.y) max.y = moved.y;
+                    if (moved.z > max.z) max.z = moved.z;
+
+                    if (hasNormals)
+                    {
+                        var norm = _normalBuffer[i];
+                        _normalBuffer[i] = new Vector3(-norm.x, norm.z, norm.y);
+                    }
                 }
 
-                if (hasNormals) mesh.normals = norms;
-                mesh.vertices = verts;
-                mesh.RecalculateBounds();
+                if (hasNormals) mesh.SetNormals(_normalBuffer, 0, _normalBuffer.Count, KeepBounds);
+                mesh.SetVertices(_positionBuffer, 0, _positionBuffer.Count, KeepBounds);
+                mesh.bounds = new Bounds((min + max) * 0.5f, max - min);
             }
             
             private bool IsFootprint(GLTFast.Newtonsoft.Schema.Node node)

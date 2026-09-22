@@ -100,6 +100,12 @@ The `LandmarkTour` sample's `MapFlightController` gained crossfaded climb, cruis
 
 - `LandmarkDemoWithVector`'s building material carried a hidden HDRP `AssetVersion` sub-asset in a URP-only package, which logged a missing-script warning on import.
 
+- `GltfVisualizer.FlipYZ` recomputed a cosine for every vertex of every landmark. The height divisor is `Scale * cos(latitude)`, and both the map-information property reads and `Conversions.LatitudeElevationCompensation` sat inside the per-vertex loop, so a tile's worth of geometry paid one `Mathf.Cos` per vertex for a value that cannot change during the loop. Hoisted out.
+
+  The same method also allocated two managed arrays per primitive. glTFast builds each mesh as one interleaved vertex buffer, so reading `mesh.vertices` and `mesh.normals` deinterleaves each into a fresh array; it now fills lists reused across the tile's primitives through `GetVertices`/`GetNormals`. Bounds come from the same pass that rewrites the vertices rather than from a `RecalculateBounds` walk immediately after it, with both setters told not to recalculate.
+
+- Road materials in the `LandmarkDemo`, `LandmarkTour` and `MapboxComponents` samples referenced two textures that exist nowhere in the repository, so `_BaseMap`, `_MainTex` and `_MainTexture` pointed at missing assets. Roads already rendered untextured; the slots are now empty rather than dangling.
+
 #### Changed
 
 - `ILayerModule.Initialize` now takes an `ITileLifecycleSource`, replacing the separate `ITileLifecycleObserver` hook. A module previously had no reference to whatever was driving it - neither the constructor nor `ConstructModule` supplies one - so an extra opt-in interface existed purely to hand the visualizer over. **Breaking** for anyone implementing `ILayerModule` directly or subclassing an SDK module and overriding `Initialize`. Nothing here is serialized, so no scene or prefab data is affected.
