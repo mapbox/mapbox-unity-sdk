@@ -11,7 +11,7 @@ Sample visualizers are included with the SDK package.
 
 ### Module Settings
 
-![Vector module](Images/VectorLayerModule.png)
+![Vector module](Images/VectorLayerModule.jpeg)
 
 The module has several key settings:
 
@@ -39,7 +39,7 @@ Visualizer assets can be created from the context menu: `Create / Mapbox / Modif
 
 ### Layer Visualizer
 
-![Vector module](Images/BuildingLayerVisualizer.png)
+![Vector module](Images/BuildingLayerVisualizer.jpeg)
 
 Each Layer Visualizer defines how a specific vector layer is processed and visualized.
 
@@ -63,7 +63,7 @@ As with the Vector Module, each visualizer ends with a list of Modifier Stacks.
 
 ### Modifier Stack
 
-![Vector module](Images/ModifierStack.png)
+![Vector module](Images/ModifierStack.jpeg)
 
 A Modifier Stack defines how feature data is transformed into rendered objects—effectively acting as a visual “style.”
 

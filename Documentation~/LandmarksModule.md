@@ -6,7 +6,7 @@ When landmarks are enabled, the SDK automatically hides any basic OSM buildings 
 
 This module ships as **preview** in v3.2.0. The two limitations most likely to be hit are that dynamic map scaling is not supported (landmark heights go wrong after a zoom step if the map uses `DynamicScalingMapInformation`), and that selection only ever picks a whole landmark, never one part of it — a raycast hit cannot be resolved down to a feature id even though the per-vertex data for that exists. See [Known Gaps](LandmarksModuleKnownGaps.md) for these and everything else outstanding.
 
-<!-- TODO: add a screenshot of the LandmarkDemo scene at Images/LandmarksModule.png -->
+![A landmark building on the map, with the basic extruded buildings around it suppressed](Images/LandmarksModule.jpeg)
 
 ---
 
