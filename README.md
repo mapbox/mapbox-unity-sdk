@@ -204,6 +204,7 @@ In-package documentation lives under `Documentation~/`. Grouped by what you're t
 - [`ChangingMapLocation.md`](Documentation~/ChangingMapLocation.md) — moving the map to a new lat/lon.
 - [`ChangeImageryStyleOnRuntime.md`](Documentation~/ChangeImageryStyleOnRuntime.md) — switching tile styles at runtime.
 - [`CoordinateConversions.md`](Documentation~/CoordinateConversions.md) — lat/lon ↔ Mercator ↔ Unity world space.
+- [`RecenteringLocationBasedMaps.md`](Documentation~/RecenteringLocationBasedMaps.md) — keeping a location-driven map centred on the player with `ShiftMapForDistance`, and moving your own objects with it via `TransformsToShift` / `OnRecentered`.
 
 **Camera, input, and AR/MR**
 - [`CameraSystem.md`](Documentation~/CameraSystem.md) — camera behaviours, touch / mouse input, Input System soft-dep, AR/MR parent-transform guidance.

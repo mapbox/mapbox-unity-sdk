@@ -554,6 +554,10 @@ MonoBehaviour:
   Map: {fileID: 1316629399}
   LocationProviderFactory: {fileID: 525849128}
   ShiftMapDistance: 500
+  TransformsToShift:
+  - {fileID: 4601729577895354}
+  - {fileID: 220147485}
+  - {fileID: 1326738089}
 --- !u!114 &525849131
 MonoBehaviour:
   m_ObjectHideFlags: 0
