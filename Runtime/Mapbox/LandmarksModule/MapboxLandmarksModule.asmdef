@@ -7,7 +7,8 @@
         "GUID:25ace1f7ded6f48c0a8abf5ef590456e",
         "GUID:2400806fb903448e5b7e737b92f1e434",
         "GUID:5aef8304858a8459cb2204d15bf75ab9",
-        "Unity.Meshopt.Decompress"
+        "Unity.Meshopt.Decompress",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

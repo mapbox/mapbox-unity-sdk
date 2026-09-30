@@ -88,9 +88,9 @@ namespace Mapbox.LandmarksModule.Unity
 
         private void Update()
         {
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (TryGetClickPosition(out var clickPosition))
             {
-                var ray = _camera.ScreenPointToRay(UnityEngine.Input.mousePosition);
+                var ray = _camera.ScreenPointToRay(clickPosition);
                 if (Physics.Raycast(ray, out var hit))
                 {
                     var buildingComponent = hit.transform.gameObject.GetComponent<LandmarkComponent>();
@@ -113,6 +113,38 @@ namespace Mapbox.LandmarksModule.Unity
                     ClearSelectedBuilding();
                 }
             }
+        }
+
+        // Gated on ENABLE_INPUT_SYSTEM, the same way Mapbox.Example's PointerInput is. Unity sets it
+        // when Active Input Handling is "New" or "Both"; under "New" the legacy UnityEngine.Input
+        // API throws every frame, which is what used to break clicking here. Package presence is
+        // not the gate because com.unity.inputsystem is always installed as a dependency, and
+        // legacy-only projects must keep taking the #else branch. The block is duplicated rather
+        // than calling PointerInput because that type is internal to the examples assembly, which
+        // this module does not reference.
+        private static bool TryGetClickPosition(out Vector3 position)
+        {
+#if ENABLE_INPUT_SYSTEM
+            // No mouse device (a touch-only player, for instance) is treated as no click.
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            if (mouse == null || !mouse.leftButton.wasPressedThisFrame)
+            {
+                position = default;
+                return false;
+            }
+
+            position = mouse.position.ReadValue();
+            return true;
+#else
+            if (!UnityEngine.Input.GetMouseButtonDown(0))
+            {
+                position = default;
+                return false;
+            }
+
+            position = UnityEngine.Input.mousePosition;
+            return true;
+#endif
         }
 
         private void AddCollidersToVisuals(GameObject go)

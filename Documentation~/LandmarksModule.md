@@ -112,7 +112,7 @@ A hit's `LandmarkComponent.LandmarkId` is the tile's own id for the landmark, an
 
 **The sample's buttons do nothing, or clicking a landmark does nothing:**
 
-Both depend on the legacy input path. The sample scenes carry a `StandaloneInputModule` on their EventSystem, and `LandmarkHighlightBehaviour` reads the mouse through `UnityEngine.Input`. Under **Player Settings → Active Input Handling → Input System Package (New)** neither works: the input module is inert and `UnityEngine.Input` throws. Set Active Input Handling to **Both** to run the samples as shipped, or replace the EventSystem's input module with `InputSystemUIInputModule` and do your own hit-testing off `VisualSelected`. This applies to every sample in the SDK, not just the landmark ones - see [`CameraSystem.md`](CameraSystem.md) for the same trade-off on the camera.
+The buttons depend on the legacy UI input path; landmark clicks do not. The sample scenes carry a `StandaloneInputModule` on their EventSystem, and under **Player Settings → Active Input Handling → Input System Package (New)** that module is inert, so the UI stops responding. Set Active Input Handling to **Both** to run the samples as shipped, or replace the EventSystem's input module with `InputSystemUIInputModule`. `LandmarkHighlightBehaviour` itself reads the mouse through whichever input handler is active and works under any setting, so if clicking a landmark still does nothing, check that **Add Colliders For Selection** is on and that the main camera is tagged `MainCamera`. The UI input module issue applies to every sample in the SDK, not just the landmark ones - see [`CameraSystem.md`](CameraSystem.md) for the same trade-off on the camera.
 
 ---
 
