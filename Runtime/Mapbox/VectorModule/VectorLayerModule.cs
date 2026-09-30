@@ -174,6 +174,15 @@ namespace Mapbox.VectorModule
 		public virtual void OnDestroy()
 		{
 			_isActive = false;
+			//the source is this module's own (MapUnityService hands out one per GetVectorSource
+			//call), so tear it down here like LandmarksLayerModule does with its building source.
+			//Unsubscribe first: destroying the source disposes its cache, and that must not call
+			//back into a module that is being torn down
+			if (_vectorSource != null)
+			{
+				_vectorSource.CacheItemDisposed -= ClearDisposedDataVisual;
+				_vectorSource.OnDestroy();
+			}
 			foreach (var pair in _layerVisualizers)
 			{
 				foreach (var visualizer in pair.Value)
@@ -464,6 +473,10 @@ namespace Mapbox.VectorModule
                 return;
             }
 
+            // Worker-local decode, handed to the completion callback through the closure. The
+            // VectorData belongs to the source's cache and is handed to every consumer of the tile,
+            // so nothing is written back into it; each consumer keeps its own parsed tile.
+            Mapbox.VectorTile.VectorTile vectorTile = null;
             var meshTask = new MeshGenTaskWrapper<MeshGenTaskWrapperResult>()
             {
                 TileId = data.TileId,
@@ -473,7 +486,7 @@ namespace Mapbox.VectorModule
                     try
                     {
                         var decompressed = Compression.Decompress(data.Data);
-                        data.VectorTileData = new Mapbox.VectorTile.VectorTile(decompressed);
+                        vectorTile = new Mapbox.VectorTile.VectorTile(decompressed);
                     }
                     catch (Exception e)
                     {
@@ -484,7 +497,7 @@ namespace Mapbox.VectorModule
 
                     try
                     {
-                        var layers = data.VectorTileData.LayerNames();
+                        var layers = vectorTile.LayerNames();
                         foreach (var layerName in layers)
                         {
                             if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
@@ -497,7 +510,7 @@ namespace Mapbox.VectorModule
 		                            if (layerVisualizer.Active)
 		                            {
 			                            var key = layerVisualizers.Count > 1 ? $"{layerName}_{vi}" : layerName;
-			                            result.Data.Add(key, layerVisualizer.CreateMesh(data.TileId, data.VectorTileData.GetLayer(layerName)));
+			                            result.Data.Add(key, layerVisualizer.CreateMesh(data.TileId, vectorTile.GetLayer(layerName)));
 		                            }
 	                            }
                             }
@@ -527,7 +540,8 @@ namespace Mapbox.VectorModule
 	                    return;
                     }
                     
-                    if (taskResult.ResultType == TaskResultType.MeshGenerationFailure)
+                    if (taskResult.ResultType == TaskResultType.MeshGenerationFailure ||
+                        taskResult.ResultType == TaskResultType.DataProcessingFailure)
                     {
                         var failResult = new MeshGenerationTaskResult(taskResult.ResultType);
                         foreach (var e in taskResult.GetExceptions())
@@ -544,7 +558,7 @@ namespace Mapbox.VectorModule
                     try
                     {
 	                    var resultGameObjects = new List<GameObject>();
-	                    foreach (var layerName in data.VectorTileData.LayerNames())
+	                    foreach (var layerName in vectorTile.LayerNames())
 	                    {
 	                        if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
 	                        {

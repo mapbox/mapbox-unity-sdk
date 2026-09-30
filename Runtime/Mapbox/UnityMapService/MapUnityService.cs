@@ -80,66 +80,25 @@ namespace Mapbox.UnityMapService
 		}
 
 		/// <summary>
-		/// Returns the one shared vector source, creating it on the first call.
+		/// Returns a new vector source on every call; each module owns the one it asked for and
+		/// destroys it in its own OnDestroy.
 		///
-		/// One source per map is deliberate: the Vector Tiles API composes tilesets, so
-		/// "{a},{b}/{z}/{x}/{y}.vector.pbf" fetches the union of their layers in a single request,
-		/// and a second source would mean a second request and a second cache entry per tile.
-		///
-		/// The consequence is that whoever calls first defines the tileset for everyone after them.
-		/// A later caller asking for a tileset the existing source does not carry used to receive it
-		/// silently and then find none of its layers in any tile; it is now told, naming both ids.
-		/// Composing them for the caller is not something this method can do - the source is already
-		/// fetching - so the fix on the caller's side is to compose the ids up front, which
-		/// VectorModuleSettingsDrawer's "Add Mapbox Streets V8" button exists to help with.
+		/// This used to return one shared source per map, on the grounds that the Vector Tiles API
+		/// composes tilesets ("{a},{b}/{z}/{x}/{y}") so one request could serve every module. In
+		/// practice the sharing meant whoever constructed first fixed the tileset and cache size for
+		/// everyone after, two modules with different data zooms cancelled and evicted each other's
+		/// tiles through the one retain set, and every module decoded the same shared data object.
+		/// All of that machinery existed to save a second request and cache entry per tile in the
+		/// rare map that runs two vector modules on the same tileset. That map now pays for its two
+		/// sources; the common single-module map pays nothing. A module that wants layers from two
+		/// tilesets still composes the ids into one comma-separated TilesetId, which the
+		/// VectorModuleSettingsDrawer's "Add Mapbox Streets V8" button does for it.
 		/// </summary>
 		public override Source<VectorData> GetVectorSource(VectorSourceSettings settings)
 		{
-			var existing = _dataSources.FirstOrDefault(x => x is VectorSource) as VectorSource;
-			if (existing != null)
-			{
-				WarnIfTilesetIsMissing(existing.TilesetId, settings.TilesetId);
-				return existing;
-			}
-
 			var vectorSource = new VectorSource(_fetchingManager, _cacheManager, settings);
 			_dataSources.Add(vectorSource);
 			return vectorSource;
-		}
-
-		/// <summary>
-		/// Reports every requested tileset the shared source does not carry. Both ids can be
-		/// composed, comma-separated lists, so this is a set comparison rather than string equality.
-		/// </summary>
-		private static void WarnIfTilesetIsMissing(string existingTilesetId, string requestedTilesetId)
-		{
-			if (string.IsNullOrEmpty(requestedTilesetId) || existingTilesetId == requestedTilesetId)
-			{
-				return;
-			}
-
-			var carried = new HashSet<string>((existingTilesetId ?? string.Empty)
-				.Split(',')
-				.Select(id => id.Trim())
-				.Where(id => id.Length > 0));
-
-			var missing = requestedTilesetId
-				.Split(',')
-				.Select(id => id.Trim())
-				.Where(id => id.Length > 0 && !carried.Contains(id))
-				.ToList();
-
-			if (missing.Count == 0)
-			{
-				return;
-			}
-
-			Debug.LogError(string.Format(
-				"A vector source for '{0}' already exists and is the only one this map will have, so " +
-				"the request for '{1}' returns it unchanged. None of the tiles it produces will carry " +
-				"a layer from {2}. Compose the tileset ids into one comma-separated id " +
-				"(\"{0},{2}\") on whichever module constructs the source first.",
-				existingTilesetId, requestedTilesetId, string.Join(",", missing)));
 		}
 		
 		public override Source<BuildingData> GetBuildingSource(VectorSourceSettings settings)
