@@ -35,5 +35,13 @@ namespace Mapbox.DirectionsApi.Response
 		/// </summary>
 		[JsonProperty("congestion_numeric")]
 		public int?[] CongestionNumeric;
+
+		/// <summary>
+		/// The posted speed limit between each pair of coordinates, one <see cref="Response.MaxSpeed"/> per segment:
+		/// a known limit with its unit, an unknown limit, or no legal limit. Only populated for the driving and
+		/// driving-traffic profiles when <c>maxspeed</c> is requested.
+		/// </summary>
+		[JsonProperty("maxspeed")]
+		public MaxSpeed[] MaxSpeed;
 	}
 }

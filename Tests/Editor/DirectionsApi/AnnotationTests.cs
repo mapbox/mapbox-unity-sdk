@@ -66,5 +66,45 @@ namespace Mapbox.DirectionsApiTests
             Assert.IsNull(leg.Annotation.CongestionNumeric[1]);
             Assert.AreEqual(85, leg.Annotation.CongestionNumeric[2]);
         }
+
+        [Test]
+        public void Deserialize_ParsesMaxSpeed_SpeedUnknownAndNoneElements()
+        {
+            var json = @"{ ""maxspeed"": [
+                { ""speed"": 50, ""unit"": ""km/h"" },
+                { ""unknown"": true },
+                { ""none"": true }
+            ] }";
+
+            var annotation = JsonConvert.DeserializeObject<Annotation>(json);
+
+            Assert.IsNotNull(annotation.MaxSpeed);
+            Assert.AreEqual(3, annotation.MaxSpeed.Length);
+
+            Assert.AreEqual(50.0, annotation.MaxSpeed[0].Speed);
+            Assert.AreEqual("km/h", annotation.MaxSpeed[0].Unit);
+            Assert.IsFalse(annotation.MaxSpeed[0].Unknown);
+            Assert.IsFalse(annotation.MaxSpeed[0].None);
+
+            Assert.IsNull(annotation.MaxSpeed[1].Speed);
+            Assert.IsNull(annotation.MaxSpeed[1].Unit);
+            Assert.IsTrue(annotation.MaxSpeed[1].Unknown);
+            Assert.IsFalse(annotation.MaxSpeed[1].None);
+
+            Assert.IsNull(annotation.MaxSpeed[2].Speed);
+            Assert.IsNull(annotation.MaxSpeed[2].Unit);
+            Assert.IsFalse(annotation.MaxSpeed[2].Unknown);
+            Assert.IsTrue(annotation.MaxSpeed[2].None);
+        }
+
+        [Test]
+        public void Deserialize_MaxSpeed_DefaultsToNull_WhenAbsent()
+        {
+            var json = @"{ ""congestion_numeric"": [0, 45] }";
+
+            var annotation = JsonConvert.DeserializeObject<Annotation>(json);
+
+            Assert.IsNull(annotation.MaxSpeed);
+        }
     }
 }

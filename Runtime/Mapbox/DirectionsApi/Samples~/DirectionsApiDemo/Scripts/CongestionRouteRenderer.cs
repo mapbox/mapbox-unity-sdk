@@ -205,8 +205,13 @@ namespace Mapbox.DirectionsApi.Samples
 				return null;
 			}
 
+			// Full-overview geometry is dense and the extrusion emits ~4 vertices per point, so a long route in a
+			// single congestion level can pass the 65535-vertex limit of the default 16-bit index buffer, and Unity
+			// then drops the mesh with an error. UInt32 indices cost nothing that matters for a handful of route
+			// meshes. It has to be set before vertices/triangles, which object initializers assign in order.
 			vectorEntity.Mesh = new Mesh
 			{
+				indexFormat = UnityEngine.Rendering.IndexFormat.UInt32,
 				vertices = meshData.Vertices.ToArray(),
 				triangles = meshData.Triangles[0].ToArray()
 			};
