@@ -23,6 +23,23 @@ namespace Mapbox.LandmarksModule
 		public const int LandmarkDataZoom = 14;
 
 		/// <summary>
+		/// How close, in z14 tile units, a landmark footprint has to come to a tile edge before the
+		/// overlap connectors also copy it into the neighbouring z14 tile.
+		///
+		/// Crossing the edge is not the right test. Vector tiles carry a buffer of roughly 1/64 of the
+		/// tile past each edge, and VectorLayerVisualizer converts geometry without clipping it, so a
+		/// building straddling the edge between tiles A and B is drawn by B's copy of it slightly past
+		/// B's edge, into A. A landmark lying wholly inside A but close to that edge overlaps the
+		/// overhang, yet was only ever stored under A - and the connectors look buildings up under
+		/// their own z14 parent only, so B's copy was tested against nothing and stayed visible through
+		/// the landmark. Replicating within this margin puts the footprint in B too.
+		///
+		/// Twice the typical buffer, because being generous is cheap: a footprint copied into a
+		/// neighbour it does not actually reach only costs a few extra bbox rejections there.
+		/// </summary>
+		public const float NeighbourReplicationMargin = 1f / 32f;
+
+		/// <summary>
 		/// How many times a tile may fail to generate before it is given up on. The first failure is
 		/// worth a retry - a truncated download decodes as a malformed glTF - but a tile that is
 		/// genuinely broken must stop being retried, or it re-downloads, re-fails and logs an error

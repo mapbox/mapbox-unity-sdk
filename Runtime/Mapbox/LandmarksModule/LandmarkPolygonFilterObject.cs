@@ -30,9 +30,14 @@ namespace Mapbox.LandmarksModule
             }
         }
 
-        public void AddLandmarkPolygons(CanonicalTileId z14TileId, List<Vector3[]> polygons)
+        /// <summary>
+        /// Stores a landmark tile's footprints and returns every z14 tile whose polygon list changed
+        /// (the source tile plus each neighbour a footprint was replicated into), empty when nothing
+        /// was added. See <see cref="LandmarkPolygonFilter.AddLandmarkPolygons"/>.
+        /// </summary>
+        public IReadOnlyCollection<CanonicalTileId> AddLandmarkPolygons(CanonicalTileId z14TileId, List<Vector3[]> polygons)
         {
-            GetOrCreateFilter().AddLandmarkPolygons(z14TileId, polygons);
+            return GetOrCreateFilter().AddLandmarkPolygons(z14TileId, polygons);
         }
 
         public void RemoveLandmarkPolygonsFromSource(CanonicalTileId z14TileId)
@@ -100,8 +105,9 @@ namespace Mapbox.LandmarksModule
 
             // Look up landmark data for the parent z14 tile.
             // Neighbor tile coverage is handled by polygon replication in AddLandmarkPolygons —
-            // polygons that extend beyond tile boundaries are copied into neighboring z14 tiles,
-            // so a single lookup here is sufficient.
+            // polygons that reach within NeighbourReplicationMargin of a tile boundary are copied
+            // into the neighboring z14 tiles, so a single lookup here is sufficient even for a
+            // feature whose buffer overhang pokes into the next tile.
             if (!landmarks.TryGetValue(z14Parent, out var landmarkData))
                 return true;
 
@@ -204,9 +210,24 @@ namespace Mapbox.LandmarksModule
             return buffer;
         }
 
-        public void AddLandmarkPolygons(CanonicalTileId z14TileId, List<Vector3[]> polygons)
+        /// <summary>
+        /// Stores the footprints of one landmark tile, replicating those near a tile edge into the
+        /// neighbouring z14 tiles, and returns every z14 tile whose polygon list this changed.
+        ///
+        /// The caller needs that set because vector tiles already built under any of those tiles
+        /// were filtered against the old polygons and have to be rebuilt - the neighbours as much
+        /// as the source tile, since a replica is what hides a building on the far side of the edge.
+        /// Most landmark tiles carry no footprints at all, and the empty result is what lets the
+        /// caller skip the rebuild entirely for them.
+        ///
+        /// A fresh set per call rather than a reused field: the caller iterates it after the write
+        /// lock is released, and one small allocation per landmark tile that has footprints is not
+        /// worth the aliasing hazard. The empty result is a shared empty array, so the common case
+        /// allocates nothing.
+        /// </summary>
+        public IReadOnlyCollection<CanonicalTileId> AddLandmarkPolygons(CanonicalTileId z14TileId, List<Vector3[]> polygons)
         {
-            if (polygons == null || polygons.Count == 0) return;
+            if (polygons == null || polygons.Count == 0) return Array.Empty<CanonicalTileId>();
 
             lock (_writeLock)
             {
@@ -215,17 +236,23 @@ namespace Mapbox.LandmarksModule
                 // lists may be touched once they are visible - only the tiles this call actually
                 // changes get cloned, the rest are shared by reference and stay immutable.
                 var next = new Dictionary<CanonicalTileId, LandmarkTileData>(_landmarksAtZ14);
+                var changedTiles = new HashSet<CanonicalTileId>();
 
                 foreach (var polygon in polygons)
                 {
                     if (polygon == null || polygon.Length == 0) continue;
                     AppendPolygon(next, z14TileId, z14TileId, polygon);
+                    changedTiles.Add(z14TileId);
                 }
 
-                // Replicate polygons that extend beyond tile boundaries into neighbor tiles
-                ReplicateToNeighbors(next, z14TileId, polygons);
+                // Every polygon was null or empty: nothing to publish, nothing for the caller to rebuild.
+                if (changedTiles.Count == 0) return Array.Empty<CanonicalTileId>();
+
+                // Replicate polygons that reach near or past the tile boundaries into neighbor tiles
+                ReplicateToNeighbors(next, z14TileId, polygons, changedTiles);
 
                 _landmarksAtZ14 = next;
+                return changedTiles;
             }
         }
 
@@ -282,8 +309,10 @@ namespace Mapbox.LandmarksModule
         }
 
         private static void ReplicateToNeighbors(Dictionary<CanonicalTileId, LandmarkTileData> pending,
-            CanonicalTileId originalId, List<Vector3[]> polygons)
+            CanonicalTileId originalId, List<Vector3[]> polygons, HashSet<CanonicalTileId> changedTiles)
         {
+            const float margin = LandmarksLayerModule.NeighbourReplicationMargin;
+
             foreach (var polygon in polygons)
             {
                 if (polygon == null || polygon.Length == 0) continue;
@@ -301,49 +330,53 @@ namespace Mapbox.LandmarksModule
                     if (polygon[i].z > maxZ) maxZ = polygon[i].z;
                 }
 
-                var extendsLeft = minX < 0;
-                var extendsRight = maxX > 1;
-                var extendsTop = maxZ > 0;
-                var extendsBottom = minZ < -1;
+                // Within the margin of an edge, not only past it: a neighbour's buildings overhang
+                // into this tile by the vector tile buffer, and Try() only looks a feature up under
+                // its own z14 parent. See NeighbourReplicationMargin.
+                var extendsLeft = minX < margin;
+                var extendsRight = maxX > 1 - margin;
+                var extendsTop = maxZ > -margin;
+                var extendsBottom = minZ < -1 + margin;
 
                 // Cardinal neighbors
                 if (extendsLeft)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y),
                         polygon);
 
                 if (extendsRight)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y),
                         polygon);
 
                 if (extendsTop)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y - 1),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y - 1),
                         polygon);
 
                 if (extendsBottom)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y + 1),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y + 1),
                         polygon);
 
-                // Diagonal neighbors — polygon extends beyond both X and Z boundaries
+                // Diagonal neighbors — polygon reaches both an X and a Z boundary
                 if (extendsLeft && extendsTop)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y - 1),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y - 1),
                         polygon);
 
                 if (extendsRight && extendsTop)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y - 1),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y - 1),
                         polygon);
 
                 if (extendsLeft && extendsBottom)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y + 1),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y + 1),
                         polygon);
 
                 if (extendsRight && extendsBottom)
-                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y + 1),
+                    AddPolyToNeighbor(pending, changedTiles, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y + 1),
                         polygon);
             }
         }
 
         private static void AddPolyToNeighbor(Dictionary<CanonicalTileId, LandmarkTileData> pending,
-            CanonicalTileId originalId, CanonicalTileId neighborId, Vector3[] polygon)
+            HashSet<CanonicalTileId> changedTiles, CanonicalTileId originalId, CanonicalTileId neighborId,
+            Vector3[] polygon)
         {
             var dif = new Vector3(neighborId.X - originalId.X, 0, neighborId.Y - originalId.Y);
             var newPoly = new Vector3[polygon.Length];
@@ -353,6 +386,7 @@ namespace Mapbox.LandmarksModule
             }
 
             AppendPolygon(pending, neighborId, originalId, newPoly);
+            changedTiles.Add(neighborId);
         }
 
         /// <summary>

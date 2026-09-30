@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
@@ -36,7 +37,9 @@ namespace Mapbox.LandmarksModule
     /// Landmarks are expected to load before vector tiles. When landmark footprints arrive via the
     /// TileFinished event, the filter is populated immediately. If the vector module has already
     /// processed tiles in the same area (race condition), VectorLayerModule.ReloadTile() is called
-    /// to re-run the pipeline with the now-populated filter.
+    /// to re-run the pipeline with the now-populated filter. "Same area" is every z14 tile the
+    /// filter reports as changed, which includes the neighbours a footprint was replicated into;
+    /// a landmark tile with no footprints changes nothing and reloads nothing.
     ///
     /// COORDINATE SPACES:
     /// Landmark polygons are stored at z14 tile space inside the filter. During Try(), each
@@ -89,11 +92,19 @@ namespace Mapbox.LandmarksModule
 
         private void OnLandmarkTileFinished(CanonicalTileId z14TileId, List<Vector3[]> polygons)
         {
-            // Feed landmark polygons into the filter (stored at z14, with neighbor replication)
-            LandmarkFilter.AddLandmarkPolygons(z14TileId, polygons);
+            // Feed landmark polygons into the filter (stored at z14, with neighbor replication).
+            // What comes back is every z14 tile whose polygon list changed - the source tile plus
+            // each neighbour a footprint near the edge was copied into.
+            var changedTiles = LandmarkFilter.AddLandmarkPolygons(z14TileId, polygons);
 
-            // Check if the vector module has already processed tiles in this z14 area.
-            // If so, reload them so the filter can reject overlapping features.
+            // Most landmark tiles carry no footprints. Rebuilding the vector tiles under them would
+            // destroy and regenerate every ready building mesh in the area for no change at all.
+            if (changedTiles.Count == 0) return;
+
+            // Check if the vector module has already processed tiles in any changed z14 area.
+            // If so, reload them so the filter can reject overlapping features. The neighbours
+            // matter as much as the source tile: a replicated footprint is what hides a building
+            // across the edge, and one already built there was filtered before the replica existed.
             if (_vectorLayerModule == null) return;
 
             // Snapshot the ready tiles to avoid modifying the collection during iteration
@@ -102,7 +113,9 @@ namespace Mapbox.LandmarksModule
             foreach (var readyTile in _vectorLayerModule.GetReadyTiles())
             {
                 var parentTile = readyTile.ParentAt(LandmarksLayerModule.LandmarkDataZoom);
-                if (parentTile.Equals(z14TileId))
+                // Enumerable.Contains defers to ICollection<T>.Contains, so this is a hash lookup
+                // on the HashSet the filter returns, not a linear scan.
+                if (changedTiles.Contains(parentTile))
                 {
                     _tilesToReload.Add(readyTile);
                 }

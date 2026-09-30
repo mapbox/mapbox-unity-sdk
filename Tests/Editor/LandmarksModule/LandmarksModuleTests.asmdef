@@ -1,0 +1,46 @@
+{
+    "name": "LandmarksModuleTests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:093b9fb2cd4794a8c94472d55c8bb0a9",
+        "GUID:2400806fb903448e5b7e737b92f1e434",
+        "GUID:6c70378ed90ee43a3953a9ff574df29b",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Mapbox.VectorTile.VectorTileReader.dll",
+        "Mapbox.VectorTile.Geometry.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "MAPBOX_GLTFAST_PRESENT",
+        "MAPBOX_MESHOPT_PRESENT"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.cloud.gltfast",
+            "expression": "",
+            "define": "MAPBOX_GLTFAST_PRESENT"
+        },
+        {
+            "name": "com.unity.meshopt.decompress",
+            "expression": "",
+            "define": "MAPBOX_MESHOPT_PRESENT"
+        },
+        {
+            "name": "com.unity.meshopt.decompress",
+            "expression": "0.2.0-exp.1",
+            "define": "MESHOPT_IS_RECENT"
+        }
+    ],
+    "noEngineReferences": false
+}

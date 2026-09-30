@@ -89,8 +89,9 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
 
         // Check against landmarks in the parent z14 tile.
         // Neighbor tile coverage is handled by landmark-side polygon replication in AddLandmarkData —
-        // polygons extending beyond tile boundaries are copied into all 8 neighboring z14 tiles,
-        // so a single lookup here is sufficient.
+        // polygons reaching within NeighbourReplicationMargin of a tile boundary are copied into the
+        // neighboring z14 tiles on that side, so a single lookup here is sufficient even for a
+        // building whose buffer overhang pokes into the next tile.
         if (_landmarksPerTile.TryGetValue(buildingAtZ14, out var landmarkData))
         {
             HandleCollision(buildingData, landmarkData);
@@ -256,21 +257,11 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
 
     private IEnumerable<CanonicalTileId> AddLandmarkData(CanonicalTileId id, List<Vector3[]> polygons)
     {
+        const float margin = LandmarksLayerModule.NeighbourReplicationMargin;
+
         var changedTiles = new HashSet<CanonicalTileId>();
         foreach (var polygon in polygons)
         {
-            var minX = float.MaxValue;
-            var maxX = float.MinValue;
-            var minZ = float.MaxValue;
-            var maxZ = float.MinValue;
-            for (var i = 0; i < polygon.Length; i++)
-            {
-                if (polygon[i].x < minX) minX = polygon[i].x;
-                if (polygon[i].x > maxX) maxX = polygon[i].x;
-                if (polygon[i].z < minZ) minZ = polygon[i].z;
-                if (polygon[i].z > maxZ) maxZ = polygon[i].z;
-            }
-
             var bbox = MapboxGeometryUtilities.BoundsOfVertices(polygon);
 
             if (!_landmarksPerTile.ContainsKey(id)) _landmarksPerTile.Add(id, new LandmarkData(id));
@@ -279,10 +270,13 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
             _landmarksPerTile[id].Sources.Add(id);
             changedTiles.Add(id);
 
-            var extendsLeft = minX < 0;
-            var extendsRight = maxX > 1;
-            var extendsTop = maxZ > 0;
-            var extendsBottom = minZ < -1;
+            // Within the margin of an edge, not only past it: a neighbour's buildings overhang into
+            // this tile by the vector tile buffer, and OnBuildingMeshCreated only looks a building up
+            // under its own z14 parent. See NeighbourReplicationMargin.
+            var extendsLeft = bbox.min.x < margin;
+            var extendsRight = bbox.max.x > 1 - margin;
+            var extendsTop = bbox.max.z > -margin;
+            var extendsBottom = bbox.min.z < -1 + margin;
 
             // Cardinal neighbors
             CanonicalTileId neighbourId;
@@ -314,7 +308,7 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
                 changedTiles.Add(neighbourId);
             }
 
-            // Diagonal neighbors — polygon extends beyond both X and Z boundaries
+            // Diagonal neighbors — polygon reaches both an X and a Z boundary
             if (extendsLeft && extendsTop)
             {
                 neighbourId = new CanonicalTileId(id.Z, id.X - 1, id.Y - 1);
