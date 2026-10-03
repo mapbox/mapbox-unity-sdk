@@ -12,6 +12,12 @@ using UnityEngine.Events;
 
 namespace Mapbox.LandmarksModule.Unity
 {
+	/// <summary>
+	/// Inspector entry point that builds a <see cref="LandmarksLayerModule"/> for the map.
+	///
+	/// <b>Preview.</b> The Landmarks Module ships as preview in v3.2.0: its API and behaviour may
+	/// change in a minor release. See <c>Documentation~/LandmarksModuleKnownGaps.md</c>.
+	/// </summary>
 	public class LandmarksLayerModuleScript : ModuleConstructorScript
 	{
 		[Tooltip("Material every landmark mesh is rendered with. Must be a glTF-compatible material that exposes baseColorFactor - use the shipped LandmarkMaterialGLTF unless you have built your own from the same subgraphs, since landmark tiles supply PBR textures the standard URP shaders will not bind.")]

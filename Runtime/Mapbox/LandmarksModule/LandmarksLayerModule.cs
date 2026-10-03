@@ -13,6 +13,14 @@ using UnityEngine;
 
 namespace Mapbox.LandmarksModule
 {
+	/// <summary>
+	/// Fetches 3D landmark tiles from the Mapbox 3D Buildings tileset, builds them with glTFast,
+	/// and hides the basic buildings they overlap.
+	///
+	/// <b>Preview.</b> This module ships as preview in v3.2.0: its API and behaviour may change in a
+	/// minor release. Dynamic map scaling is not supported. See
+	/// <c>Documentation~/LandmarksModuleKnownGaps.md</c> for everything outstanding.
+	/// </summary>
 	public class LandmarksLayerModule : ILayerModule
 	{
 		/// <summary>
