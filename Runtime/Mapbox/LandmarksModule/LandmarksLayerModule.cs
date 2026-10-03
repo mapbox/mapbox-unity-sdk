@@ -150,9 +150,9 @@ namespace Mapbox.LandmarksModule
 					// up on. Without this, every call to LoadTileCoverToMemory (e.g. MapFlightController
 					// re-checking readiness after each animated step) re-ran the full glTF mesh
 					// generation for every already-finished landmark in the cover, not just new
-					// ones - GenerateTask has no guard of its own and even calling it again would
-					// have thrown on the second _visualCache.Add for the same key. Mirrors the
-					// same check EnsureRetainedTilesReady already uses for the RetainTiles path.
+					// ones. GenerateTask re-checks resolution itself, since this check runs before
+					// the fetch and the tile can resolve while it is in flight; this one just saves
+					// the fetch. Mirrors the check EnsureRetainedTilesReady uses for RetainTiles.
 					if (!IsResolved(targetId) && !_meshGenerationUnit.IsInWork(targetId))
 					{
 						yield return LoadAndProcessTileCoroutine(targetId);
@@ -323,6 +323,17 @@ namespace Mapbox.LandmarksModule
 
 		private Task GenerateTask(CanonicalTileId tileId, BuildingData vectorData)
 		{
+			// Callers check this before they start, but the cover path checks it before fetching
+			// the data and only calls in here once the fetch completes, frames later. In that gap
+			// RetainTiles can see the same data arrive and resolve the tile itself - synchronously,
+			// for an empty tile - so by the time the cover path gets here the cache already holds
+			// the key and the Add below would throw. Checked here, at the last moment, so no
+			// caller can race it.
+			if (IsResolved(tileId))
+			{
+				return Task.CompletedTask;
+			}
+
 			return _meshGenerationUnit.Generate(vectorData, result =>
 			{
 				// Another call owns the in-flight generation and will report its outcome to its
