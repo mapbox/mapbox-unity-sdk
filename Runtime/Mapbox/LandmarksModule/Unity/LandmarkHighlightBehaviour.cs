@@ -29,7 +29,11 @@ namespace Mapbox.LandmarksModule.Unity
         // Tinting through a property block rather than Renderer.material. Touching .material
         // instantiates a private copy of the material on first access and never frees it, so every
         // selection leaked one Material for the rest of the session.
-        private readonly MaterialPropertyBlock _propertyBlock = new MaterialPropertyBlock();
+        //
+        // Created in Awake, not in a field initializer: MaterialPropertyBlock's constructor calls
+        // into the engine, and Unity throws when a MonoBehaviour does that during construction
+        // ("CreateImpl is not allowed to be called from a MonoBehaviour constructor").
+        private MaterialPropertyBlock _propertyBlock;
         /// <summary>
         /// Id of the landmark currently highlighted, or null when nothing is selected. The same
         /// value is on the selected GameObject's <see cref="LandmarkComponent"/>; this is here so a
@@ -42,6 +46,12 @@ namespace Mapbox.LandmarksModule.Unity
         private LandmarksLayerModule _module;
         private Camera _camera;
         private MapBehaviourCore _map;
+
+        private void Awake()
+        {
+            _propertyBlock = new MaterialPropertyBlock();
+        }
+
         private void Start()
         {
             _camera = Camera.main;
