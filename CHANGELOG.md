@@ -2,7 +2,14 @@
 
 ### v3.2.0 (unreleased)
 
-Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, single values standing in for several different outcomes, and - in the removals below - public surfaces that advertised access to tile data they could never return.
+Minor-version bump per semver: adds a new Landmarks Module, shipping as **preview**, and traffic-aware routing in the Directions API. Alongside those, this release also carries correctness work across the tile pipeline, independent of any one feature module. That theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, single values standing in for several different outcomes, and - in the removals below - public surfaces that advertised access to tile data they could never return.
+
+#### Breaking changes
+
+**Bbox coordinate order:**
+- `BboxToVector2dBoundsConverter` (`Mapbox.BaseModule.Utilities.JsonConverters`, in `BboxToGeoCoordinateBoundsConverter.cs`) read a GeoJSON `bbox` array's four values into `LatitudeLongitudeBounds` in the wrong order. GeoJSON's documented order is `[min_lon, min_lat, max_lon, max_lat]`, and the converter is shared: it is the only thing that turns a `bbox` field into a `LatitudeLongitudeBounds` anywhere in the SDK. It now reads the pairs as `(lat, lon)` from each `(lon, lat)` slot correctly. **Breaking** for any caller reading `Bbox` off a `GeocodingApi.Feature` and depending on the previous (swapped) values — those values were wrong before this fix, so any code compensating for the swap now double-corrects and must be updated.
+
+#### New features
 
 Adds the Landmarks Module, shipping as **preview** in this release; see `Documentation~/LandmarksModuleKnownGaps.md` for what preview does not yet cover. The module fetches 3D landmark meshes from the Mapbox 3D Buildings tileset, with overlap suppression against both the Vector and Components building pipelines. Landmark types live in the `Mapbox.LandmarksModule` namespace, with the MonoBehaviour wrappers under `Mapbox.LandmarksModule.Unity`. glTFast is consumed as a normal package dependency rather than bundled, and two new hard dependencies are declared: `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`.
 
@@ -102,8 +109,6 @@ The `LandmarkTour` sample's `MapFlightController` gained crossfaded climb, cruis
 
 - `LandmarkHighlightBehaviour` threw `UnityException: CreateImpl is not allowed to be called from a MonoBehaviour constructor` as soon as a scene carrying it loaded. It created its `MaterialPropertyBlock` in a field initializer, which Unity runs during the MonoBehaviour's constructor, where engine objects may not be created. The block is now created in `Awake`.
 - Clicking a landmark did nothing when Active Input Handling was set to "Input System Package (New)", and the console filled with an `InvalidOperationException` every frame. `LandmarkHighlightBehaviour` read the mouse through the legacy `UnityEngine.Input` API, which throws under that setting even though `com.unity.inputsystem` is a package dependency. It now reads `Mouse.current` when `ENABLE_INPUT_SYSTEM` is defined, the same gate the example camera input uses, and treats a missing mouse as no click; `MapboxLandmarksModule` gained a reference to `Unity.InputSystem` for it.
-
-
 
 - A landmark module with no Base Material assigned fell through to `new Material(Shader.Find("Standard"))`. `Standard` is the built-in render pipeline's shader and this SDK requires URP, where `Shader.Find` returns null in a player build - so the fallback produced either a material with no shader or magenta geometry, and leaked one material per import. `LandmarksLayerModuleScript` now logs an error against the component, and the visualizer reports every tile as empty rather than throwing its way through the cover.
 
