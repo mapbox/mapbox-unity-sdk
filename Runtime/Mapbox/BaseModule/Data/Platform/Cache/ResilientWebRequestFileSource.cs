@@ -177,23 +177,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 
 		protected string CreateFinalUrl(string uri)
 		{
-			var uriBuilder = new UriBuilder(uri);
-			if (!string.IsNullOrEmpty(_accessToken))
-			{
-				string accessTokenQuery = "access_token=" + _accessToken;
-				string mapsSkuToken = "sku=" + _getMapsSkuToken();
-				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
-				}
-				else
-				{
-					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
-				}
-			}
-
-			string finalUrl = uriBuilder.ToString();
-			return finalUrl;
+			return MapboxApiUrls.AppendCredentials(uri, _accessToken, _getMapsSkuToken);
 		}
 		
 		protected bool IsRetryable(ResilientWebRequest request)
@@ -210,22 +194,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 
 		public IAsyncRequest Request(string uri, Action<Response> callback, int timeout = 10)
 		{
-			var uriBuilder = new UriBuilder(uri);
-			if (!string.IsNullOrEmpty(_accessToken))
-			{
-				string accessTokenQuery = "access_token=" + _accessToken;
-				string mapsSkuToken = "sku=" + _getMapsSkuToken();
-				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
-				}
-				else
-				{
-					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
-				}
-			}
-
-			string finalUrl = uriBuilder.ToString();
+			var finalUrl = CreateFinalUrl(uri);
 			return requestTileAndCache(finalUrl, timeout, callback);
 		}
 

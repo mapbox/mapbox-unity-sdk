@@ -4,6 +4,10 @@
 
 Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, single values standing in for several different outcomes, and - in the removals below - public surfaces that advertised access to tile data they could never return.
 
+#### Security
+
+- `access_token` and `sku` are now appended only to requests whose host is `mapbox.com` or a subdomain, over https. Other hosts are requested without credentials. Proxy or custom endpoints that need credentials must include them in the URL template.
+
 #### Fixed
 
 - Callbacks that were silently dropped, each of which could park a coroutine forever. `VectorLayerModule.CreateVisual` returned without invoking its callback when mesh generation for the tile was already in flight, leaving `CreateVisualCoroutine` spinning on `Runnable` for the rest of the session and hanging `LoadTileCoverToMemory` with it, so `LoadViewCompleted` never fired. `UnitySource.RequestData` did the same for a tile id already being fetched; a second request now joins the in-flight fetch and receives its real outcome.
