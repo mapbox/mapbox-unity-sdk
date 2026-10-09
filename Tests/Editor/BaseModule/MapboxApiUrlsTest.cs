@@ -78,24 +78,22 @@ namespace Mapbox.BaseModuleTests
         public void AppendCredentials_AppendsWhenNoExistingQuery()
         {
             const string url = "https://api.mapbox.com/v4/mapbox.satellite/0/0/0.png";
-            var result = MapboxApiUrls.AppendCredentials(url, AccessToken, SkuToken());
+            var result = new Uri(MapboxApiUrls.AppendCredentials(url, AccessToken, SkuToken()));
 
-            var parts = result.Split("?".ToCharArray());
-            Assert.AreEqual(2, parts.Length);
-            Assert.AreEqual(url, parts[0]);
-            Assert.AreEqual("access_token=pk.test&sku=01", parts[1]);
+            // Compared through Uri rather than as strings because UriBuilder.ToString()
+            // emits the default port (":443") under Mono.
+            Assert.AreEqual(url, result.GetLeftPart(UriPartial.Path));
+            Assert.AreEqual("?access_token=pk.test&sku=01", result.Query);
         }
 
         [Test]
         public void AppendCredentials_MergesWithExistingQuery()
         {
             const string url = "https://api.mapbox.com/v4/mapbox.streets.json?secure";
-            var result = MapboxApiUrls.AppendCredentials(url, AccessToken, SkuToken());
+            var result = new Uri(MapboxApiUrls.AppendCredentials(url, AccessToken, SkuToken()));
 
-            var parts = result.Split("?".ToCharArray());
-            Assert.AreEqual(2, parts.Length);
-            Assert.AreEqual("https://api.mapbox.com/v4/mapbox.streets.json", parts[0]);
-            Assert.AreEqual("secure&access_token=pk.test&sku=01", parts[1]);
+            Assert.AreEqual("https://api.mapbox.com/v4/mapbox.streets.json", result.GetLeftPart(UriPartial.Path));
+            Assert.AreEqual("?secure&access_token=pk.test&sku=01", result.Query);
         }
 
         [Test]
