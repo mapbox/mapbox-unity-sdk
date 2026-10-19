@@ -48,6 +48,14 @@ namespace Mapbox.BaseModule.Data.DataFetchers
 
 		public virtual void EnqueueForFetching(FetchInfo info)
 		{
+			if (info == null) return;
+
+			// Nothing will service this once teardown has started, and requests already in flight
+			// when the app stops keep delivering callbacks that enqueue more work. The callback is
+			// deliberately not invoked here: it would run against objects being destroyed, and
+			// anything waiting on it is a coroutine that dies with the app anyway.
+			if (_isDestroying || _fetchQueue == null) return;
+
 			info.QueueTime = Time.time;
 			_fetchQueue.Enqueue(info);
 		}
@@ -60,9 +68,13 @@ namespace Mapbox.BaseModule.Data.DataFetchers
 		public void OnDestroy()
 		{
 			_isDestroying = true;
-			_fetchQueue.Clear();
-			_fetchQueue = null;
-			_fileSource.OnDestroy();
+
+			// Emptied but not nulled. Setting the field to null turned every late enqueue into a
+			// NullReferenceException instead of a no-op, and the queue is structural rather than
+			// per-session state.
+			_fetchQueue?.Clear();
+
+			_fileSource?.OnDestroy();
 			_fileSource = null;
 		}
 		

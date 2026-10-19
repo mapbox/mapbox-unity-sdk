@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Platform;
 using Mapbox.BaseModule.Data.Platform.Cache;
+using Mapbox.BaseModule.Data.Tasks;
 using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
@@ -449,14 +450,24 @@ namespace Mapbox.UnityMapService.DataSources
             if (dataTask != null) //can be null if sqlite cache isn't available
             {
                 if (dataTask.IsCompleted) //supporting instant calls
-                    OnDataTaskDataContinueWith(dataTask.DataResult);
+                    OnDataTaskDataContinueWith(dataTask.Outcome, dataTask.DataResult);
                 else
-                    dataTask.DataCompleted += (task, data) => OnDataTaskDataContinueWith(data);
+                    dataTask.DataCompleted += (task, data) => OnDataTaskDataContinueWith(dataTask.Outcome, data);
             }
         }
 
-        private void OnDataTaskDataContinueWith(T data)
+        private void OnDataTaskDataContinueWith(DataTaskOutcome outcome, T data)
         {
+            // Nothing usable came back, so there is no expiration to check. All three of the
+            // conditions below used to arrive as one undifferentiated null and were dereferenced
+            // on the next line:
+            //  - Cancelled: the read never ran, so this tile's expiry is simply unknown.
+            //  - Faulted: sqlite threw. TaskManager has already logged the exception.
+            //  - Completed with a null result: there is genuinely no row for this tile.
+            // Skipping the check is the right response to all three, but they are distinguishable
+            // now, so a caller that needs to treat a fault differently from a miss can.
+            if (outcome != DataTaskOutcome.Completed || data == null) return;
+
             if (data.ExpirationDate == null || DateTime.Compare((DateTime)data.ExpirationDate, DateTime.Now) < 0)
             {
                 TileExpired(data.TilesetId, data.TileId);

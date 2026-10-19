@@ -108,7 +108,8 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 			if (info.Exists)
 			{
 				var fullPath = RelativePathToUnityRequestExpects(relativePath);
-				_fileDataFetcher.FetchData<T>(fullPath, tileId, tilesetId, isTextureNonreadable, callback);
+				_fileDataFetcher.FetchData<T>(fullPath, tileId, tilesetId, isTextureNonreadable,
+					(data) => { DiscardUnreadableFile(relativePath, data); callback(data); });
 			}
 			else
 			{
@@ -146,12 +147,38 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 					isTextureNonreadable,
 					(data) =>
 					{
+						DiscardUnreadableFile(relativePath, data);
 						callback(data);
 					});
 			}
 			else
 			{
 				callback(null);
+			}
+		}
+
+		/// <summary>
+		/// Deletes a cached file that could not be read back.
+		///
+		/// The read failing is already reported upstream (MapboxCacheManager turns HasError into a
+		/// cache miss, so the tile is re-fetched from the network), but the unreadable file stayed on
+		/// disk and Exists still returned true for it. Every later request for that tile therefore
+		/// paid a full failing UnityWebRequestTexture before falling through to the network, for the
+		/// life of the cache. Removing it turns a permanent tax into a one-off.
+		/// </summary>
+		private void DiscardUnreadableFile(string relativePath, MapboxTileData data)
+		{
+			if (data == null || !data.HasError) return;
+
+			try
+			{
+				DeleteByFileRelativePath(relativePath);
+			}
+			catch (Exception e)
+			{
+				// Never let cache housekeeping break the read path - the caller still gets its
+				// callback, and a file we failed to delete only costs the old retry behaviour.
+				Debug.LogWarning($"Could not delete unreadable cache file '{relativePath}': {e.Message}");
 			}
 		}
 

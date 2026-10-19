@@ -52,7 +52,7 @@ namespace Mapbox.VectorModule
 			_tilesToRemove = new List<CanonicalTileId>(10);
 		}
 
-		public virtual IEnumerator Initialize()
+		public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
 		{
 			if (_vectorSource != null)
 			{
@@ -174,6 +174,15 @@ namespace Mapbox.VectorModule
 		public virtual void OnDestroy()
 		{
 			_isActive = false;
+			//the source is this module's own (MapUnityService hands out one per GetVectorSource
+			//call), so tear it down here like LandmarksLayerModule does with its building source.
+			//Unsubscribe first: destroying the source disposes its cache, and that must not call
+			//back into a module that is being torn down
+			if (_vectorSource != null)
+			{
+				_vectorSource.CacheItemDisposed -= ClearDisposedDataVisual;
+				_vectorSource.OnDestroy();
+			}
 			foreach (var pair in _layerVisualizers)
 			{
 				foreach (var visualizer in pair.Value)
@@ -350,7 +359,11 @@ namespace Mapbox.VectorModule
 		{
 			if (_readyTiles.Contains(tileId))
 			{
-				callback?.Invoke(new MeshGenerationTaskResult(TaskResultType.Success));
+				//AlreadyGenerated rather than Success: nothing was generated here, so there are
+				//no GeneratedObjects to hand back, and Success is the one member that promises
+				//there are. The tile is ready either way, which is what separates this from
+				//AlreadyInProgress below.
+				callback?.Invoke(new MeshGenerationTaskResult(TaskResultType.AlreadyGenerated));
 			}
 			else if (!IsMeshGenInWork(vectorData.TileId))
 			{
@@ -387,6 +400,20 @@ namespace Mapbox.VectorModule
 
 					callback?.Invoke(result);;
 				}));
+			}
+			else
+			{
+				//mesh generation for this tile is already running, started by an earlier caller.
+				//that caller owns the in-flight task and reports the real outcome to its own
+				//callback; all this one can honestly say is "you don't have to start it".
+				//deliberately NOT Success - the tile isn't ready, and a caller that treated this
+				//as completion would start dependent work against a visual that doesn't exist yet.
+				//
+				//the callback has to be invoked with something, though. without this branch it was
+				//dropped entirely, and CreateVisualCoroutine's "while (!isMeshGenDone) yield return
+				//null" then spun forever on Runnable - one dead per-frame coroutine per tile, every
+				//time LoadTileCoverToMemory was called while a generation was already under way.
+				callback?.Invoke(new MeshGenerationTaskResult(TaskResultType.AlreadyInProgress));
 			}
 		}
 
@@ -446,6 +473,10 @@ namespace Mapbox.VectorModule
                 return;
             }
 
+            // Worker-local decode, handed to the completion callback through the closure. The
+            // VectorData belongs to the source's cache and is handed to every consumer of the tile,
+            // so nothing is written back into it; each consumer keeps its own parsed tile.
+            Mapbox.VectorTile.VectorTile vectorTile = null;
             var meshTask = new MeshGenTaskWrapper<MeshGenTaskWrapperResult>()
             {
                 TileId = data.TileId,
@@ -455,7 +486,7 @@ namespace Mapbox.VectorModule
                     try
                     {
                         var decompressed = Compression.Decompress(data.Data);
-                        data.VectorTileData = new Mapbox.VectorTile.VectorTile(decompressed);
+                        vectorTile = new Mapbox.VectorTile.VectorTile(decompressed);
                     }
                     catch (Exception e)
                     {
@@ -466,7 +497,7 @@ namespace Mapbox.VectorModule
 
                     try
                     {
-                        var layers = data.VectorTileData.LayerNames();
+                        var layers = vectorTile.LayerNames();
                         foreach (var layerName in layers)
                         {
                             if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
@@ -479,7 +510,7 @@ namespace Mapbox.VectorModule
 		                            if (layerVisualizer.Active)
 		                            {
 			                            var key = layerVisualizers.Count > 1 ? $"{layerName}_{vi}" : layerName;
-			                            result.Data.Add(key, layerVisualizer.CreateMesh(data.TileId, data.VectorTileData.GetLayer(layerName)));
+			                            result.Data.Add(key, layerVisualizer.CreateMesh(data.TileId, vectorTile.GetLayer(layerName)));
 		                            }
 	                            }
                             }
@@ -509,7 +540,8 @@ namespace Mapbox.VectorModule
 	                    return;
                     }
                     
-                    if (taskResult.ResultType == TaskResultType.MeshGenerationFailure)
+                    if (taskResult.ResultType == TaskResultType.MeshGenerationFailure ||
+                        taskResult.ResultType == TaskResultType.DataProcessingFailure)
                     {
                         var failResult = new MeshGenerationTaskResult(taskResult.ResultType);
                         foreach (var e in taskResult.GetExceptions())
@@ -523,27 +555,39 @@ namespace Mapbox.VectorModule
                     }
                     
 					
-                    var resultGameObjects = new List<GameObject>();
-                    foreach (var layerName in data.VectorTileData.LayerNames())
+                    try
                     {
-                        if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
-                        {
-	                        for (var vi = 0; vi < layerVisualizers.Count; vi++)
+	                    var resultGameObjects = new List<GameObject>();
+	                    foreach (var layerName in vectorTile.LayerNames())
+	                    {
+	                        if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
 	                        {
-		                        var key = layerVisualizers.Count > 1 ? $"{layerName}_{vi}" : layerName;
-		                        if (!taskResult.Data.TryGetValue(key, out var tileMeshData))
-			                        continue;
-		                        var layerVisualizer = layerVisualizers[vi];
-		                        var layerGameObjects = layerVisualizer.CreateGo(data.TileId, tileMeshData);
-		                        foreach (var gameObject in layerGameObjects)
+		                        for (var vi = 0; vi < layerVisualizers.Count; vi++)
 		                        {
-			                        gameObject.SetActive(false);
-			                        resultGameObjects.Add(gameObject);
+			                        var key = layerVisualizers.Count > 1 ? $"{layerName}_{vi}" : layerName;
+			                        if (!taskResult.Data.TryGetValue(key, out var tileMeshData))
+				                        continue;
+			                        var layerVisualizer = layerVisualizers[vi];
+			                        if (layerVisualizer.ContainsVisualFor(data.TileId))
+				                        continue;
+			                        var layerGameObjects = layerVisualizer.CreateGo(data.TileId, tileMeshData);
+			                        foreach (var gameObject in layerGameObjects)
+			                        {
+				                        gameObject.SetActive(false);
+				                        resultGameObjects.Add(gameObject);
+			                        }
 		                        }
 	                        }
-                        }
+	                    }
+	                    callback(new MeshGenerationTaskResult(TaskResultType.Success, resultGameObjects));
                     }
-                    callback(new MeshGenerationTaskResult(TaskResultType.Success, resultGameObjects));
+                    catch (Exception e)
+                    {
+	                    Debug.LogError($"[VLM] CreateGo failed for tile {data.TileId}: {e}");
+	                    var failResult = new MeshGenerationTaskResult(TaskResultType.MeshGenerationFailure);
+	                    failResult.AddException(e);
+	                    callback(failResult);
+                    }
                     
                 }
             };

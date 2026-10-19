@@ -4,7 +4,7 @@ namespace Mapbox.BaseModule.Utilities
 {
 	public static class Constants
 	{
-		public const string SDK_VERSION = "3.0.7";
+		public const string SDK_VERSION = "3.2.0";
 		public const string SDK_SKU_ID = "05";
 		public const string SDK_IDENTIFIER = "Unity_SDK";
 		public const string PACKAGE_NAME = "com.mapbox.unitysdk";
@@ -15,6 +15,9 @@ namespace Mapbox.BaseModule.Utilities
 			public const string BaseAPI = "https://api.mapbox.com/";
 
 			public const string EventsAPI = "https://events.mapbox.com/";
+
+			/// <summary> Tileset serving 3D landmark meshes as meshopt-compressed glTF binaries. </summary>
+			public const string LandmarksTilesetId = "mapbox.mapbox-3dbuildings-v1-meshopt";
 
 			/// <summary> Mercator projection max latitude limit. </summary>
 			public const double LatitudeMax = 85.0511;

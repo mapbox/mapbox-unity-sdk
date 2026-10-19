@@ -10,6 +10,30 @@ namespace Mapbox.VectorModule.ComponentSystem.Modifiers
 {
     public class ArrayPolygon
     {
+        /// <summary>
+        /// Buffer capacity that can hold any triangulation of a single feature, for callers
+        /// sizing the <c>triList</c> they pass to <see cref="Polygonize"/>.
+        ///
+        /// Ear clipping yields at most (V + 2H - 2) triangles for V vertices across H holes,
+        /// so that many triangles is an upper bound. One spare triangle is added on top,
+        /// because <see cref="Polygonize"/> treats a buffer as full at
+        /// <c>count + offset &gt;= length</c> and so needs a slot it never writes to.
+        ///
+        /// The result is counted in triangles and multiplied by three, so the capacity is
+        /// always a multiple of three. Callers hand whole buffers to <c>Mesh.SetTriangles</c>
+        /// with the unused tail left as zeroes (degenerate triangles that draw nothing), and
+        /// that call rejects any length that is not a multiple of three. It is also why the
+        /// visualizers' default pool size is 10002 rather than 10000.
+        /// </summary>
+        public static int WorstCaseIndexCount(FeatureVertexData vertexData)
+        {
+            // Submeshes holds ring boundaries, so there are Count - 1 rings and at most
+            // Count - 2 of them are holes.
+            var holeCount = Mathf.Max(0, vertexData.Submeshes.Count - 2);
+            var triangleCount = Mathf.Max(0, vertexData.VertexCount + 2 * holeCount - 2);
+            return (triangleCount + 1) * 3;
+        }
+
         public int Polygonize(
             Span<Vector3> vertices,
             Span<Vector3> normals,

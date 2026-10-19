@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mapbox.BaseModule;
 using Mapbox.BaseModule.Data.DataFetchers;
@@ -78,13 +79,23 @@ namespace Mapbox.UnityMapService
 			return staticRasterSource;
 		}
 
+		/// <summary>
+		/// Returns a new vector source on every call; each module owns the one it asked for and
+		/// destroys it in its own OnDestroy.
+		///
+		/// This used to return one shared source per map, on the grounds that the Vector Tiles API
+		/// composes tilesets ("{a},{b}/{z}/{x}/{y}") so one request could serve every module. In
+		/// practice the sharing meant whoever constructed first fixed the tileset and cache size for
+		/// everyone after, two modules with different data zooms cancelled and evicted each other's
+		/// tiles through the one retain set, and every module decoded the same shared data object.
+		/// All of that machinery existed to save a second request and cache entry per tile in the
+		/// rare map that runs two vector modules on the same tileset. That map now pays for its two
+		/// sources; the common single-module map pays nothing. A module that wants layers from two
+		/// tilesets still composes the ids into one comma-separated TilesetId, which the
+		/// VectorModuleSettingsDrawer's "Add Mapbox Streets V8" button does for it.
+		/// </summary>
 		public override Source<VectorData> GetVectorSource(VectorSourceSettings settings)
 		{
-			if (_dataSources.Any(s => s is VectorSource))
-			{
-				return _dataSources.First(x => x is VectorSource) as Source<VectorData>;
-			}
-			
 			var vectorSource = new VectorSource(_fetchingManager, _cacheManager, settings);
 			_dataSources.Add(vectorSource);
 			return vectorSource;

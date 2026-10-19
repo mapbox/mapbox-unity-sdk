@@ -10,7 +10,14 @@ namespace Mapbox.VectorModule.MeshGeneration.Unity
     public abstract class ScriptableGameObjectModifierObject : ScriptableObject, IGameObjectModifier
     {
         [SerializeField, HideInInspector] private bool m_Active = true;
-        
+
+        /// <summary>
+        /// Whether this modifier takes part in its stack. See
+        /// <see cref="ScriptableMeshModifierObject.Active"/> - the Inspector drew this toggle and
+        /// nothing read it.
+        /// </summary>
+        public bool Active => m_Active;
+
         protected abstract GameObjectModifier _gameObjectModifierImplementation { get; }
 
         public abstract void ConstructModifier(UnityContext unityContext);

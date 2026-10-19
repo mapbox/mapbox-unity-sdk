@@ -20,6 +20,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Debug = UnityEngine.Debug;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.PlayModeTests
 {
@@ -99,7 +100,7 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
                 _map = mapCore.MapboxMap;
             }
         
-            while(mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates) yield return null;
+            yield return TestWait.While(() => mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates, "ProcessScene: mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates");
 
             yield return new WaitForSeconds(2);
         
@@ -136,7 +137,7 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
             {
                 _map = mapCore.MapboxMap;
             }
-            while(mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates) yield return null;
+            yield return TestWait.While(() => mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates, "ZoomOutTest: mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates");
 
             yield return new WaitForSeconds(1);
 
@@ -157,8 +158,13 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
             _testRecorderController.PrepareRecording();
             _testRecorderController.StartRecording();
             
+            var zoomOutDeadline = Time.realtimeSinceStartup + 60f;
             while (mapCore.MapInformation.Zoom > 6)
             {
+                // The loop drives the zoom itself, so it cannot use TestWait; it still needs an end,
+                // since a map that clamps or stalls above 6 would otherwise spin forever.
+                Assert.Less(Time.realtimeSinceStartup, zoomOutDeadline,
+                    $"Timed out zooming out to 6; stuck at {mapCore.MapInformation.Zoom}.");
                 mapCore.MapboxMap.ChangeView(null, mapCore.MapInformation.Zoom - 1 * Time.deltaTime);
                 yield return null;
             }
@@ -193,7 +199,7 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
             {
                 _map = mapCore.MapboxMap;
             }
-            while(mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates) yield return null;
+            yield return TestWait.While(() => mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates, "ZoomInTest: mapCore.InitializationStatus < InitializationStatus.ReadyForUpdates");
 
             yield return new WaitForSeconds(1);
 
@@ -220,8 +226,11 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
             //     yield return null;
             // }
             
+            var zoomInDeadline = Time.realtimeSinceStartup + 60f;
             while (mapCore.MapInformation.Zoom < 16.9)
             {
+                Assert.Less(Time.realtimeSinceStartup, zoomInDeadline,
+                    $"Timed out zooming in to 16.9; stuck at {mapCore.MapInformation.Zoom}.");
                 mapCore.MapboxMap.ChangeView(null, mapCore.MapInformation.Zoom + 1 * Time.deltaTime);
                 yield return null;
             }

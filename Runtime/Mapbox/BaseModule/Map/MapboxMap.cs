@@ -156,6 +156,10 @@ namespace Mapbox.BaseModule.Map
         /// <param name="bearing">Bearing value of the camera</param>
         public void ChangeView(LatitudeLongitude? latlng = null, float? zoom = null, float? pitch = null, float? bearing = null, float? scale = null)
         {
+            // Lets the task queue tell a moving map from a settled one, so it only pays the dispatch
+            // debounce - which exists so a tile leaving the cover can cancel its work - while there
+            // is movement that could actually cancel something.
+            UnityContext?.TaskManager?.NotifyViewChanged();
             MapInformation.SetInformation(latlng, zoom, pitch, bearing, scale);
             RedrawMap();
         }
@@ -196,11 +200,32 @@ namespace Mapbox.BaseModule.Map
         /// <summary>
         /// Map tile finished loading with targeted detail level data. This tile isn't temporary anymore, it'll be in
         /// ActiveTiles list.
+        ///
+        /// <b>Fires for a subset of tiles only,</b> and that catches people out. A tile is drawn as
+        /// soon as it enters the active set - as a coarser <c>Temporary</c> stand-in, or a
+        /// <c>Filler</c> synthesized from neighbouring zoom levels - and neither of those raises
+        /// this. Promotion to Finished needs every layer module to report ready, so a tile whose
+        /// modules never all become ready is visible on screen and never raises it at all.
+        ///
+        /// <b>So do not use this to track which tiles are on screen.</b> There is no event for that;
+        /// read <c>MapVisualizer.ActiveTiles</c> instead, which is complete at every instant it can
+        /// be read - the visualizer shows a replacement tile before pooling what it replaces, inside
+        /// one synchronous call. Use this event for the tile's <i>data</i>: elevation, imagery, mesh
+        /// features.
+        ///
+        /// <b>Not paired one-to-one with <see cref="TileUnloading"/>,</b> which fires for every tile
+        /// leaving whatever fidelity it reached. Expect unload callbacks for tiles this never
+        /// announced, and make teardown tolerant of ids it never saw.
         /// </summary>
         public Action<UnityMapTile> TileLoaded = (tile) => { };
         /// <summary>
         /// Map tile unloading event fires for tiles that are still in active tiles list but not in the latest tileCover.
         /// UnityMapTile object attached to event will be pooled after the event call.
+        ///
+        /// Fires for <b>every</b> tile leaving the active set, whatever fidelity it reached - so it
+        /// does not pair with <see cref="TileLoaded"/>, which fires only for tiles that reached
+        /// their own detail level. This will fire for tiles <see cref="TileLoaded"/> never
+        /// announced.
         /// </summary>
         public Action<UnityMapTile> TileUnloading = (tile) => { };
     }

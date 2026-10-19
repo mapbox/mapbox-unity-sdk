@@ -8,7 +8,8 @@
         "GUID:36ca6af6e2b304d4090888554d6ce199",
         "GUID:b539fa37cbf6b482d9d4da9b14c33dc6",
         "GUID:5ff00896142b94bc7a58a7c72b2faf57",
-        "GUID:2400806fb903448e5b7e737b92f1e434"
+        "GUID:2400806fb903448e5b7e737b92f1e434",
+        "MapboxTestUtils"
     ],
     "includePlatforms": [
         "Editor"

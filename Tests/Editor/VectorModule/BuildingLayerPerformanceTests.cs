@@ -16,6 +16,7 @@ using NUnit.Framework;
 using Unity.PerformanceTesting;
 using UnityEditor;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.VectorModuleTests
 {
@@ -25,6 +26,15 @@ namespace Mapbox.VectorModuleTests
         
         private ResilientWebRequestFileSource _fs;
         private byte[] buffer;
+
+        /// <summary>
+        /// The tile is fetched once per Editor session, not once per test. [UnitySetUp] runs before
+        /// every test, so this fixture used to spend a network round trip per test on bytes that
+        /// never change - and a run's numbers depended on all of them succeeding. Static, so it also
+        /// survives between runs in the same session, which keeps a before/after comparison on the
+        /// same input.
+        /// </summary>
+        private static byte[] _cachedTileBytes;
         private CanonicalTileId tileId = new CanonicalTileId(15, 18654, 9481);
         private string LatLng = "60.1664427,24.9318587";
         private string _buildingVisualizerAssetPath = "Packages/com.mapbox.sdk/Tests/Editor/VectorModule/BuildingSetups/TEST_BuildingLayerVisualizerObject.asset";
@@ -33,6 +43,12 @@ namespace Mapbox.VectorModuleTests
         [UnitySetUp]
         public IEnumerator SetUp()
         {
+            if (_cachedTileBytes != null)
+            {
+                buffer = _cachedTileBytes;
+                yield break;
+            }
+
             var mapboxContext = new MapboxContext();
             yield return mapboxContext.LoadConfigurationCoroutine(false);
             _fs = new ResilientWebRequestFileSource(mapboxContext.GetAccessToken(), mapboxContext.GetSkuToken);
@@ -42,13 +58,14 @@ namespace Mapbox.VectorModuleTests
             {
                 response = r;
             });
-            while (!req.IsCompleted)
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => !req.IsCompleted, "SetUp: !req.IsCompleted");
             
+            Assert.IsNotNull(response, "Tile request completed without delivering a response.");
+            Assert.IsFalse(response.HasError, $"Tile request failed ({response.StatusCode}): {response.ExceptionsAsString}");
             buffer = response.Data;
+            Assert.IsNotNull(buffer, "Tile response carried no data.");
             Assert.NotZero(buffer.Length);
+            _cachedTileBytes = buffer;
         }
 
         private IMapInformation GetMapInformation()
@@ -129,7 +146,11 @@ namespace Mapbox.VectorModuleTests
             var settings = doChamfer
                 ? new BuildingComponentSettings() { RoundBuildingCorners = true }
                 : new BuildingComponentSettings() { RoundBuildingCorners = false };
-            var vizObj = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            // Instantiate a copy: AssetDatabase hands back the project asset itself, so assigning
+            // Settings on it edits the committed file and leaves whichever case ran last as its
+            // stored state - which also makes these two cases order-dependent.
+            var asset = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            var vizObj = UnityEngine.Object.Instantiate(asset);
             vizObj.Settings = settings;
             var viz = (BuildingComponentVisualizer) vizObj.ConstructLayerVisualizer(GetMapInformation(), null);
             yield return viz.Initialize();
@@ -148,7 +169,11 @@ namespace Mapbox.VectorModuleTests
             var settings = doChamfer
                 ? new BuildingComponentSettings() { RoundBuildingCorners = true }
                 : new BuildingComponentSettings() { RoundBuildingCorners = false };
-            var vizObj = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            // Instantiate a copy: AssetDatabase hands back the project asset itself, so assigning
+            // Settings on it edits the committed file and leaves whichever case ran last as its
+            // stored state - which also makes these two cases order-dependent.
+            var asset = (BuildingComponentVisualizerObject) AssetDatabase.LoadAssetAtPath(_buildingVisualizerAssetPath, typeof(BuildingComponentVisualizerObject));
+            var vizObj = UnityEngine.Object.Instantiate(asset);
             vizObj.Settings = settings;
             var viz = (BuildingComponentVisualizer) vizObj.ConstructLayerVisualizer(GetMapInformation(), null);
             yield return viz.Initialize();

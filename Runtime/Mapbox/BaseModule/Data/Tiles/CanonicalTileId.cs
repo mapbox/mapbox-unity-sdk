@@ -143,23 +143,23 @@ namespace Mapbox.BaseModule.Data.Tiles
 
 		#endregion
 
-		public CanonicalTileId ParentAt(int i)
+		/// <summary>
+		/// The ancestor of this tile at zoom level <paramref name="i"/>, or this tile itself if it is
+		/// already at or above that level. Does not modify this tile - use <see cref="MoveToParent"/>
+		/// when the mutation is what you want.
+		/// </summary>
+		public readonly CanonicalTileId ParentAt(int i)
 		{
-			if (Z < i)
+			if (Z <= i)
 			{
 				return this;
 			}
 
 			var delta = Z - i; //zoom level diff
-			for (int j = 0; j < delta; j++)
-			{
-				MoveToParent();
-			}
-
-			return this;
+			return new CanonicalTileId(i, X >> delta, Y >> delta);
 		}
-		
-		public bool IsParentOf(CanonicalTileId canonicalTileId)
+
+		public readonly bool IsParentOf(CanonicalTileId canonicalTileId)
 		{
 			return (this == canonicalTileId.ParentAt(this.Z));
 		}

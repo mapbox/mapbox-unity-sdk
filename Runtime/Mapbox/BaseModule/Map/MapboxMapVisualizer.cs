@@ -43,6 +43,11 @@ namespace Mapbox.BaseModule.Map
         // Reusable scratch array to avoid per-frame allocation in InternalUpdateCoroutine
         private readonly UnwrappedTileId[] _quadrants = new UnwrappedTileId[4];
 
+        // Snapshot of TempTiles for InternalUpdateCoroutine to walk. PoolTile removes the tile
+        // it pools from TempTiles, and the loop pools its tiles' children, so the live list can
+        // shrink mid-iteration. Reused rather than allocated per frame.
+        private readonly List<UnityMapTile> _tempTileScratch = new List<UnityMapTile>();
+
         // Explicit stack for the iterative DelveInto (was recursive with per-call new bool[4]
         // and new UnwrappedTileId[4] allocations). Bounded by recursion depth × 4, so the
         // List reaches its peak size after one large call and never re-allocates after.
@@ -98,18 +103,11 @@ namespace Mapbox.BaseModule.Map
                 yield return _tileCreator.Initialize(terrainStrategy);
             }
 
-            // Give layer modules a chance to wire bookkeeping that observes tile lifecycle
-            // (terrain bounds tracker, etc) BEFORE their own Initialize runs — so any
-            // subscriptions are in place when the first tiles start loading.
-            foreach (var module in LayerModules)
-            {
-                if (module is ITileLifecycleObserver observer)
-                {
-                    observer.AttachToMapVisualizer(this);
-                }
-            }
-
-            yield return LayerModules.Select(x => x.Initialize()).WaitForAll();
+            // Modules that keep bookkeeping in step with tiles (the terrain bounds tracker, for
+            // one) subscribe from inside Initialize, using the source passed here. Handing it over
+            // at this point is what makes a second attachment pass unnecessary: a module reaches
+            // its subscription before its first yield, so it is watching before any tile loads.
+            yield return LayerModules.Select(x => x.Initialize(this)).WaitForAll();
         }
 
         /// <summary>
@@ -212,12 +210,23 @@ namespace Mapbox.BaseModule.Map
         {
             //finish temp tiles from tempTiles list
             _toRemove.Clear();
-            for (var index = TempTiles.Count - 1; index >= 0; index--)
+
+            // Walk a snapshot and remove by reference, never by index. PoolTile takes the tile it
+            // pools out of TempTiles - it has to, or a pooled instance stays listed and can be
+            // re-issued while a stale entry still points at it - and the promotion branch below
+            // pools this tile's children, which may themselves be Temporary. So the live list can
+            // shrink at any point in the body, which made a saved index both wrong and, when the
+            // list shrank past it, out of range.
+            _tempTileScratch.Clear();
+            _tempTileScratch.AddRange(TempTiles);
+
+            for (var index = _tempTileScratch.Count - 1; index >= 0; index--)
             {
-                var tilePair = TempTiles[index];
+                var tilePair = _tempTileScratch[index];
                 if (!ActiveTiles.ContainsKey(tilePair.UnwrappedTileId))
                 {
-                    TempTiles.RemoveAt(index);
+                    // May already be gone, if pooling an earlier tile's children took it out.
+                    TempTiles.Remove(tilePair);
                     continue;
                 }
 
@@ -234,7 +243,7 @@ namespace Mapbox.BaseModule.Map
                         tilePair.Children.Clear();
                     }
 
-                    TempTiles.RemoveAt(index);
+                    TempTiles.Remove(tilePair);
 
                     _quadrants[0] = tilePair.UnwrappedTileId.Quadrant(0);
                     _quadrants[1] = tilePair.UnwrappedTileId.Quadrant(1);
@@ -390,17 +399,50 @@ namespace Mapbox.BaseModule.Map
                     if (ActiveTiles.TryGetValue(quadrant, out var unityMapTile))
                     {
                         _toRemove.Remove(quadrant);
-                        unityMapTile.LoadingState = LoadingState.Filler;
-                        activeChildren.Add(unityMapTile);
-                        if (unityMapTile.Children != null && unityMapTile.Children.Count > 0)
+
+                        // A tile with a non-empty Children list is itself still hidden and
+                        // covered by those (more detailed) children — it was created
+                        // Temporary, its own DelveInto exploration found something, and it
+                        // was never shown (Load()'s "if (!coveredByQuadrants) ShowTile(...)"
+                        // skipped it). Passing those children through, instead of collapsing
+                        // to this tile's own not-yet-loaded imagery, is what keeps the most
+                        // detailed data actually available on screen during a fast zoom
+                        // rather than replacing it with a coarser fallback the moment an
+                        // ancestor happens to explore this far down. unityMapTile's own state
+                        // and TempTiles membership are left untouched: it can still promote
+                        // normally later, and InternalUpdateCoroutine's promotion path already
+                        // shows it and pools these same child objects together, atomically, so
+                        // there is never a frame where both are visible. The existing "protect
+                        // filler children of temp tiles" pass at the top of Load() keeps
+                        // reprotecting these children each frame for as long as unityMapTile
+                        // stays in TempTiles, exactly as it already did before this tile was
+                        // ever found by an ancestor's search.
+                        if (unityMapTile.LoadingState == LoadingState.Temporary
+                            && unityMapTile.Children != null && unityMapTile.Children.Count > 0)
                         {
-                            foreach (var subchild in unityMapTile.Children)
-                            {
-                                activeChildren.Add(subchild);
-                            }
-                            unityMapTile.Children.Clear();
+                            activeChildren.Add(unityMapTile);
                         }
-                        ShowTile(unityMapTile);
+                        else
+                        {
+                            // Nothing more detailed hiding behind this one — it is already
+                            // showing its own data (Finished, or a filler adopted earlier by
+                            // a different ancestor search). Show it, and pool any children it
+                            // might still be holding (shouldn't happen given the invariant
+                            // above, kept defensively) instead of leaving them dangling.
+                            TempTiles.Remove(unityMapTile);
+                            unityMapTile.LoadingState = LoadingState.Filler;
+                            if (unityMapTile.Children != null && unityMapTile.Children.Count > 0)
+                            {
+                                foreach (var subchild in unityMapTile.Children)
+                                {
+                                    PoolTile(subchild);
+                                }
+                                unityMapTile.Children.Clear();
+                            }
+                            ShowTile(unityMapTile);
+                            activeChildren.Add(unityMapTile);
+                        }
+
                         frame.Found |= 1 << slot;
                         _delveStack[frameIdx] = frame;
                     }
@@ -477,6 +519,19 @@ namespace Mapbox.BaseModule.Map
 
             TileUnloading(tile);
             ActiveTiles.Remove(tile.UnwrappedTileId);
+
+            // A pooled tile must not stay in TempTiles. Every caller that pools a tile it looked up
+            // itself already removed it first, but the two paths that pool a tile's CHILDREN did
+            // not - and children can be Temporary tiles, since DelveInto's pass-through branch
+            // adopts one. The stale entry is usually swept next frame by the
+            // !ActiveTiles.ContainsKey check at the top of InternalUpdateCoroutine, but not if the
+            // pool re-issues this instance for a tile that IS active before that sweep runs: the
+            // guard then passes and TempTiles holds the same object twice, after which a single
+            // Remove clears only one and the leftover drives CreateTile/ShowTile on a tile it no
+            // longer owns. Removing here makes pooling and TempTiles membership impossible to
+            // desynchronise, whichever path did the pooling.
+            TempTiles.Remove(tile);
+
             tile.Recycle();
             tile.LoadingState = LoadingState.None;
             _tileCreator.PutTile(tile);
@@ -541,14 +596,26 @@ namespace Mapbox.BaseModule.Map
             tile.Initialize(tileId, (float)rectd.Size.x * _mapInformation.Scale);
         }
 
+        /// <summary>
+        /// Offers the tile to every module and reports whether all of them finished with it.
+        ///
+        /// Deliberately not short-circuiting on the first module that says "not yet". This used to
+        /// break out of the loop, so one unready module starved every module registered after it of
+        /// its chance to make progress on that tile - and since the loop runs again from the start
+        /// on the next update, it starved them for as long as the first module stayed unready.
+        /// "I need more time" is not "abort this tile". <see cref="CompositeLayerModule.RetainTiles"/>
+        /// already worked this way for the same reason.
+        ///
+        /// Every LoadInstant implementation is a cheap, idempotent guard - it either takes instant
+        /// data and returns true, or reports that it is still waiting - so calling all of them costs
+        /// little and is safe to repeat.
+        /// </summary>
         protected bool CreateTile(UnityMapTile unityMapTile)
         {
             var tileFinished = true;
             foreach (var module in LayerModules)
             {
-                var moduleFinished = module.LoadInstant(unityMapTile);
-                tileFinished &= moduleFinished;
-                if (!moduleFinished) break;
+                tileFinished &= module.LoadInstant(unityMapTile);
             }
 
             if (tileFinished)
@@ -574,7 +641,24 @@ namespace Mapbox.BaseModule.Map
         {
             foreach (var tilePair in ActiveTiles)
             {
-                ShowTile(tilePair.Value);
+                var tile = tilePair.Value;
+
+                // A Temporary tile with non-empty Children is a DelveInto pass-through:
+                // it is deliberately kept hidden while its own (already active, more
+                // detailed) children stand in for it - see the identical check in
+                // DelveInto's adoption branch. Showing it here as well would make the
+                // tile and its children active at the same time, which is exactly the
+                // overlap/z-fighting that invariant exists to prevent. Skipping the
+                // reposition is safe: every transition out of this state (promotion in
+                // InternalUpdateCoroutine, or adoption as a Filler in DelveInto) already
+                // calls ShowTile at that same moment, which repositions it before it is
+                // ever actually shown.
+                if (tile.LoadingState == LoadingState.Temporary && tile.Children != null && tile.Children.Count > 0)
+                {
+                    continue;
+                }
+
+                ShowTile(tile);
             }
 
             foreach (var module in LayerModules)
@@ -586,12 +670,33 @@ namespace Mapbox.BaseModule.Map
         /// <summary>
         /// Map tile finished loading with targeted detail level data. This tile isn't temporary anymore, it'll be in
         /// ActiveTiles list.
+        ///
+        /// <b>Fires for a subset of tiles only,</b> and that catches people out. A tile is drawn as
+        /// soon as it enters the active set - as a coarser <c>Temporary</c> stand-in, or a
+        /// <c>Filler</c> synthesized from neighbouring zoom levels - and neither of those raises
+        /// this. Promotion to Finished needs every layer module to report ready, so a tile whose
+        /// modules never all become ready is visible on screen and never raises it at all.
+        ///
+        /// <b>So do not use this to track which tiles are on screen.</b> There is no event for that;
+        /// read <c>MapVisualizer.ActiveTiles</c> instead, which is complete at every instant it can
+        /// be read - the visualizer shows a replacement tile before pooling what it replaces, inside
+        /// one synchronous call. Use this event for the tile's <i>data</i>: elevation, imagery, mesh
+        /// features.
+        ///
+        /// <b>Not paired one-to-one with <see cref="TileUnloading"/>,</b> which fires for every tile
+        /// leaving whatever fidelity it reached. Expect unload callbacks for tiles this never
+        /// announced, and make teardown tolerant of ids it never saw.
         /// </summary>
         public event Action<UnityMapTile> TileLoaded = (tile) => { };
 
         /// <summary>
         /// Map tile unloading event fires for tiles that are still in active tiles list but not in the latest tileCover.
         /// UnityMapTile object attached to event will be pooled after the event call.
+        ///
+        /// Fires for <b>every</b> tile leaving the active set, whatever fidelity it reached - so it
+        /// does not pair with <see cref="TileLoaded"/>, which fires only for tiles that reached
+        /// their own detail level. This will fire for tiles <see cref="TileLoaded"/> never
+        /// announced.
         /// </summary>
         public event Action<UnityMapTile> TileUnloading = (tile) => { };
     }

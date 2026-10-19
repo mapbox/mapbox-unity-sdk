@@ -12,12 +12,13 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
     }
 
     [Serializable]
-    public class SnapTerrainModifier : MeshModifier, ISnapTerrainModifier
+    public class SnapTerrainModifier : MeshModifier<SnapTerrainModifierCore>, ISnapTerrainModifier
     {
+        protected override SnapTerrainModifierCore CreateCore() => new SnapTerrainModifierCore();
+
         public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
         {
-            var hcore = new SnapTerrainModifierCore();
-            hcore.Run(feature, md, mapInfo);
+            Core.Run(feature, md, mapInfo);
         }
     }
     

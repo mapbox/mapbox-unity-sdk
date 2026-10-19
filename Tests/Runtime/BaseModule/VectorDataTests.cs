@@ -15,6 +15,7 @@ using Mapbox.UnityMapService;
 using NUnit.Framework;
 using UnityEditor.VersionControl;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.DataTests
 {
@@ -128,10 +129,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 vectorData = data;
             }));
 
-            while (Runnable.IsRunning(coroutineId))
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => Runnable.IsRunning(coroutineId), "RequestNoFileYesSqliteCache: Runnable.IsRunning(coroutineId)");
         
             Assert.NotNull(vectorData.Data);
             var sqliteTileCount = _sqliteCache.GetAllTiles().Count;
@@ -152,10 +150,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 vectorData = data;
             }));
 
-            while (Runnable.IsRunning(coroutineId))
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => Runnable.IsRunning(coroutineId), "RequestNoFileNoSqliteCaches: Runnable.IsRunning(coroutineId)");
         
             Assert.NotNull(vectorData.Data);
             Assert.AreEqual(vectorData.CacheType, CacheType.NoCache);

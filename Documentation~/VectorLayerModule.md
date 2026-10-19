@@ -11,7 +11,7 @@ Sample visualizers are included with the SDK package.
 
 ### Module Settings
 
-![Vector module](Images/VectorLayerModule.png)
+![Vector module](Images/VectorLayerModule.jpeg)
 
 The module has several key settings:
 
@@ -39,7 +39,7 @@ Visualizer assets can be created from the context menu: `Create / Mapbox / Modif
 
 ### Layer Visualizer
 
-![Vector module](Images/BuildingLayerVisualizer.png)
+![Vector module](Images/BuildingLayerVisualizer.jpeg)
 
 Each Layer Visualizer defines how a specific vector layer is processed and visualized.
 
@@ -63,7 +63,7 @@ As with the Vector Module, each visualizer ends with a list of Modifier Stacks.
 
 ### Modifier Stack
 
-![Vector module](Images/ModifierStack.png)
+![Vector module](Images/ModifierStack.jpeg)
 
 A Modifier Stack defines how feature data is transformed into rendered objects—effectively acting as a visual “style.”
 
@@ -98,3 +98,33 @@ Below these, three main sections define the behavior of the stack:
   They do not produce new mesh data but modify existing GameObject, such as applying materials or adding interaction scripts.
 
 After the game object modifiers finish, the visual generation process is complete.
+
+### Reading feature data
+
+A mesh modifier is the supported way to read vector features. `IMeshModifier.Run` is handed every
+feature the stack's filters let through:
+
+```csharp
+void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo);
+```
+
+`VectorFeatureUnity` carries the feature's `TileId`, its decoded `Properties` dictionary, and its
+`Points` — the geometry as one or more rings in Unity tile space, where the tile's top-left corner is
+`(0, 0)` and its bottom-right is `(1, -1)`. Multi-part geometry arrives as several rings on a single
+feature rather than as a distinct multi-polygon type.
+
+Two properties of this hook are worth knowing:
+
+- **It runs on the mesh-generation worker thread, before any GameObject exists.** Do not touch the
+  Unity scene API from inside it. Buffer what you need and act on it from the main thread.
+- **Writing to `md` is optional.** A modifier that reads `feature`, records what it needs and leaves
+  `md` untouched produces no geometry — so a stack whose modifiers all decline to write generates no
+  visuals. This is how you consume feature data without rendering it.
+
+`Properties` values are boxed, and integers are normalized to `long` before they reach you, so cast
+integer properties to `long` rather than `int`. Values differ per tileset; the properties available on
+Mapbox tilesets are listed in the tileset's own documentation.
+
+Each feature is allocated fresh rather than pooled, and the generated `MeshData` keeps a reference to
+it, so a modifier may hold onto a feature after `Run` returns. Treat it as read-only: the same instance
+is passed to every modifier in the stack.

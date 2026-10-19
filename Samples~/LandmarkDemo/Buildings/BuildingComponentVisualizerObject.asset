@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6eb41c8ba1c475ab45d048dafafaf77, type: 3}
+  m_Name: BuildingComponentVisualizerObject
+  m_EditorClassIdentifier: 
+  Settings:
+    EnableTerrainSnapping: 0
+    RoundBuildingCorners: 1
+    Material: {fileID: 2100000, guid: 28bdb3642fa094c678254a6e463e2b5e, type: 2}
+    ChamferExtrusionSettings:
+      OffsetInMeters: 1
+      ExtrusionOptions:
+        extrusionType: 1
+        propertyName: height
+        minimumHeight: 0
+        maximumHeight: 1000
+        extrusionScaleFactor: 1
+    BasicExtrusionSettings:
+      ExtrusionOptions:
+        extrusionType: 1
+        propertyName: height
+        minimumHeight: 0
+        maximumHeight: 1000
+        extrusionScaleFactor: 1
+  IsActive: 1

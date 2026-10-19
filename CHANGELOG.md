@@ -1,5 +1,108 @@
 ## CHANGELOG
 
+### v3.2.0
+
+#### Highlights
+
+- **Landmarks Module (preview)**, new `MapboxLandmarksModule` assembly
+  - 3D landmark buildings from the Mapbox 3D Buildings tileset, rendered through glTFast.
+  - Basic buildings underneath are hidden automatically, in both the Vector and Components pipelines.
+  - Sits on elevated terrain; click-to-select with `LandmarkHighlightBehaviour`.
+  - Requires `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`. Without them the module is skipped, nothing else breaks.
+  - Preview: dynamic map scaling not supported, selection is whole-mesh. See `Documentation~/LandmarksModuleKnownGaps.md`.
+- **Three new samples**: `LandmarkDemo`, `LandmarkDemoWithVector`, `LandmarkTour`
+  - `LandmarkTour` flies the camera between famous landmarks.
+- **Traffic-aware routing**, Directions API
+  - `DirectionResource.Annotations` requests distance, duration, speed, congestion and max-speed per segment.
+  - `RoutingProfile.DrivingTraffic` profile; `CongestionLevel` buckets congestion for coloring.
+  - Directions demo draws the route colored by traffic.
+- **Minimap**, `Minimap.prefab` in the imagery module
+  - Drop under a Canvas, assign a map. Follows the map, a transform or a camera; rotates with the map bearing or a camera rig. Wired into the `LocationBasedGame` sample.
+  - Shows the map's imagery, terrain height, or a different style through a Data Only custom imagery layer.
+- **Custom imagery modes**, `CustomApiLayerModuleScript.Mode`
+  - `DataOnly` fetches without drawing; `DisplayNonBlocking` never delays a tile; `DataZoomOffset` fetches coarser tiles.
+- **Components module settings in the Inspector**: zoom range, data-level clamp and cache size, no subclass needed.
+
+#### Breaking changes
+
+- `Bbox` on `GeocodingApi.Feature` now carries latitude and longitude in the correct order. Code that compensated for the swapped values must drop that workaround.
+- `ILayerModule.Initialize` takes an `ITileLifecycleSource` parameter, and `ITileLifecycleObserver` is removed. Affects custom modules and subclasses that override `Initialize`.
+- `CanonicalTileId.ParentAt` no longer modifies the tile it is called on. Use `MoveToParent()` if you relied on that.
+- `VectorData.VectorTileData` is removed. Subclasses that read it after `MeshGeneration` should decode `Data` themselves.
+- Removed public members that never returned data: `ByteArrayTile.Data`, `LayerNames()`, `GetLayer()`, `SetVectorFromCache()` and `Dispose(bool)`; `Source<T>.DataFetched`, `DataFetchedWithCallback`, `FetchingError` and `SetMeshGenerationMethod`; `TileErrorEventArgs`; `UnityTileVectorContainer` and `UnityMapTile.VectorContainer`.
+
+#### Security
+
+- `access_token` and `sku` are now appended only to requests whose host is `mapbox.com` or a subdomain, over https. Other hosts are requested without credentials. Proxy or custom endpoints that need credentials must include them in the URL template.
+
+#### Fixed
+
+- Map loading could stall, with `LoadViewCompleted` never firing, when a tile's fetch or mesh generation was already in progress.
+- Failed imagery and terrain cache reads were treated as valid tiles, producing blank imagery tiles and terrain tiles that never finished loading.
+- Cancelled or failed data tasks could cause a null reference in image sources.
+- A failed terrain fetch threw inside `TerrainLayerModule.GetElevationData` instead of reporting to the caller.
+- `CompositeLayerModule` did not load or retain its child modules.
+- Large polygons, such as coastlines at low zoom, were silently dropped, leaving holes in water.
+- Overlapping tiles flickered at the map centre during a fast zoom-out.
+- Feature filters threw on features that lacked the tested property. Such features are now treated as not matching. Filtering no longer allocates per feature.
+- Custom imagery module: `Source Type` and `Custom Source Id` were missing from the Inspector, the `Source Type` dropdown had no effect, and multiple custom layers shared one cache.
+- `ShiftMapForDistance` never recentred while walking.
+- Each vector module now has its own data source. A module requesting a different tileset than an earlier module no longer silently receives the earlier module's tileset. Two modules on the same tileset now fetch separately; where possible, combine layers into one module with a comma-separated `TilesetId`.
+- The enable toggle on filters and modifiers in the Inspector had no effect.
+- `GeometryTypeFilter` never matched multi-part geometry types.
+- A filter stack used without a modifier stack was never initialized.
+- One module waiting for data blocked every module registered after it on that tile.
+- `Conversions.Tile01ToLatitudeLongitude(Vector2, CanonicalTileId)` returned mirrored longitudes.
+- Negative integer feature properties, such as contour elevations below sea level, were read as large positive numbers.
+- The Editor could crash during map loads with imagery and vector buildings. SQLite cache access is now fully synchronized.
+- Buildings with collinear footprint corners got NaN vertices from the chamfer modifiers, reported by Unity as abnormal mesh bounds.
+- `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` on `MapboxComponentsModuleScript` are now editable in the Inspector.
+- Landmarks: every landmark tile leaked its meshes, materials and textures for the session.
+- Landmarks: overlapped basic buildings sometimes stayed visible, including across tile edges.
+- Landmarks: a tile that failed to generate was retried and re-downloaded indefinitely. Generation is now capped at two attempts.
+- Landmarks: loads finishing after the map was destroyed, or after their tile was evicted, caused errors and permanently hidden buildings.
+- Landmarks: unassigned Inspector references on the connector and highlight components threw instead of logging a warning.
+- Landmarks: tiles with unusual node or primitive layouts failed to load.
+- Landmarks: errors raised in generation callbacks were silently lost.
+- Landmarks: `LandmarkHighlightBehaviour` threw on scene load, and clicking did nothing under the new Input System.
+- Landmarks: a missing Base Material produced broken rendering instead of an error.
+- Samples: `LandmarkDemo` had missing materials when imported on its own; `LandmarkDemoWithVector` logged a missing-script warning; road materials in `LandmarkDemo`, `LandmarkTour` and `MapboxComponents` referenced textures that did not exist.
+
+#### Changed
+
+- `TaskResultType` gained `AlreadyGenerated`, `AlreadyInProgress` and `NoData`, so these outcomes are no longer reported as `Success`. Custom modules should record a tile as resolved on `NoData`.
+- `MapboxLandmarksModule` only compiles when `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress` are installed. Without them the assembly is left out, and scenes referencing landmark components show missing-script references.
+- `LandmarksLayerModule.BuildingLoaded` is now `Action<GameObject, string>`, carrying the landmark id.
+- `LandmarkHighlightBehaviour.HightlightColor` is renamed `HighlightColor`, and `_visualSelectedEvent` is renamed `VisualSelected`.
+- Landmark implementation classes (`GltfVisualizer`, `MapboxGltfImport`, `LandmarkAnchor`, `LandmarkPolygonFilter` and related) are now `internal`.
+- Landmark glTF loads are cancelled when their tile's data is evicted or the map is destroyed.
+
+#### Removed
+
+- `LandmarksLayerModule.LandmarkFootprintCreated`, `LandmarkMeshResults` and `BuildingUnloaded`. Use `TileFinished` and `TileDisposed`.
+- Five commented-out filter and modifier source files that defined no type.
+
+#### Added
+
+- **Traffic-aware routing.** `DirectionResource.Annotations` (`AnnotationOptions`: `Distance`, `Duration`, `Speed`, `Congestion`, `CongestionNumeric`, `MaxSpeed`) requests per-segment annotations, returned on `Response.Leg.Annotation`. Requires `Overview.Full`; congestion also requires `RoutingProfile.DrivingTraffic`. `CongestionLevel` and `CongestionLevelUtility.LevelForNumeric` bucket congestion into `Low`, `Moderate`, `Heavy` and `Severe`. The Directions demo draws the route colored by congestion.
+- **Minimap.** `MinimapScript` drives it; extend with `IMinimapTileSource` and `IMinimapRenderer`.
+- **Recentering support.** `ShiftMapForDistance.TransformsToShift` moves the listed transforms with the map on each recenter. `ShiftMapForDistance.OnRecentered` reports the offset (`MapRecenteredArgs`) for objects placed from code. See `Documentation~/RecenteringLocationBasedMaps.md`.
+- `IMapInformation.TryQueryElevation`, which reports whether an elevation is known rather than returning 0 for unknown.
+- `IMapInformation.TryGetViewCenterPosition`, `TryGetViewCenterMercator` and `TryGetViewCenterLatLng`, reporting the point the camera is looking at. Returns `false` when the view centre does not meet the map plane.
+- `MvtProperties.NormalizeIntegers`, for reading integer feature properties from your own decode path.
+- `UnitySource<T>.TilesetId`.
+- `MapboxGeometryUtilities` moved to `MapboxBaseModule`: polygon intersection, point-in-polygon, bounds, boundary-ring extraction and convex hull.
+- `LandmarksLayerModuleScript.TilesetId`, an Inspector field defaulting to `Constants.Map.LandmarksTilesetId`.
+- `LandmarkComponent.LandmarkId` and `LandmarkHighlightBehaviour.SelectedLandmarkId`.
+- `MapboxComponentsModuleScript` exposes `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize`.
+- Both `LocationBasedGame` sample scenes list their player and camera objects in `TransformsToShift`.
+- Tests for `MapboxGeometryUtilities` and `LandmarkPolygonFilter`.
+
+#### Dependencies
+
+- `com.unity.cloud.gltfast` 6.18.0, the last release supporting Unity 2022.3. Projects on Unity 6 may raise the version in their own manifest.
+- `com.unity.meshopt.decompress` 0.2.0-exp.1. Required for landmarks.
+
 ### v3.1.1
 
 Patch release. Reclassifies `com.unity.inputsystem` from a soft to a **hard** package dependency and switches the example-assembly `#if` gate from package presence to Player Settings, restoring compilation on Unity 6+ projects where the input system package ships preinstalled. Existing legacy-input projects updating from 3.1.0 see no runtime behavior change.
@@ -272,7 +375,6 @@ Minor-version bump per semver: this release contains source-breaking API changes
 - Removed the Point Layer Visualizer, which became unnecessary after the structural changes above.
 - Removed the Terrain Type setting, as it now only had a single valid option after recent updates.
 
-
 ### v3.0.5
 Bug fixes, performance improvements, vector module changes, and core library updates for Android 16KB page size compatibility.
 
@@ -389,7 +491,6 @@ Improvements
 
 ### v3.0.1
 ### v3.0.0
-
 
 ### v2.1.2
 ### Bug Fixes
@@ -648,7 +749,6 @@ Improvements
 - If you have issues with missing libraries in Xcode, please check that you are not using `symlink` in your Unity build settings and that your min. target OS is 8.
 - Requesting too many tiles at once (on client) will often lead to many failed tile requests. We recommend that you distribute these requests over many frames!
 
-
 ### v.1.2.0
 
 *09/26/2017*
@@ -775,7 +875,6 @@ Improvements
 - Terrain generation in Unity 5.5+ should be much faster and allocate less memory
 
 ##### New Features
-
 
 - Added new retina-resolution raster tiles
 - Added mipmap, compression, and retina-resolution support to `MapImageFactory`

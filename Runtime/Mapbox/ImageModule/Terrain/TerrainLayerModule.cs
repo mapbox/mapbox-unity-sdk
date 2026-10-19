@@ -22,15 +22,22 @@ namespace Mapbox.ImageModule.Terrain
     /// settings, and hands each tile through a <see cref="TerrainStrategy"/> that produces
     /// render + optional collider meshes.
     /// </summary>
-    public class TerrainLayerModule : ITerrainLayerModule, ITileLifecycleObserver
+    public class TerrainLayerModule : ITerrainLayerModule
     {
         private TerrainLayerModuleSettings _settings;
         private Source<TerrainData> _rasterSource;
+        /// <summary>
+        /// The terrain data behind this module, for reading elevation rasters without going
+        /// through a tile. A tile holds one terrain slot filled by whichever module drew it, so
+        /// anything wanting a specific module's data - a second, data-only source at another
+        /// tileset, say - has to ask the module.
+        /// </summary>
+        public Source<TerrainData> RasterSource => _rasterSource;
         private HashSet<CanonicalTileId> _retainedTerrainTiles;
         private TerrainStrategy _terrainStrategy;
         // Owns the Min/MaxElevation bookkeeping that used to live in MapboxMapVisualizer.
-        // Constructed in AttachToMapVisualizer once the visualizer is available, disposed
-        // in OnDestroy. The visualizer never references this directly.
+        // Constructed in Initialize, from the tile-lifecycle source handed in there, and
+        // disposed in OnDestroy. The visualizer never references this directly.
         private TerrainBoundsTracker _boundsTracker;
         // One-shot guard so QueryElevation doesn't spam the console on every call when the
         // user genuinely disabled CPU extraction.
@@ -39,14 +46,6 @@ namespace Mapbox.ImageModule.Terrain
         // plus iterator chain from Where/Select/Distinct on every tile-cover update.
         private readonly HashSet<CanonicalTileId> _dataIdScratch = new HashSet<CanonicalTileId>();
 
-        public void AttachToMapVisualizer(ITileLifecycleSource source)
-        {
-            // Idempotent: if a tracker is already running (re-init scenarios), keep it.
-            // Constructing a second one would leak the first (coroutine + subscriptions).
-            if (_boundsTracker != null) return;
-            _boundsTracker = new TerrainBoundsTracker(source);
-        }
-        
         public TerrainLayerModule(Source<TerrainData> source, TerrainLayerModuleSettings settings) : base()
         {
             _settings = settings;
@@ -55,8 +54,17 @@ namespace Mapbox.ImageModule.Terrain
             _terrainStrategy = new ElevatedTerrainStrategy();
         }
         
-        public virtual IEnumerator Initialize()
+        public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
         {
+            // Subscribed before the first yield, so the tracker is watching before any tile can
+            // load - the rest of this method waits on network work.
+            // Idempotent: if a tracker is already running (re-init scenarios), keep it.
+            // Constructing a second one would leak the first (coroutine + subscriptions).
+            if (_boundsTracker == null && tileLifecycle != null)
+            {
+                _boundsTracker = new TerrainBoundsTracker(tileLifecycle);
+            }
+
             yield return _rasterSource.Initialize();
             if (_rasterSource is TerrainSource terrainSource)
             {
@@ -217,24 +225,67 @@ namespace Mapbox.ImageModule.Terrain
         /// <returns></returns>
         public float QueryElevation(CanonicalTileId tileId, float x, float y)
         {
-            if (!_settings.NeedsCpuElevation && !_elevationDisabledWarningLogged)
+            // Lossy by design: 0 is returned both for genuine sea level and for "no data", and the
+            // caller cannot tell which. Kept for the many callers that have no useful response to
+            // "unknown" anyway. Anything that would act differently should use TryQueryElevation.
+            TryQueryElevation(tileId, x, y, out var elevation);
+            return elevation;
+        }
+
+        /// <summary>
+        /// Elevation at a point, and whether it is actually known.
+        ///
+        /// Only searches the memory cache, exactly as <see cref="QueryElevation"/> does - it walks
+        /// up to 5 levels of ancestors looking for a loaded data tile. The difference is the return
+        /// value: false means no data was found (not loaded yet, or CPU elevation extraction is
+        /// switched off entirely), where QueryElevation reports that as 0 - indistinguishable from
+        /// a real sea-level reading. That distinction matters because mesh generation is one-shot:
+        /// SnapTerrainModifier writes whatever it gets straight into vertex positions and nothing
+        /// re-snaps them when terrain arrives later, so a 0 that meant "not loaded yet" is baked in
+        /// permanently and reads as a building sunk into a hillside.
+        /// </summary>
+        /// <param name="tileId">TileId of the elevation data</param>
+        /// <param name="x">Point in texture coordinate space, origin is bottom left.</param>
+        /// <param name="y">Point in texture coordinate space, origin is bottom left.</param>
+        /// <param name="elevation">The elevation, or 0 when this returns false.</param>
+        /// <returns>True if elevation data for this point was available.</returns>
+        public bool TryQueryElevation(CanonicalTileId tileId, float x, float y, out float elevation)
+        {
+            elevation = 0f;
+
+            // No CPU elevation will ever exist in this configuration, so say so immediately rather
+            // than walking the ancestors and reporting a found-but-undecoded tile as a real answer.
+            if (!_settings.NeedsCpuElevation)
             {
-                _elevationDisabledWarningLogged = true;
-                Debug.LogWarning("[Mapbox] QueryElevation was called but TerrainLayerModuleSettings.ExtractCpuElevationData is disabled, so no CPU elevation data exists. Returning 0 for every query. Enable ExtractCpuElevationData if anything in your scene snaps to terrain (vector features, buildings, colliders, custom elevation lookups).");
+                if (!_elevationDisabledWarningLogged)
+                {
+                    _elevationDisabledWarningLogged = true;
+                    Debug.LogWarning("[Mapbox] QueryElevation was called but TerrainLayerModuleSettings.ExtractCpuElevationData is disabled, so no CPU elevation data exists. Returning 0 for every query. Enable ExtractCpuElevationData if anything in your scene snaps to terrain (vector features, buildings, colliders, custom elevation lookups).");
+                }
+
+                return false;
             }
 
             var originalTileId = tileId;
             var targetTileId = tileId;
             for (int i = 0; i < 5; i++)
             {
-                if (_rasterSource.GetInstantData(targetTileId, out var instantData))
+                // IsElevationDataReady, not merely "a data tile exists". The texture arrives before
+                // the elevation array: TerrainSource decodes elevation asynchronously, and
+                // QueryHeightData answers a silent 0 while ElevationValues is still null. Returning
+                // true there would report "sea level" for every tile whose decode is in flight -
+                // precisely the case this method exists to tell apart from a real reading, and the
+                // one a caller is most likely to hit, since it is the window right after a fetch.
+                if (_rasterSource.GetInstantData(targetTileId, out var instantData) &&
+                    instantData.IsElevationDataReady)
                 {
-                    return instantData.QueryHeightData(originalTileId, x, y);
+                    elevation = instantData.QueryHeightData(originalTileId, x, y);
+                    return true;
                 }
                 targetTileId.MoveToParent();
             }
 
-            return 0;
+            return false;
         }
         
         /// <summary>
@@ -265,6 +316,11 @@ namespace Mapbox.ImageModule.Terrain
 
         /// <summary>
         /// This method will cause tile requests if data isn't already available on memory cache. Use with caution.
+        ///
+        /// The callback is invoked exactly once on every path, including failure - callers park
+        /// coroutines on it. Note 0 is reported both for genuine sea level and for a fetch that
+        /// failed, 404'd or was cancelled; there is no caller today that could act on the
+        /// difference, so it is not surfaced.
         /// </summary>
         /// <param name="latLng">Latitude longitude of the location you want to query</param>
         /// <param name="callback">Callback method returning the elevation in float</param>
@@ -278,8 +334,7 @@ namespace Mapbox.ImageModule.Terrain
                 if (_rasterSource.GetInstantData(tileId, out var instantData))
                 {
                     var tilePos = Conversions.LatitudeLongitudeToInTile01(latLng, instantData.TileId);
-                    var elevation = instantData.QueryHeightData(tilePos);
-                    callback?.Invoke(elevation);
+                    callback?.Invoke(instantData.QueryHeightData(tilePos));
                     dataFound = true;
                     break;
                 }
@@ -294,9 +349,17 @@ namespace Mapbox.ImageModule.Terrain
                 tileId = Conversions.LatitudeLongitudeToTileId(latLng, 14).Canonical;
                 yield return LoadTileData(tileId, terrainData =>
                 {
+                    // A failed, 404'd or cancelled fetch arrives here as null. Dereferencing it threw
+                    // inside this lambda, which meant the caller's callback was never invoked at all
+                    // and anything awaiting an elevation answer waited for good.
+                    if (terrainData == null)
+                    {
+                        callback?.Invoke(0f);
+                        return;
+                    }
+
                     var tilePos = Conversions.LatitudeLongitudeToInTile01(latLng, terrainData.TileId);
-                    var elevation = terrainData.QueryHeightData(tilePos);
-                    callback?.Invoke(elevation);
+                    callback?.Invoke(terrainData.QueryHeightData(tilePos));
                 });
             }
         }

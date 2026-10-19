@@ -15,8 +15,21 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
         private GUIStyle _boxStyle;
         private List<Type> _visualizerTypes;
 
-        private void OnEnable()
+                private bool _editorInitialized;
+
+        // Editor.OnEnable can run while the target is null - entering Play mode destroys and recreates
+        // the inspected object - and touching serializedObject then throws
+        // SerializedObjectNotCreatableException, which cannot be recovered from inside the callback.
+        // Initialization is retried from OnInspectorGUI, which only runs once the target is real.
+        private void TryInitializeEditor()
         {
+            if (_editorInitialized || target == null)
+            {
+                return;
+            }
+
+            _editorInitialized = true;
+
             _layerVisualizersProp = serializedObject.FindProperty("_layerVisualizers");
 
             // Find all ScriptableObject types that implement IPerformanceLayerVisualizer
@@ -28,9 +41,22 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
                 .ToList();
         }
 
+        private void OnEnable()
+        {
+            TryInitializeEditor();
+        }
+
         public override void OnInspectorGUI()
         {
+            TryInitializeEditor();
+            if (!_editorInitialized)
+            {
+                return;
+            }
+
             serializedObject.Update();
+
+            DrawPropertiesOtherThanVisualizerList();
 
             if (_boxStyle == null)
             {
@@ -105,6 +131,33 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
             EditorGUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        /// <summary>
+        /// Draws every serialized field except the visualizer list, which gets its own custom UI
+        /// below. Enumerated rather than listed by name so a field added to
+        /// <see cref="MapboxComponentsModuleScript"/> shows up without anyone remembering this file -
+        /// RejectTilesOutsideZoom, ClampDataLevelToMax and CacheSize were invisible here for exactly
+        /// that reason, which left subclassing as the only way to change them.
+        /// </summary>
+        private void DrawPropertiesOtherThanVisualizerList()
+        {
+            var iterator = serializedObject.GetIterator();
+            var drewAny = false;
+
+            // enterChildren on the first step only: we want top-level fields, and their own children
+            // are drawn by PropertyField's foldout.
+            for (var enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false)
+            {
+                if (iterator.propertyPath == "m_Script") continue;
+                if (iterator.propertyPath == _layerVisualizersProp.propertyPath) continue;
+
+                EditorGUILayout.PropertyField(iterator, true);
+                drewAny = true;
+            }
+
+            if (drewAny)
+                EditorGUILayout.Space(8);
         }
 
         private void AddEmptySlot()

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6183aeb8971b45778ba9d2c9fc425433, type: 3}
+  m_Name: ParksComponentVisualizerObject
+  m_EditorClassIdentifier: 
+  Settings:
+    LayerName: landuse
+    GameObjectOffset: 0.0001
+    Styles:
+    - ClassName: park
+      Material: {fileID: 2100000, guid: d232afdb7262244a6b98ac662cb45e8e, type: 2}
+      PushUp: 0.0001
+    - ClassName: wood
+      Material: {fileID: 2100000, guid: 3b3a70efa971e426b8cc3faf179b5fc4, type: 2}
+      PushUp: 0.0003
+    - ClassName: grass
+      Material: {fileID: 2100000, guid: 8df54aa073044414c8396981868b33d5, type: 2}
+      PushUp: 0.0002
+    - ClassName: commercial_area
+      Material: {fileID: 2100000, guid: 167293a21907941fe97fc5f058273086, type: 2}
+      PushUp: 0.00005
+    - ClassName: school
+      Material: {fileID: 2100000, guid: e3ea02cb9e2cc4a2b8f01b840198ac18, type: 2}
+      PushUp: 0.00035
+    - ClassName: agriculture
+      Material: {fileID: 2100000, guid: 8df54aa073044414c8396981868b33d5, type: 2}
+      PushUp: 0.00035
+    - ClassName: pitch
+      Material: {fileID: 2100000, guid: 794ac0b054f4147a58bc875d6da48405, type: 2}
+      PushUp: 0.0004
+  IsActive: 1

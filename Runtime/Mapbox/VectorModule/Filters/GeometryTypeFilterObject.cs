@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Mapbox.BaseModule.Utilities;
+using Mapbox.VectorTile.Geometry;
 using UnityEngine;
 
 namespace Mapbox.VectorModule.Filters
@@ -35,28 +36,24 @@ namespace Mapbox.VectorModule.Filters
 
         public override bool Try(VectorFeatureUnity feature)
         {
-            //this is a slightly cheesy way to negate by a flag
-            //so right side is simply negated by the first part and equality check
-
-            var geoType = feature.Data.GeometryType.ToString().ToLowerInvariant();
-
-            switch (geoType)
+            // Switched on the enum rather than its lowercased name. The string version matched
+            // GeoJSON-style names, of which half could never arrive: an MVT GeomType is only
+            // UNKNOWN, POINT, LINESTRING or POLYGON, so the "multipolygon", "multilinestring" and
+            // "multipoint" arms were unreachable - and the first of those had a space inside the
+            // literal ("case\" multipolygon\":"), so it could not have matched even if MVT produced
+            // one. Multi-part geometry arrives as several rings on a single feature, not as a
+            // distinct type. Also drops a ToString plus ToLowerInvariant per feature.
+            switch (feature.Data.GeometryType)
             {
-                case "polygon":
-                case" multipolygon":
-                    return (_value == GeometryTypeEnum.Polygon);
-                    break;
-                case "linestring":
-                case "multilinestring":
-                    return (_value == GeometryTypeEnum.Line);
-                    break;
-                case "point":
-                case "multipoint":
-                    return (_value == GeometryTypeEnum.Point);
-                    break;
+                case GeomType.POLYGON:
+                    return _value == GeometryTypeEnum.Polygon;
+                case GeomType.LINESTRING:
+                    return _value == GeometryTypeEnum.Line;
+                case GeomType.POINT:
+                    return _value == GeometryTypeEnum.Point;
+                default:
+                    return false;
             }
-
-            return false;
         }
     }
 

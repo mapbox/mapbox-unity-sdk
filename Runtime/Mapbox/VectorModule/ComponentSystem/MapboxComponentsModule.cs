@@ -95,38 +95,46 @@ namespace Mapbox.VectorModule.ComponentSystem
                         return;
                     }
 
-                    var resultGameObjects = new List<GameObject>();
-                    foreach (var layerData in taskResult.MeshData)
+                    try
                     {
-                        // foreach (var vectorLayerVisualizers in _layerVisualizers
-                        //              .Where(x => x.Value is MapboxComponentVisualizer && x.Key == layerData.LayerName)
-                        //              .Select(x => x.Value))
-                        IVectorLayerVisualizer visualizer = null;
-                        var visualizers = _layerVisualizers[layerData.LayerName];
-                        for (int i = 0; i < visualizers.Count; i++)
+                        var resultGameObjects = new List<GameObject>();
+                        foreach (var layerData in taskResult.MeshData)
                         {
-                            if (((MapboxComponentVisualizer)visualizers[i]).VisualizerId == layerData.LayerId)
+                            IVectorLayerVisualizer visualizer = null;
+                            var visualizers = _layerVisualizers[layerData.LayerName];
+                            for (int i = 0; i < visualizers.Count; i++)
                             {
-                                visualizer = visualizers[i];
-                                break;
+                                if (((MapboxComponentVisualizer)visualizers[i]).VisualizerId == layerData.LayerId)
+                                {
+                                    visualizer = visualizers[i];
+                                    break;
+                                }
+                            }
+                            if (visualizer == null)
+                                continue;
+
+                            var layerVisualizer = (MapboxComponentVisualizer)visualizer;
+                            if (layerData.MeshData == null)
+                                continue;
+                            if (layerVisualizer.ContainsVisualFor(data.TileId))
+                                continue;
+                            var layerGameObjects = layerVisualizer.CreateGo(data.TileId, layerData.MeshData);
+                            foreach (var gameObject in layerGameObjects)
+                            {
+                                gameObject.SetActive(false);
+                                resultGameObjects.Add(gameObject);
                             }
                         }
-                        if (visualizer == null)
-                            continue;
-                        
-                        var layerVisualizer = (MapboxComponentVisualizer)visualizer;
-                        if (layerData.MeshData == null)
-                            continue;
-                        var layerGameObjects = layerVisualizer.CreateGo(data.TileId, layerData.MeshData);
-                        foreach (var gameObject in layerGameObjects)
-                        {
-                            gameObject.SetActive(false);
-                            resultGameObjects.Add(gameObject);
-                        }
-                        
-                    }
 
-                    callback(new MeshGenerationTaskResult(TaskResultType.Success, resultGameObjects));
+                        callback(new MeshGenerationTaskResult(TaskResultType.Success, resultGameObjects));
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"[MCM] CreateGo failed for tile {data.TileId}: {e}");
+                        var failResult = new MeshGenerationTaskResult(TaskResultType.MeshGenerationFailure);
+                        failResult.AddException(e);
+                        callback(failResult);
+                    }
                 }
             };
             if (!_activeTasks.ContainsKey(data.TileId)) _activeTasks.Add(data.TileId, new List<TaskWrapper>());

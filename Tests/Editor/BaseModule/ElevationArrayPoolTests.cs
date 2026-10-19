@@ -68,8 +68,13 @@ namespace Mapbox.BaseModuleTests
             // original pushed set (i.e. a freshly allocated array, meaning the pool
             // was empty for this size). Count distinct pushed buffers seen.
             var seen = new System.Collections.Generic.HashSet<float[]>(ReferenceEqualityComparer.Instance);
+            // Bounded well above the pool's documented cap of 32: the loop ends when Rent hands back
+            // something it was not given, and if that never happens the assertions below are the
+            // wrong way to learn it.
+            var drainGuard = 0;
             while (true)
             {
+                Assert.Less(++drainGuard, 1000, "Pool never drained; Rent kept returning pushed buffers.");
                 var rented = ElevationArrayPool.Rent(size);
                 if (!pushedSet.Contains(rented))
                 {
