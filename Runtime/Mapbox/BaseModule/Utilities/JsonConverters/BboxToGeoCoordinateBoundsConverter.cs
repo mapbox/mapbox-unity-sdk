@@ -44,9 +44,11 @@ namespace Mapbox.BaseModule.Utilities.JsonConverters
 		/// <returns>A <see cref="LatitudeLongitudeBounds"/>.</returns>
 		public LatitudeLongitudeBounds Create(Type objectType, JArray val)
 		{
+			// GeoJSON bbox order is [min_lon, min_lat, max_lon, max_lat];
+			// LatitudeLongitude's constructor takes (latitude, longitude), so the pairs are swapped.
 			return new LatitudeLongitudeBounds(
-				new LatitudeLongitude((double)val[0], (double)val[1]),
-				new LatitudeLongitude((double)val[2], (double)val[3]));
+				new LatitudeLongitude((double)val[1], (double)val[0]),
+				new LatitudeLongitude((double)val[3], (double)val[2]));
 		}
 
 		/// <summary>

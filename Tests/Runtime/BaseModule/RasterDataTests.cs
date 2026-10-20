@@ -16,6 +16,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.DataTests
 {
@@ -138,10 +139,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 resultData = data;
             }));
 
-            while (Runnable.IsRunning(coroutineId))
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => Runnable.IsRunning(coroutineId), "RequestWithAllCaches: Runnable.IsRunning(coroutineId)");
 
             Assert.NotNull(resultData.Texture);
             Assert.AreEqual(resultData.CacheType, CacheType.NoCache);
@@ -167,10 +165,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 resultData = data;
             }));
 
-            while (Runnable.IsRunning(coroutineId))
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => Runnable.IsRunning(coroutineId), "RequestNoFileYesSqliteCache: Runnable.IsRunning(coroutineId)");
             
             Assert.NotNull(resultData.Texture);
             Assert.AreEqual(resultData.CacheType, CacheType.NoCache);
@@ -191,10 +186,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 resultData = data;
             }));
 
-            while (Runnable.IsRunning(coroutineId))
-            {
-                yield return null;
-            }
+            yield return TestWait.While(() => Runnable.IsRunning(coroutineId), "RequestNoFileNoSqliteCaches: Runnable.IsRunning(coroutineId)");
             
             Assert.NotNull(resultData.Texture);
             Assert.AreEqual(resultData.CacheType, CacheType.NoCache);

@@ -87,15 +87,26 @@ namespace Mapbox.BaseModule.Utilities
 			return new Vector2((float) dx, (float) dy);
 		}
 		
+		/// <summary>
+		/// Inverse of <see cref="LatitudeLongitudeToInTile01"/>: y-up tile-local 01 space, where
+		/// (0,0) is the tile's south-west corner. Note this is a different space from the
+		/// <see cref="Vector3"/> overload below, which takes Unity tile space - (0,0) at the
+		/// north-west corner, z running to -1 southwards.
+		/// </summary>
 		public static LatitudeLongitude Tile01ToLatitudeLongitude(Vector2 zeroOne, CanonicalTileId tileId)
 		{
 			var rect = TileIdToBounds(tileId.X, tileId.Y, tileId.Z);
 			return new LatitudeLongitude(
 				latitude: Mathd.Lerp(rect.South, rect.North, zeroOne.y),
-				longitude:Mathd.Lerp(rect.East, rect.West, zeroOne.x)
+				longitude:Mathd.Lerp(rect.West, rect.East, zeroOne.x)
 			);
 		}
-		
+
+		/// <summary>
+		/// Unity tile space: (0,0) is the tile's north-west corner and z runs to -1 southwards, as
+		/// produced for feature geometry. For y-up 01 coordinates use the <see cref="Vector2"/>
+		/// overload above.
+		/// </summary>
 		public static LatitudeLongitude Tile01ToLatitudeLongitude(Vector3 zeroOne, CanonicalTileId tileId)
 		{
 			var rect = TileIdToBounds(tileId.X, tileId.Y, tileId.Z);

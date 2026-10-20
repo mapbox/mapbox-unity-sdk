@@ -25,6 +25,12 @@ namespace Mapbox.DirectionsApiTests
         }
 
         [Test]
+        public void DrivingTraffic_Profile_Exists()
+        {
+            Assert.IsNotNull(RoutingProfile.DrivingTraffic);
+        }
+
+        [Test]
         public void Driving_ToString_ReturnsCorrectValue()
         {
             var profile = RoutingProfile.Driving;
@@ -43,6 +49,13 @@ namespace Mapbox.DirectionsApiTests
         {
             var profile = RoutingProfile.Cycling;
             Assert.AreEqual("mapbox/cycling/", profile.ToString());
+        }
+
+        [Test]
+        public void DrivingTraffic_ToString_ReturnsCorrectValue()
+        {
+            var profile = RoutingProfile.DrivingTraffic;
+            Assert.AreEqual("mapbox/driving-traffic/", profile.ToString());
         }
 
         [Test]
@@ -67,11 +80,21 @@ namespace Mapbox.DirectionsApiTests
         }
 
         [Test]
+        public void GetProfile_ReturnsDrivingTraffic_ForDrivingTrafficOption()
+        {
+            var profile = RoutingProfile.GetProfile(RoutingProfile.RoutingProfileOptions.DrivingTraffic);
+            Assert.AreEqual(RoutingProfile.DrivingTraffic, profile);
+        }
+
+        [Test]
         public void Profiles_AreUnique()
         {
             Assert.AreNotEqual(RoutingProfile.Driving, RoutingProfile.Walking);
             Assert.AreNotEqual(RoutingProfile.Driving, RoutingProfile.Cycling);
             Assert.AreNotEqual(RoutingProfile.Walking, RoutingProfile.Cycling);
+            Assert.AreNotEqual(RoutingProfile.Driving, RoutingProfile.DrivingTraffic);
+            Assert.AreNotEqual(RoutingProfile.Walking, RoutingProfile.DrivingTraffic);
+            Assert.AreNotEqual(RoutingProfile.Cycling, RoutingProfile.DrivingTraffic);
         }
 
         [Test]

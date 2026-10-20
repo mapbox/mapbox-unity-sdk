@@ -21,13 +21,16 @@ namespace Mapbox.DirectionsApi
 		/// <summary> The cycling profile. </summary>
 		public static readonly RoutingProfile Cycling = new RoutingProfile("mapbox/cycling/");
 
+		/// <summary> The driving profile with live traffic conditions factored in. </summary>
+		public static readonly RoutingProfile DrivingTraffic = new RoutingProfile("mapbox/driving-traffic/");
+
 		private readonly string profile;
 
 		private RoutingProfile(string profile)
 		{
 			this.profile = profile;
 		}
-		
+
 		public static RoutingProfile GetProfile(RoutingProfileOptions option)
 		{
 			switch (option)
@@ -35,6 +38,7 @@ namespace Mapbox.DirectionsApi
 				case RoutingProfileOptions.Driving: return RoutingProfile.Driving; break;
 				case RoutingProfileOptions.Walking: return RoutingProfile.Walking; break;
 				case RoutingProfileOptions.Cycling: return RoutingProfile.Cycling; break;
+				case RoutingProfileOptions.DrivingTraffic: return RoutingProfile.DrivingTraffic; break;
 			}
 
 			return RoutingProfile.Driving;
@@ -51,7 +55,8 @@ namespace Mapbox.DirectionsApi
 		{
 			Driving,
 			Walking,
-			Cycling
+			Cycling,
+			DrivingTraffic
 		}
 	}
 }

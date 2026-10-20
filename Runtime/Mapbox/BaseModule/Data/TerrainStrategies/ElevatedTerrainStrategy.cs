@@ -12,6 +12,14 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using TerrainData = Mapbox.BaseModule.Data.DataFetchers.TerrainData;
+// Unity 6.3 replaced the int instance id in Physics.BakeMesh with the opaque EntityId
+// handle and marked the int overload obsolete-as-error. Alias the id type so the same
+// job code compiles on 2022.3 through 6.2 (int) and 6.3+ (EntityId).
+#if UNITY_6000_3_OR_NEWER
+using MeshBakeId = UnityEngine.EntityId;
+#else
+using MeshBakeId = System.Int32;
+#endif
 
 namespace Mapbox.ImageModule.Terrain.TerrainStrategies
 {
@@ -530,7 +538,11 @@ namespace Mapbox.ImageModule.Terrain.TerrainStrategies
 				// sharedMesh is assigned, so the main-thread step is near-free.
 				var handle = new BakeColliderJob
 				{
+#if UNITY_6000_3_OR_NEWER
+					MeshId = mesh.GetEntityId(),
+#else
 					MeshId = mesh.GetInstanceID(),
+#endif
 					CookingOptions = TerrainColliderCookingOptions
 				}.Schedule();
 				Runnable.Instance.StartCoroutine(CompleteBakeAndAssign(meshCollider, mesh, handle));
@@ -681,7 +693,7 @@ namespace Mapbox.ImageModule.Terrain.TerrainStrategies
 		/// </summary>
 		private struct BakeColliderJob : IJob
 		{
-			public int MeshId;
+			public MeshBakeId MeshId;
 			public MeshColliderCookingOptions CookingOptions;
 
 			public void Execute()

@@ -51,7 +51,12 @@ namespace Mapbox.BaseModule.Map
 
             SetLatitudeLongitude(latitudeLongitude);
             _isInitialized = true;
-            QueryElevation = (tileId, x, y) => 0;
+            // Back to the no-terrain defaults: 0 everywhere, with the Try form reporting false so
+            // callers can tell "no terrain in this scene" from a genuine sea-level reading. The
+            // field initializers cover instances whose Initialize override never runs this; these
+            // assignments cover an instance being reused for a fresh session.
+            QueryElevation = NoElevation;
+            TryQueryElevation = NoElevationAvailable;
             // Reset terrain bounds to TerrainInfo defaults so a previous map's Min/Max
             // never bleeds into a fresh session. Field initializers already set defaults
             // on new MapInformation instances, but explicitly resetting here guards
@@ -122,7 +127,36 @@ namespace Mapbox.BaseModule.Map
             }
         }
 
-        public Func<CanonicalTileId, float, float, float> QueryElevation { get; set; }
+        /// <summary>
+        /// Both elevation lookups are defaulted here rather than only in Initialize, because
+        /// DynamicScalingMapInformation overrides Initialize without calling base - so anything
+        /// assigned only there is silently skipped for that subclass, and QueryElevation was left
+        /// null. Most callers null-check it, but MapInformationStaticMethods.ConvertLatLngToPosition
+        /// invokes it directly. A field initializer means neither can be null whichever path ran,
+        /// and a terrain module simply overwrites them.
+        /// </summary>
+        public Func<CanonicalTileId, float, float, float> QueryElevation { get; set; } = NoElevation;
+
+        public TryQueryElevationDelegate TryQueryElevation { get; set; } = NoElevationAvailable;
+
+        /// <summary>Default lookup for a map with no terrain module: nothing is known anywhere.</summary>
+        private static bool NoElevationAvailable(CanonicalTileId tileId, float x, float y, out float elevation)
+        {
+            elevation = 0f;
+            return false;
+        }
+
+        /// <summary>
+        /// Lossy counterpart to <see cref="NoElevationAvailable"/>, defined in terms of it so the
+        /// two defaults cannot drift apart - the same relationship TerrainLayerModule's real
+        /// QueryElevation has with its TryQueryElevation.
+        /// </summary>
+        private static float NoElevation(CanonicalTileId tileId, float x, float y)
+        {
+            NoElevationAvailable(tileId, x, y, out var elevation);
+            return elevation;
+        }
+
         public TerrainInfo Terrain { get; } = new TerrainInfo();
         public event Action<IMapInformation> SetView = (t) => {};
         public event Action<IMapInformation> ViewChanged = (t) => {};

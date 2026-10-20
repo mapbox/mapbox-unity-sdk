@@ -24,7 +24,7 @@ namespace Mapbox.ImageModule
 			_rasterSource = source;
 		}
 
-		public virtual IEnumerator Initialize()
+		public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
 		{
 			yield return _rasterSource.Initialize();
 			if (_settings.LoadBackgroundTextures)

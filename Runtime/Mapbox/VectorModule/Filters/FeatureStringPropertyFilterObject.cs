@@ -29,42 +29,67 @@ namespace Mapbox.VectorModule.Filters
 	public class FeatureStringPropertyFilter : FilterBase
 	{
 		public FeatureStringPropertyFilterSettings PropertyFilterSettings;
+
+		// Case-insensitive by comparer, so no lowered copy is allocated per feature.
 		private HashSet<string> _types;
 
 		public FeatureStringPropertyFilter(FeatureStringPropertyFilterSettings propertyFilterSettings)
 		{
 			PropertyFilterSettings = propertyFilterSettings;
 		}
-		
+
 		public override void Initialize()
 		{
 			base.Initialize();
 			if (PropertyFilterSettings.CheckOperation == StringCheckOperation.Contains)
 			{
-				_types = new HashSet<string>();
-				foreach (var s in PropertyFilterSettings.FilterString.Split(','))
+				_types = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				if (!string.IsNullOrEmpty(PropertyFilterSettings.FilterString))
 				{
-					_types.Add(s.Trim().ToLowerInvariant());
+					foreach (var s in PropertyFilterSettings.FilterString.Split(','))
+					{
+						_types.Add(s.Trim());
+					}
 				}
 			}
 		}
 
+		/// <summary>
+		/// Runs per feature, so no allocation: the property is read with TryGetValue and compared
+		/// case-insensitively in place.
+		///
+		/// This used to index Properties directly, which threw KeyNotFoundException on any feature
+		/// lacking the property - and plenty do, whole layers of them - and it lowercased both the
+		/// feature's value and the filter's own string on every single feature, three allocations to
+		/// answer one comparison. A feature without the property is now simply not a match.
+		/// </summary>
 		public override bool Try(VectorFeatureUnity feature)
 		{
 			//this is a slightly cheesy way to negate by a flag
 			//so right side is simply negated by the first part and equality check
 
 			var result = false;
-			if (PropertyFilterSettings.CheckOperation == StringCheckOperation.Equals)
+			if (feature.Properties != null &&
+			    feature.Properties.TryGetValue(PropertyFilterSettings.PropertyName, out var value) &&
+			    value != null)
 			{
-				result = PropertyFilterSettings.FilterString.ToLowerInvariant() == feature.Properties[PropertyFilterSettings.PropertyName].ToString().ToLowerInvariant();
-			}
-			else if (PropertyFilterSettings.CheckOperation == StringCheckOperation.Contains)
-			{
-				result = _types.Contains(feature.Properties[PropertyFilterSettings.PropertyName].ToString().ToLowerInvariant());
+				// Only strings avoid a ToString allocation here; a boxed number formats itself, which
+				// is the caller asking a string filter to do a number's job.
+				var featureValue = value as string ?? value.ToString();
+
+				if (PropertyFilterSettings.CheckOperation == StringCheckOperation.Equals)
+				{
+					result = string.Equals(PropertyFilterSettings.FilterString, featureValue,
+						StringComparison.OrdinalIgnoreCase);
+				}
+				else if (PropertyFilterSettings.CheckOperation == StringCheckOperation.Contains)
+				{
+					// Initialize builds this; if it never ran, nothing can match.
+					result = _types != null && _types.Contains(featureValue);
+				}
 			}
 
-			return (!PropertyFilterSettings.Invert) ? result : !result; 
+			return (!PropertyFilterSettings.Invert) ? result : !result;
 		}
 	}
 

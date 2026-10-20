@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Mapbox.BaseModule.Data.Platform.Cache;
+using Mapbox.BaseModule.Utilities;
 using UnityEngine;
 
 namespace Mapbox.BaseModule.Data.Platform
@@ -64,23 +65,7 @@ namespace Mapbox.BaseModule.Data.Platform
             , int timeout = 10
         )
         {
-            if (!string.IsNullOrEmpty(_accessToken))
-            {
-                var uriBuilder = new UriBuilder(url);
-                string accessTokenQuery = "access_token=" + _accessToken;
-                string skuToken = "sku=" + _getMapsSkuToken();
-                if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-                {
-                    uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + skuToken;
-                    ;
-                }
-                else
-                {
-                    uriBuilder.Query = accessTokenQuery + "&" + skuToken;
-                }
-
-                url = uriBuilder.ToString();
-            }
+            url = MapboxApiUrls.AppendCredentials(url, _accessToken, _getMapsSkuToken);
 
             // TODO:
             // * add queue for requests

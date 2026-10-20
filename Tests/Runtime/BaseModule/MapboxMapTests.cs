@@ -18,6 +18,7 @@ using NUnit.Framework;
 using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests.DataTests
 {
@@ -123,7 +124,7 @@ namespace Mapbox.BaseModuleTests.DataTests
             {
                 response = r;
             });
-            while (request.IsCompleted == false) yield return null;
+            yield return TestWait.While(() => request.IsCompleted == false, "TileJson: request.IsCompleted == false");
             Assert.IsNotNull(response);
         }
 
@@ -135,7 +136,7 @@ namespace Mapbox.BaseModuleTests.DataTests
             {
                 mapLoaded = true;
             }));
-            while(mapLoaded == false) yield return null;
+            yield return TestWait.While(() => mapLoaded == false, "LoadMapIntoMemory: mapLoaded == false");
             
             Assert.IsTrue(mapLoaded);
         }
@@ -232,7 +233,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 isDone = true;
             }));
             //Assert.AreEqual(_datafetcher.TotalRequestCount, 1);
-            while (isDone == false) yield return null;
+            yield return TestWait.While(() => isDone == false, "VectorFetching: isDone == false");
             
             Assert.NotNull(tile);
             Assert.NotNull(tile.ByteData);
@@ -250,7 +251,7 @@ namespace Mapbox.BaseModuleTests.DataTests
                 isDone = true;
             }));
             tile.Cancel();
-            while (isDone == false) yield return null;
+            yield return TestWait.While(() => isDone == false, "VectorFetchingCancelled: isDone == false");
             
             Assert.NotNull(tile);
             Assert.AreEqual(tile.CurrentTileState, TileState.Canceled);

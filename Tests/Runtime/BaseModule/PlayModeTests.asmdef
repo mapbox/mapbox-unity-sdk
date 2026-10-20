@@ -11,7 +11,8 @@
         "Unity.Recorder",
         "Unity.Recorder.Editor",
         "MapboxImageryModule",
-        "MapboxVectorModule"
+        "MapboxVectorModule",
+        "MapboxTestUtils"
     ],
     "includePlatforms": [
         "Editor"
@@ -21,6 +22,7 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
+        "Newtonsoft.Json.dll",
         "Mapbox.VectorTile.VectorTileReader.dll",
         "Mapbox.VectorTile.Geometry.dll"
     ],

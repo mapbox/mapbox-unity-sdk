@@ -46,6 +46,7 @@ namespace Mapbox.Example.Scripts.ModuleBehaviours
 					Settings);
 
 			mapInformation.QueryElevation = module.QueryElevation;
+			mapInformation.TryQueryElevation = module.TryQueryElevation;
 			ModuleImplementation = module;
 			return ModuleImplementation;
 		}

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mapbox.BaseModule.Data.Tiles;
-using UnityEngine;
 
 namespace Mapbox.BaseModule.Data.DataFetchers
 {
@@ -13,10 +12,6 @@ namespace Mapbox.BaseModule.Data.DataFetchers
 	
 	public abstract class Source<T> : Source
 	{
-		public Action<CanonicalTileId> DataFetched = (data) => { };
-		public Action<T, Action> DataFetchedWithCallback = (data, act) => { };
-		public Action<TileErrorEventArgs> FetchingError = (data) => { };
-
 		public virtual IEnumerator Initialize()
 		{
 			return null;
@@ -57,11 +52,6 @@ namespace Mapbox.BaseModule.Data.DataFetchers
 		}
 
 		public virtual void DisposeData(T data)
-		{
-			
-		}
-
-		public virtual void SetMeshGenerationMethod(Action<ByteArrayTile, GameObject, Action<List<GameObject>>> action1)
 		{
 			
 		}

@@ -19,8 +19,7 @@ namespace Mapbox.BaseModule.Unity
 		//change this with list T : containers?
 		public UnityTileTerrainContainer TerrainContainer;
 		public UnityTileImageContainer ImageContainer;
-		public UnityTileVectorContainer VectorContainer;
-		
+
 		private static readonly int TileScalePropertyId = Shader.PropertyToID("_TileScale");
 		
 		private MeshRenderer _meshRenderer;
@@ -75,7 +74,6 @@ namespace Mapbox.BaseModule.Unity
 		public void Awake()
 		{
 			ImageContainer = new UnityTileImageContainer(this, DataDisposed);
-			VectorContainer = new UnityTileVectorContainer(this);
 			TerrainContainer = new UnityTileTerrainContainer(this, ElevationUpdatedCallback, DataDisposed);
 			
 			_meshRenderer = gameObject.AddComponent<MeshRenderer>();
@@ -139,7 +137,6 @@ namespace Mapbox.BaseModule.Unity
 			gameObject.SetActive(false);
 			ImageContainer.GetAndClearImageData();
 			TerrainContainer.GetAndClearTerrainData();
-			VectorContainer.GetAndClearVectorData();
 		}
 
 		private void DataDisposed()
@@ -151,7 +148,6 @@ namespace Mapbox.BaseModule.Unity
 		{
 			ImageContainer.OnDestroy();
 			TerrainContainer.OnDestroy();
-			VectorContainer.OnDestroy();
 
 			// Unity does not auto-free runtime-created Meshes when the GameObject is
 			// destroyed. Release the render mesh allocated in Awake and any dedicated

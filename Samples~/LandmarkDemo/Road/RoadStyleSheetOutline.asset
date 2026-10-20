@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5417554272265697845
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8a61183121446bbd024747630bf05c, type: 3}
+  m_Name: RoadStyle_1_Filters
+  m_EditorClassIdentifier: 
+  Filters: []
+  Type: 0
+--- !u!114 &-1538625035922140899
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8a61183121446bbd024747630bf05c, type: 3}
+  m_Name: RoadStyle_0_Filters
+  m_EditorClassIdentifier: 
+  Filters: []
+  Type: 0
+--- !u!114 &-245792505840917342
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8a61183121446bbd024747630bf05c, type: 3}
+  m_Name: RoadStyle_0_Filters
+  m_EditorClassIdentifier: 
+  Filters: []
+  Type: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf8c281932374fb0b5c80fa7fbca2b5b, type: 3}
+  m_Name: RoadStyleSheetOutline
+  m_EditorClassIdentifier: 
+  Styles:
+  - Name: secondary,tertiary
+    Filters:
+      Filters:
+      - rid: 5722777937161748527
+      Type: 0
+    Width: 7.8
+    PushUp: 0.0001
+    Material: {fileID: 2100000, guid: 1c7586ff0ee3740e5ac7473d96b67ed4, type: 2}
+  - Name: primary
+    Filters:
+      Filters:
+      - rid: 5722777937161748529
+      Type: 0
+    Width: 8.2
+    PushUp: 0.0002
+    Material: {fileID: 2100000, guid: 1c7586ff0ee3740e5ac7473d96b67ed4, type: 2}
+  - Name: street,street_limited
+    Filters:
+      Filters:
+      - rid: 5722777937161748530
+      Type: 0
+    Width: 6.6
+    PushUp: 0.0001
+    Material: {fileID: 2100000, guid: 1c7586ff0ee3740e5ac7473d96b67ed4, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 5722777937161748527
+      type: {class: RoadClassFilter, ns: Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer, asm: MapboxComponentSystem}
+      data:
+        CheckOperation: 1
+        FilterString: secondary,tertiary
+        Invert: 0
+    - rid: 5722777937161748529
+      type: {class: RoadClassFilter, ns: Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer, asm: MapboxComponentSystem}
+      data:
+        CheckOperation: 0
+        FilterString: primary
+        Invert: 0
+    - rid: 5722777937161748530
+      type: {class: RoadClassFilter, ns: Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer, asm: MapboxComponentSystem}
+      data:
+        CheckOperation: 1
+        FilterString: street,street_limited
+        Invert: 0
+--- !u!114 &6606382917155413568
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8a61183121446bbd024747630bf05c, type: 3}
+  m_Name: RoadStyle_0_Filters
+  m_EditorClassIdentifier: 
+  Filters: []
+  Type: 0

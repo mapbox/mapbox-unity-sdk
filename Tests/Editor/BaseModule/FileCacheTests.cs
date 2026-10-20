@@ -10,6 +10,7 @@ using Mapbox.MapDebug.Scripts.Logging;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Mapbox.Tests;
 
 namespace Mapbox.BaseModuleTests
 {
@@ -104,7 +105,7 @@ namespace Mapbox.BaseModuleTests
                 isWorking = false;
                 resultData = data;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "ReadTileCoroutineTest: isWorking");
             
             Assert.IsNotNull(resultData);
             Assert.AreEqual(_testTileId, resultData.TileId);
@@ -125,7 +126,7 @@ namespace Mapbox.BaseModuleTests
                 isWorking = false;
                 resultData = data;
             }));
-            while(isWorking) yield return null;
+            yield return TestWait.While(() => isWorking, "DeleteTileTest: isWorking");
             
             Assert.IsNull(resultData);
             

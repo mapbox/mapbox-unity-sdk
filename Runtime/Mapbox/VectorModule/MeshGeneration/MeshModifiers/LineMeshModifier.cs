@@ -45,6 +45,10 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 		private float _distance = 0f;
 		private IMapInformation _mapInformation;
 	
+		public LineMeshCore(LineMeshParameters parameters) : this(parameters, null)
+		{
+		}
+
 		public LineMeshCore(LineMeshParameters parameters, IMapInformation mapInformation)
 		{
 			_lineMeshParameters = parameters;
@@ -60,6 +64,17 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 
 		public void Run(VectorFeatureUnity feature, MeshData md)
 		{
+			ExtrudeLine(feature, md);
+		}
+
+		/// <summary>
+		/// Takes the map information per run rather than at construction, so one core can be reused
+		/// across features. Per-feature state is reset by ExtrudeLine, which calls ResetFields for
+		/// every road segment.
+		/// </summary>
+		public void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInformation)
+		{
+			_mapInformation = mapInformation;
 			ExtrudeLine(feature, md);
 		}
 
@@ -529,7 +544,7 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 	}
 
 	[Serializable]
-	public class LineMeshForPolygonsModifier : MeshModifier
+	public class LineMeshForPolygonsModifier : MeshModifier<LineMeshCore>
 	{
 		private LineMeshParameters _lineMeshParameters;
 
@@ -537,11 +552,12 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 		{
 			_lineMeshParameters = options;
 		}
-		
+
+		protected override LineMeshCore CreateCore() => new LineMeshCore(_lineMeshParameters);
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
 		{
-			var core = new LineMeshCore(_lineMeshParameters, mapInfo);
-			core.Run(feature, md);
+			Core.Run(feature, md, mapInfo);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
     "name": "com.mapbox.sdk",
-    "version": "3.1.1",
+    "version": "3.2.0",
     "displayName": "Mapbox Unity SDK",
     "description": "Mapbox Unity SDK",
     "unity": "2022.3",
@@ -8,7 +8,9 @@
         "com.unity.render-pipelines.universal": "10.10.1",
 	"com.unity.nuget.newtonsoft-json": "3.2.1",
 	"com.unity.burst": "1.8.12",
-	"com.unity.inputsystem": "1.7.0"
+	"com.unity.inputsystem": "1.7.0",
+	"com.unity.cloud.gltfast": "6.18.0",
+	"com.unity.meshopt.decompress": "0.2.0-exp.1"
     },
     "author": {
         "name": "Mapbox",
@@ -40,6 +42,21 @@
             "displayName": "MapboxComponents",
             "description": "Mapbox Components Demo",
             "path": "Samples~/MapboxComponents"
+        },
+        {
+            "displayName": "LandmarkDemo",
+            "description": "Landmark Demo",
+            "path": "Samples~/LandmarkDemo"
+        },
+        {
+            "displayName": "LandmarkDemoWithVector",
+            "description": "Landmark Demo With Vector",
+            "path": "Samples~/LandmarkDemoWithVector"
+        },
+        {
+            "displayName": "LandmarkTour",
+            "description": "Landmark Tour",
+            "path": "Samples~/LandmarkTour"
         }
     ]
 }

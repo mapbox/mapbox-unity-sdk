@@ -10,8 +10,19 @@ using UnityEngine.Serialization;
 
 namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 {
+	/// <summary>
+	/// Scatters prefab meshes along a line feature at a fixed spacing.
+	///
+	/// UNFINISHED, and deliberately kept rather than deleted. It has no ScriptableObject wrapper in
+	/// MeshModifiers/ScriptableObjects, unlike every other mesh modifier, so there is no
+	/// CreateAssetMenu entry and no way to add it to a stack from the Inspector; nothing in the
+	/// package constructs it either. To finish it: add the wrapper, and give the spacing a home -
+	/// <see cref="MeshOnLineModifierCore"/> reads a _distance field that nothing ever assigns, so
+	/// spacing is zero and <c>OnLine</c> divides by it and places nothing. PrefabSet has no such
+	/// setting today.
+	/// </summary>
 	[Serializable]
-	public class MeshOnLineModifier : MeshModifier
+	public class MeshOnLineModifier : MeshModifier<MeshOnLineModifierCore>
 	{
 		private PrefabSet _prefabSet;
 
@@ -57,16 +68,19 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 			}
 		}
 		
+		protected override MeshOnLineModifierCore CreateCore() => new MeshOnLineModifierCore(_prefabSet);
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
 		{
-			var core = new MeshOnLineModifierCore(_prefabSet);
-			core.Run(feature, md, mapInfo);
+			Core.Run(feature, md, mapInfo);
 		}
 	}
 
 	[Serializable]
-	public class MeshOnLineModifierCore : MeshModifier
+	public class MeshOnLineModifierCore
 	{
+		// Never assigned; see the note on MeshOnLineModifier. Until it has a source, unityDistance
+		// below is zero and OnLine's count calculation divides by it.
 		private float _distance;
 		private PrefabSet _prefabSet;
 		private System.Random _random;
@@ -86,7 +100,7 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 				_doRotate = true;
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
+		public void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
 		{
 			if (_prefabSet?.MeshDatas == null) return;
 			

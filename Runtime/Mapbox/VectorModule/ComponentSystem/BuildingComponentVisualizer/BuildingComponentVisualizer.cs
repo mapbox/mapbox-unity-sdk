@@ -109,14 +109,42 @@ namespace Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer
 
                     meshData.Triangles.Add(triList);
                     baseTriIndex += triList.Length;
-                    triList = new int[poolSize];
+
+                    // On the first failure, size the replacement to what this feature can
+                    // actually need rather than to poolSize again. A fresh buffer of the
+                    // same size is no help to a feature whose own triangulation exceeds it:
+                    // the retry overflows identically and the feature is dropped without a
+                    // word. Building footprints are far below the limit in practice, so this
+                    // is a guard rather than an observed failure — but it is the same defect
+                    // that lost low-zoom water in AreaComponentVisualizer, and the extrusion
+                    // path below already sizes to its requirement this way.
+                    // The capacity that actually just failed, captured before the buffer is
+                    // replaced. Not replacementCapacity: on the second failure the sizing
+                    // block above is skipped, so that variable holds poolSize rather than the
+                    // worst-case capacity the retry was really attempted against - which made
+                    // the warning report a number the code had never tried.
+                    var attemptedCapacity = triList.Length;
+
+                    var replacementCapacity = poolSize;
+                    if (retryCount == 0)
+                    {
+                        replacementCapacity = Mathf.Max(poolSize, ArrayPolygon.WorstCaseIndexCount(featureResult.VertexData));
+                    }
+
+                    triList = new int[replacementCapacity];
                     triIndex = 0;
                     if (retryCount++ < 1)
                     {
                         i--;
                         continue;
                     }
-                    // Degenerate feature — skip it
+
+                    // Sized to this feature's worst case and still short, so the geometry is
+                    // degenerate rather than merely large. Skip it, but say so.
+                    Debug.LogWarning(
+                        $"BuildingComponentVisualizer: skipped a '{VectorLayerName}' feature in tile {tileId} that could not be " +
+                        $"triangulated into {attemptedCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
+                        $"{Mathf.Max(0, featureResult.VertexData.Submeshes.Count - 1)} rings).");
                     retryCount = 0;
                     continue;
                 }
@@ -195,6 +223,7 @@ namespace Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer
 
             var mesh = entity.Mesh;
             mesh.Clear();
+            WarnOnNonFiniteVertices(tileId, meshData);
             mesh.SetVertices(meshData.Vertices);
             mesh.SetNormals(meshData.Normals);
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;

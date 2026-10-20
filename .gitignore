@@ -66,7 +66,10 @@ sdkproject/Assets/NextGenRecorder
 TextMesh Pro
 Library
 *.csproj
-Runtime/Mapbox/VectorModule/MeshGeneration/.idea
+# JetBrains project files, wherever a Rider/IntelliJ session decides to drop them.
+# Previously listed one directory at a time as each appeared, which meant a new one
+# got committed before anyone noticed.
+**/.idea/
 
 # Internal benchmark tool, kept local-only
 Runtime/Mapbox/Example/Scripts/TileProviderBenchmark.cs

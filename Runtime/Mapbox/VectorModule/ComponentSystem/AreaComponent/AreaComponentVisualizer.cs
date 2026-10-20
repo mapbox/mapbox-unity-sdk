@@ -108,7 +108,28 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
 
                     meshData.Triangles.Add(triList);
                     meshData.Materials.Add(style.Material);
-                    triangles[si] = new int[poolSize];
+
+                    // Replace the buffer that was just handed to the mesh. On the first
+                    // failure, size it to what this feature can actually need rather than
+                    // to poolSize again: a fresh buffer of the same size is no help to a
+                    // feature whose own triangulation exceeds it, so the retry overflowed
+                    // identically and the feature was dropped without a word. Low-zoom
+                    // coastline and ocean rings are exactly that shape, which is why water
+                    // went missing in patches when zoomed out.
+                    // The capacity that actually just failed, captured before the buffer is
+                    // replaced. Not replacementCapacity: on the second failure the sizing
+                    // block above is skipped, so that variable holds poolSize rather than the
+                    // worst-case capacity the retry was really attempted against - which made
+                    // the warning report a number the code had never tried.
+                    var attemptedCapacity = triList.Length;
+
+                    var replacementCapacity = poolSize;
+                    if (retryCount == 0)
+                    {
+                        replacementCapacity = Mathf.Max(poolSize, ArrayPolygon.WorstCaseIndexCount(featureResult.VertexData));
+                    }
+
+                    triangles[si] = new int[replacementCapacity];
                     baseTriIndices[si] += triList.Length;
                     triIndices[si] = 0;
                     if (retryCount++ < 1)
@@ -116,7 +137,15 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
                         i--;
                         continue;
                     }
-                    // Degenerate feature — skip it
+
+                    // Retried against a buffer sized for this feature's worst case and it
+                    // still would not fit, so the geometry is degenerate rather than merely
+                    // large. Skip it, but say so — silently dropping features is what made
+                    // the low-zoom water problem hard to see.
+                    Debug.LogWarning(
+                        $"AreaComponentVisualizer: skipped a '{VectorLayerName}' feature in tile {tileId} that could not be " +
+                        $"triangulated into {attemptedCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
+                        $"{Mathf.Max(0, featureResult.VertexData.Submeshes.Count - 1)} rings).");
                     retryCount = 0;
                     continue;
                 }
@@ -152,6 +181,7 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
 
             var mesh = entity.Mesh;
             mesh.Clear();
+            WarnOnNonFiniteVertices(tileId, meshData);
             mesh.SetVertices(meshData.Vertices);
             mesh.SetNormals(meshData.Normals);
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;

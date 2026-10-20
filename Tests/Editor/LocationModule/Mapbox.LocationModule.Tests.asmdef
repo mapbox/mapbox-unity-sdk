@@ -3,7 +3,8 @@
     "rootNamespace": "Mapbox.LocationModule.Tests",
     "references": [
         "MapboxBaseModule",
-        "MapboxLocationModule"
+        "MapboxLocationModule",
+        "MapboxTestUtils"
     ],
     "includePlatforms": [
         "Editor"

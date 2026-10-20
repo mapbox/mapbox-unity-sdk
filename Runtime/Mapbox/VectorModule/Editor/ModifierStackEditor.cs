@@ -23,8 +23,21 @@ namespace Mapbox.VectorModule.Editor
         private Texture2D _magnifier;
         private UnityEditor.Editor _filterEditor;
     
-        private void OnEnable()
+                private bool _editorInitialized;
+
+        // Editor.OnEnable can run while the target is null - entering Play mode destroys and recreates
+        // the inspected object - and touching serializedObject then throws
+        // SerializedObjectNotCreatableException, which cannot be recovered from inside the callback.
+        // Initialization is retried from OnInspectorGUI, which only runs once the target is real.
+        private void TryInitializeEditor()
         {
+            if (_editorInitialized || target == null)
+            {
+                return;
+            }
+
+            _editorInitialized = true;
+
             m_MeshModifiers = serializedObject.FindProperty(nameof(ModifierStackObject.MeshModifiers));
             m_Editors.Add(m_MeshModifiers, new List<UnityEditor.Editor>());
             m_GoModifiers = serializedObject.FindProperty(nameof(ModifierStackObject.GoModifiers));
@@ -42,6 +55,11 @@ namespace Mapbox.VectorModule.Editor
                 m_GoModifiers = serializedObject.FindProperty(nameof(ModifierStackObject.GoModifiers));
                 UpdateEditorList();
             };
+        }
+
+        private void OnEnable()
+        {
+            TryInitializeEditor();
         }
 
         private void CreateFilterStack()
@@ -64,6 +82,12 @@ namespace Mapbox.VectorModule.Editor
 
         public override void OnInspectorGUI()
         {
+            TryInitializeEditor();
+            if (!_editorInitialized)
+            {
+                return;
+            }
+
             if (!EditorUtility.IsPersistent(target))
                 return;
 

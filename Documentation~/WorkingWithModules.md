@@ -17,7 +17,7 @@ Running the application now with only this base map script will display empty ti
 
 Once the map exists, you can add modules to decorate it. The base map script automatically searches for any layer module scripts attached to the same GameObject and includes them in its update cycle.
 
-![Base map script output](Images/WorkingWithModulesBaseMap.png)
+![Base map script output](Images/WorkingWithModulesBaseMap.jpeg)
 
 ### Static API Layer Module
 The Static API layer module uses the [Mapbox Static Images API](https://docs.mapbox.com/api/maps/static-images/), which serves pre-rendered images of requested regions.  
@@ -25,7 +25,7 @@ This module downloads and applies the appropriate images to the map tiles. By de
 
 If the tile material or shader is changed (for example, through a custom tile creator script), the Static API layer module may not find the correct texture fields, and images may not display as expected.
 
-![Static api layer module output](Images/WorkingWithModulesStaticApi.png)
+![Static api layer module output](Images/WorkingWithModulesStaticApi.jpeg)
 
 ### Terrain Layer Module
 The Terrain layer module uses the [Mapbox Terrain-RGB API](https://docs.mapbox.com/data/tilesets/reference/mapbox-terrain-rgb-v1/), which provides global elevation data encoded as color values in PNG files.  
@@ -35,7 +35,7 @@ Currently, the Terrain layer module supports only the `rgb v1` API, with `dem v1
 
 As with the Static API module, the Terrain module (in shader-based elevation mode) depends on a specific terrain material and shader setup.
 
-![Static api with terrain output](Images/WorkingWithModulesTerrain.png)
+![Static api with terrain output](Images/WorkingWithModulesTerrain.jpeg)
 
 ### Vector Module
 The Vector module uses the [Mapbox Vector Tiles API](https://docs.mapbox.com/api/maps/vector-tiles/), which delivers vector-based map data.  
@@ -45,4 +45,4 @@ This module downloads and decompresses vector data but does not render visuals o
 Visualization happens through submodules called “Layer Visualizers,” which generate actual map features such as 3D buildings (extruded polygons).  
 You can find sample visualizers included with the SDK package.
 
-![Vector module output](Images/WorkingWithModulesVector.png)
+![Vector module output](Images/WorkingWithModulesVector.jpeg)

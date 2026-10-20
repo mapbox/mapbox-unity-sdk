@@ -23,6 +23,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using TerrainData = Mapbox.BaseModule.Data.DataFetchers.TerrainData;
+using Mapbox.Tests;
 
 public class MapTest : MonoBehaviour
 {
@@ -166,8 +167,7 @@ public class MapTest : MonoBehaviour
         yield return _map.Initialize();
         yield return _map.LoadMapViewCoroutine();
         yield return new WaitForSeconds(2);
-        while (_dataManager.ActiveFetchCount > 0 || _dataManager.FetchQueueCount > 0)
-            yield return null;
+        yield return TestWait.While(() => _dataManager.ActiveFetchCount > 0 || _dataManager.FetchQueueCount > 0, "LoadMapOfExpiredData: _dataManager.ActiveFetchCount > 0 || _dataManager.FetchQueueCount > 0");
         
         var updatedTileCount = 0;
         foreach (var record in _dataManager.Records)
@@ -235,7 +235,7 @@ public class MapTest : MonoBehaviour
             info.Tile.Cancel();
         }
 
-        while (_map.Status < InitializationStatus.ReadyForUpdates) yield return null;
+        yield return TestWait.While(() => _map.Status < InitializationStatus.ReadyForUpdates, "LoadThenCancelAllRequests: _map.Status < InitializationStatus.ReadyForUpdates");
         
         Assert.IsTrue(_map.Status >= InitializationStatus.Initialized);
         Assert.AreEqual(finishedCount, 0);

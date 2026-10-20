@@ -24,17 +24,25 @@ namespace Mapbox.VectorModule.MeshGeneration.Unity
 		public void Initialize(UnityContext unityContext = null)
 		{
 			var filterCombiner = Filters == null ? null : Filters.GetCombiner();
+
+			// Empty slots and unticked modifiers are dropped here rather than checked per feature.
+			// The Inspector's enable toggle was drawn and never read, so unticking a modifier left
+			// it running; and an empty slot in GoModifiers reached RunGoModifiers, which - unlike
+			// RunMeshModifiers - does not null-check.
+			var activeMeshModifiers = MeshModifiers.Where(x => x != null && x.Active).ToList();
+			var activeGoModifiers = GoModifiers.Where(x => x != null && x.Active).ToList();
+
 			_modifierStack = new ModifierStack(Settings, filterCombiner)
 			{
-				MeshModifiers = MeshModifiers.Select(x => x as IMeshModifier).ToList(), 
-				GoModifiers = GoModifiers.Select(x => x as IGameObjectModifier).ToList()
+				MeshModifiers = activeMeshModifiers.Select(x => x as IMeshModifier).ToList(),
+				GoModifiers = activeGoModifiers.Select(x => x as IGameObjectModifier).ToList()
 			};
-			foreach (var modifier in MeshModifiers)
+			foreach (var modifier in activeMeshModifiers)
 			{
 				modifier.ConstructModifier(unityContext);
 			}
-				
-			foreach (var modifier in GoModifiers)
+
+			foreach (var modifier in activeGoModifiers)
 			{
 				modifier.ConstructModifier(unityContext);
 			}

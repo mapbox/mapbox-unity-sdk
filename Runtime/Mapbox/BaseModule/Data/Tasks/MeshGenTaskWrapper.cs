@@ -57,7 +57,42 @@ namespace Mapbox.BaseModule.Data.Tasks
         DataProcessingFailure,
         MeshGenerationFailure,
         GameObjectFailure,
+
+        /// <summary>
+        /// This call generated the visual, and it is carrying the result. The only member
+        /// that implies GeneratedObjects is populated.
+        /// </summary>
         Success,
-        Cancelled
+        Cancelled,
+
+        /// <summary>
+        /// The visual already existed, so this call did no work and carries no objects - the
+        /// ones that exist belong to whichever call generated them. The tile IS usable, so a
+        /// caller that only needs it present can proceed. Distinct from Success because
+        /// GeneratedObjects is null here, and consumers key off that to mean "no visual for
+        /// this tile" - some consumers key off that - so reporting Success
+        /// would have them cache a null visual over a tile that has a perfectly good one.
+        /// </summary>
+        AlreadyGenerated,
+
+        /// <summary>
+        /// Generation for this tile is already in flight, owned by an earlier caller. The
+        /// visual is NOT ready and this result says nothing about whether it will ever
+        /// succeed - the owning call reports that outcome to its own callback, not to this
+        /// one. A caller must not treat this as completion or start work that depends on the
+        /// tile being finished. It only means "you don't need to start this yourself."
+        /// </summary>
+        AlreadyInProgress,
+
+        /// <summary>
+        /// The source had nothing to build for this tile, so there is no visual and never will
+        /// be. A legitimate, common outcome - most tiles contain no landmarks - and explicitly
+        /// NOT a failure: the data is correct and must not be invalidated or re-fetched. This
+        /// is what separates it from DataProcessingFailure, and reporting Success instead made
+        /// "this tile is genuinely empty" indistinguishable from "this tile produced a
+        /// building", which is the difference a caller deciding whether to retry needs.
+        /// Callers should still record the tile as resolved, or they will regenerate it forever.
+        /// </summary>
+        NoData
     }
 }

@@ -19,6 +19,14 @@ namespace Mapbox.UnityMapService.DataSources
         }
 
         protected string _tilesetId;
+
+        /// <summary>
+        /// The tileset this source fetches. For vector sources this can be a composed,
+        /// comma-separated list of tileset ids, which the Vector Tiles API returns as one tile
+        /// carrying the union of their layers.
+        /// </summary>
+        public string TilesetId => _tilesetId;
+
         private bool _isTileJsonReady;
         private TileJSONResponse _tileJsonResponse;
         protected int[] _sourceZoomRange;
@@ -69,11 +77,30 @@ namespace Mapbox.UnityMapService.DataSources
         protected void WebRequestData(Tile tile, Action<DataFetchingResult> callback) => RequestData(tile, callback, false);
         protected void WebRequestUpdate(Tile tile, Action<DataFetchingResult> callback) => RequestData(tile, callback, true);
         
+        /// <summary>
+        /// Enqueues a fetch for the tile. The callback is invoked exactly once, always - that is
+        /// the contract callers depend on, because several of them park a coroutine on a flag the
+        /// callback sets (see ImageSource and PbfSource's "while (working) yield return null").
+        ///
+        /// A second request for a tile id already in flight joins the existing fetch instead of
+        /// starting a new one, so it receives that fetch's real outcome. It used to return here
+        /// without invoking the callback at all, which read to the caller as "nothing happened,
+        /// ever" and left those coroutines spinning for the rest of the session - and with them
+        /// LoadTileCoverToMemory, and so LoadViewCompleted, which never fired.
+        ///
+        /// Note the join is keyed on tile id alone, so a conditional-GET refresh (WebRequestUpdate)
+        /// and a real data fetch (WebRequestData) collide and whichever arrived first wins. The
+        /// joiner is handed a result for a tile instance it does not own, so it will see its own
+        /// tile as unloaded and report no data - correct, if pessimistic, and it can request again.
+        /// </summary>
         private void RequestData(Tile tile, Action<DataFetchingResult> callback, bool isUpdate)
         {
-            if (_activeRequests.ContainsKey(tile.Id))
+            if (_activeRequests.TryGetValue(tile.Id, out var inFlight))
+            {
+                inFlight.Callback += callback;
                 return;
-            
+            }
+
             var fetchInfo = new FetchInfo(tile, (result) =>
             {
                 _activeRequests.Remove(tile.Id);
@@ -144,15 +171,40 @@ namespace Mapbox.UnityMapService.DataSources
             }
             else
             {
-                TrackTask(taskWrapper);
-                taskWrapper.DataCompleted += ((resultTask, result) => CompleteTask(taskWrapper));
+                TrackUntilComplete(taskWrapper);
             }
             return taskWrapper;
         }
         
         public IEnumerator GetTileData<T1>(CanonicalTileId tileId, string tilesetid, T1 data = null, int priority = 1, Action<T1> callback = null) where T1 : MapboxTileData, new()
         {
-            yield return _cacheManager.GetBlobCoroutine<T1>(tileId, tilesetid, priority, data, callback);
+            // Tracked like the etag read above, so CancelFetching can reach it. This is the path that
+            // reads the actual tile bytes and it was the one path whose tasks nothing could cancel.
+            //
+            // Untracking is keyed on the task completing, not on this coroutine completing, and that
+            // distinction matters: IsActiveRequest is _activeTasks.ContainsKey, which PbfSource and
+            // ImageSource use as their "already in flight" guard. An entry left behind by a coroutine
+            // that was abandoned - the map destroyed mid-read, the owner stopped - would make that
+            // tile look permanently in flight and it would never be requested again. DataCompleted
+            // fires on cancellation as well as on success, so the entry always comes back out.
+            //
+            // GetBlobCoroutine is virtual and always hands back a DataTaskWrapper<T1> today, but the
+            // cast is not just defensive dressing: if that ever stopped holding, silently tracking
+            // without a matching untrack would reintroduce this exact leak one level up, with nothing
+            // to say why.
+            yield return _cacheManager.GetBlobCoroutine<T1>(tileId, tilesetid, priority, data, callback,
+                task =>
+                {
+                    if (task is DataTaskWrapper<T1> typed)
+                    {
+                        TrackUntilComplete(typed);
+                    }
+                    else
+                    {
+                        Debug.LogError($"{task.GetType()} is not a DataTaskWrapper<{typeof(T1)}>; "
+                            + "it cannot be tracked for cancellation and will never be untracked.");
+                    }
+                });
         }
         
         public void UpdateExpiration(CanonicalTileId tileId, string tilesetId, DateTime date)
@@ -170,6 +222,12 @@ namespace Mapbox.UnityMapService.DataSources
         //     return z >= _sourceZoomRange[0] && z <= _sourceZoomRange[1];
         // }
         
+        private void TrackUntilComplete<T1>(DataTaskWrapper<T1> task) where T1 : MapboxTileData, new()
+        {
+            TrackTask(task);
+            task.DataCompleted += (resultTask, result) => CompleteTask(task);
+        }
+
         private void TrackTask(TaskWrapper task)
         {
             if (!_activeTasks.ContainsKey(task.TileId))
